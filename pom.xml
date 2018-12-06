@@ -309,7 +309,7 @@
 			</activation>
 			<build>
 				<filters>
-					<filter>../deploy/dev.properties</filter>
+					<filter>../deploy/vars/dev.properties</filter>
 				</filters>
 			</build>
 		</profile>
