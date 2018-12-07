@@ -11,7 +11,7 @@
 
 	<artifactId>raptor-web</artifactId>
 	<packaging>war</packaging>
-	<name>raptor-web Maven Webapp[RPC日志统计WEB模块]</name>
+	<name>raptor-web [RPC服务载体-Web容器化]</name>
 	<url>http://maven.apache.org</url>
 
 

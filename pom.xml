@@ -271,6 +271,17 @@
 					<groupId>org.eclipse.jetty</groupId>
 					<artifactId>jetty-maven-plugin</artifactId>
 					<version>9.4.14.v20181114</version>
+					<!-- 
+					jetty:stop,stop命令会终止一个运行中的Jetty实例。为了使用它，你需要为这个插件配置一个特别的端口和key。相同的端口和key将被另一个运行的Jetty使用。
+						  stopPort:一个Jetty的端口数字，又来监听接收一个终止的命令并将其终止。
+						  stopKey:一个发送到stopPort端口的有效命令。
+						  stopWait:等待Jetty停止确认的最大时间间隔，单位秒。如果为false或者为设置，那么插件将不会再发出命令后等待结果。
+					 -->
+				    <configuration>
+					    <stopPort>8081</stopPort>
+					    <stopKey>foo</stopKey>
+					    <stopWait>10</stopWait>
+                    </configuration>
 				</plugin>
 
 			</plugins>
