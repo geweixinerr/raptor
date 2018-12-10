@@ -17,11 +17,12 @@ import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import raptor.core.init.RpcParameter;
 import raptor.core.server.handler.DispatcherHandler;
-import raptor.core.server.handler.ExceptionHandler;
 import raptor.util.StringUtil;
 
 /**
@@ -74,8 +75,9 @@ public final class RpcServer {
 					protected void initChannel(SocketChannel ch) throws Exception {
 						ChannelPipeline pipline = ch.pipeline();
 						pipline.addLast(new LoggingHandler(LogLevel.INFO)); //开启日志监控
+						pipline.addLast(new LineBasedFrameDecoder(1024));
+						pipline.addLast(new StringDecoder());
 						pipline.addLast(new DispatcherHandler());
-						pipline.addLast(new ExceptionHandler());
 					}
 				});
 
