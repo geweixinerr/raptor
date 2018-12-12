@@ -1,6 +1,5 @@
 package raptor.service;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import raptor.core.annotation.RpcHandler;

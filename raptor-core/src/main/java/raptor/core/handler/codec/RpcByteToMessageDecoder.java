@@ -25,21 +25,22 @@ public final class RpcByteToMessageDecoder extends ByteToMessageDecoder {
 	
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-		LOGGER.info("数据解码!");
 		int rpcByteCount = 0;
+		in.markReaderIndex();
 		if (in.readableBytes() > 4) {
 			rpcByteCount = in.readInt(); //RPC调用字节总数
 		}
-		
+
 		if (in.readableBytes() < rpcByteCount) {
+			in.resetReaderIndex();
 			return;
 		}
 
 		byte [] rpcByteArray = new byte[in.readableBytes()];
 		in.readBytes(rpcByteArray);
-		
+		in.markReaderIndex();
 		Object rpcObject = configuration.asObject(rpcByteArray); //反序列化
-		out.add(rpcObject);
+		out.add(rpcObject);	
 	}
 
 }

@@ -15,9 +15,9 @@ import raptor.util.StringUtil;
 /**
  * @author gewx RPC Server业务分发器
  **/
-public final class DispatcherHandler extends SimpleChannelInboundHandler<RpcRequestBody> {
+public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<RpcRequestBody> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherHandler.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ServerDispatcherHandler.class);
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcRequestBody msg) throws Exception {
