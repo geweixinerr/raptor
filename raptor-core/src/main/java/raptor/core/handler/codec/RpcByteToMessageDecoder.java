@@ -39,7 +39,7 @@ public final class RpcByteToMessageDecoder extends ByteToMessageDecoder {
 
 		byte [] rpcByteArray = new byte[rpcByteCount];
 		in.readBytes(rpcByteArray);
-		in.discardReadBytes(); //清理无效堆外内存.时间换CPU空间[这行代码可不加.]
+//		in.discardReadBytes(); //清理无效堆外内存.时间换CPU空间[这行代码可不加.]
 
 		Object rpcObject = configuration.asObject(rpcByteArray); //反序列化
 		out.add(rpcObject);	
