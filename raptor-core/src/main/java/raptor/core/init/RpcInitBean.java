@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
+import raptor.core.annotation.RpcHandler;
 import raptor.core.server.RpcServer;
 import raptor.core.server.RpcServerTaskPool;
 
@@ -37,10 +38,14 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 		Map<String,String> clientConfig = (Map<String,String>) context.getBean("RpcClientConfig");
 		Map<String,String> serverConfig = (Map<String,String>) context.getBean("RpcServerConfig");
 		
-		//优先启动/初始化业务线程池.
+		//step1.初始化建立服务端RPC映射关系
+		Map<String,Object> rpcMap = context.getBeansWithAnnotation(RpcHandler.class);
+		RpcMappingInit.initRpcMapping(rpcMap);
+		
+		//step2.启动/初始化业务线程池.
 		RpcServerTaskPool.initPool();
 		
-		//启动RPC服务
+		//step3.启动RPC服务
 		RpcParameter.INSTANCE.initRpcParameter(clientConfig, serverConfig);
 		RpcServer.start();
 	}
