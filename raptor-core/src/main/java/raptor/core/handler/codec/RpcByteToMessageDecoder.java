@@ -25,8 +25,8 @@ public final class RpcByteToMessageDecoder extends ByteToMessageDecoder {
 	
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-		int rpcByteCount = 0;
 		in.markReaderIndex();
+		int rpcByteCount = 0;
 		if (in.readableBytes() > 4) {
 			rpcByteCount = in.readInt(); //RPC调用字节总数
 		}
@@ -36,8 +36,10 @@ public final class RpcByteToMessageDecoder extends ByteToMessageDecoder {
 			return;
 		}
 
-		byte [] rpcByteArray = new byte[in.readableBytes()];
+		//客户端批量发送调用请求,需要拆包,读取固定长度的数据.
+		byte [] rpcByteArray = new byte[rpcByteCount];
 		in.readBytes(rpcByteArray);
+
 		Object rpcObject = configuration.asObject(rpcByteArray); //反序列化
 		out.add(rpcObject);	
 	}

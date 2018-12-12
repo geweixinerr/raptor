@@ -20,8 +20,9 @@ public final class AlibabaService {
 	
 	/**登录认证**/
 	@RpcMethod
-	public void LoginAuth(Map<String,String> params,String authId) {
+	public String LoginAuth(Map<String,String> params,String authId) {
 		System.out.println("AlibabaService............." + params +",authId: " +authId);
+		return "Netty is VeryGood!";
 	}
 	
 }

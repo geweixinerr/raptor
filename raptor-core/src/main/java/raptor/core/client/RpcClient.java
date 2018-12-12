@@ -5,6 +5,7 @@ import java.util.Map;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -35,8 +36,9 @@ public final class RpcClient {
 		EventLoopGroup eventGroup = new NioEventLoopGroup();
 		Bootstrap boot = new Bootstrap();
 		try {
-			boot.group(eventGroup).channel(NioSocketChannel.class).remoteAddress("localhost", 8090)
-					.handler(new ChannelInitializer<SocketChannel>() {
+
+			boot.group(eventGroup).channel(NioSocketChannel.class)
+			        .remoteAddress("localhost", 8090).handler(new ChannelInitializer<SocketChannel>() {
 						@Override
 						protected void initChannel(SocketChannel ch) throws Exception {
 							/*
@@ -47,7 +49,6 @@ public final class RpcClient {
 							}
 							*/
 							ChannelPipeline pipline = ch.pipeline();
-
 							pipline.addLast(new RpcByteToMessageDecoder());
 							pipline.addLast(new RpcMessageToByteEncoder());
 							pipline.addLast(new ClientDispatcherHandler());
