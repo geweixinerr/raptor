@@ -29,7 +29,6 @@ public final class RpcMessageToByteEncoder extends MessageToByteEncoder<RpcMessa
 		int rcpByteCount = rpcByteArray.length;
 		out.writeInt(rcpByteCount);
 		out.writeBytes(rpcByteArray);
-		ctx.writeAndFlush(out);
 	}
 
 }

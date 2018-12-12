@@ -2,7 +2,10 @@ package raptor.core.client.handler;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.ReferenceCountUtil;
@@ -24,7 +27,22 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 		requestBody.setBody(new Object[] {params , message});
 		requestBody.setRpcMethod("LoginAuth");
 		requestBody.setMessageId("ABCDEFG_MESSAGE");
-		ctx.writeAndFlush(requestBody);
+		ChannelFuture future2 =  ctx.writeAndFlush(requestBody);
+		future2.addListener(new ChannelFutureListener() {
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				System.out.println("future2执行结果: " + future.isSuccess());
+			}
+		});
+		System.out.println("==============================>");
+		TimeUnit.SECONDS.sleep(10);
+		ChannelFuture future =  ctx.writeAndFlush(requestBody);
+		future.addListener(new ChannelFutureListener() {
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				System.out.println("future执行结果: " + future.isSuccess());
+			}
+		});
 	}
 
 	@Override

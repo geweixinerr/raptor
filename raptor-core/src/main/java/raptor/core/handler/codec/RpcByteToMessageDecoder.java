@@ -38,7 +38,6 @@ public final class RpcByteToMessageDecoder extends ByteToMessageDecoder {
 
 		byte [] rpcByteArray = new byte[in.readableBytes()];
 		in.readBytes(rpcByteArray);
-		in.markReaderIndex();
 		Object rpcObject = configuration.asObject(rpcByteArray); //反序列化
 		out.add(rpcObject);	
 	}
