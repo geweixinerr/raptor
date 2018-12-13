@@ -37,8 +37,8 @@ public class PushMessageServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.setCharacterEncoding("UTF-8");
-		response.getWriter().write("RPC调用开始!");
+	
+		response.getWriter().write("RPC execute start!");
 		
 		String message = "Netty RPC Send, Netty is VeryGood!";
 		RpcRequestBody requestBody = new RpcRequestBody();
@@ -48,7 +48,7 @@ public class PushMessageServlet extends HttpServlet {
 		ClientDispatcherHandler channelHandler = (ClientDispatcherHandler) RpcClientHandlerRegistry.INSTANCE.getClientHandler(RpcClientHandlerRegistry.classEnum.ClientDispatcherHandler);
 		channelHandler.pushMessage(requestBody);
 		
-		response.getWriter().write("RPC调用完毕!");
+		response.getWriter().write("RPC execute ok!");
 
 	}
 
