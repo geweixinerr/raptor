@@ -3,8 +3,6 @@ package raptor.core.handler.codec;
 import java.util.List;
 
 import org.nustaq.serialization.FSTConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,8 +13,6 @@ import io.netty.handler.codec.ByteToMessageDecoder;
  * 解决TCP拆包,粘包,半包读写
  * **/
 public final class RpcByteToMessageDecoder extends ByteToMessageDecoder {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(RpcByteToMessageDecoder.class);
 
 	/**
 	 * 得益于Netty的IO线程设计[线程封闭技术],下面的代码不会存在线程安全问题.
