@@ -24,8 +24,8 @@ public final class RpcMessageToByteEncoder extends MessageToByteEncoder<RpcMessa
 	@Override
 	protected void encode(ChannelHandlerContext ctx, RpcMessage msg, ByteBuf out) throws Exception {
 		byte [] rpcByteArray = configuration.asByteArray(msg);
-		int rcpByteCount = rpcByteArray.length;
-		out.writeInt(rcpByteCount);
+		int rpcByteCount = rpcByteArray.length;
+		out.writeInt(rpcByteCount);
 		out.writeBytes(rpcByteArray);
 	}
 
