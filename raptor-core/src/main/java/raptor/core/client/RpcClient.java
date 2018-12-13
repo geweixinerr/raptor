@@ -35,6 +35,7 @@ public final class RpcClient {
 
 		EventLoopGroup eventGroup = new NioEventLoopGroup();
 		Bootstrap boot = new Bootstrap();
+		
 		try {
 
 			boot.group(eventGroup).channel(NioSocketChannel.class)
