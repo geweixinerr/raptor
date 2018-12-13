@@ -6,11 +6,7 @@ package raptor.exception;
 
 public class RpcException extends RuntimeException {
 
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
+	private static final long serialVersionUID = 5536355594315689736L;
 
 	public RpcException() {
 	      super();
