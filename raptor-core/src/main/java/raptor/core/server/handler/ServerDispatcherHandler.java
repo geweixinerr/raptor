@@ -2,6 +2,7 @@ package raptor.core.server.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -27,6 +28,8 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 		RpcServerTaskPool.addTask(msg, new AbstractCallBack() {
 			@Override
 			public void invoke(RpcResult result) {
+				MDC.put("invokeId", "invokeId-"+java.util.UUID.randomUUID().toString().replaceAll("-", "").toUpperCase());
+				
 				LOGGER.info("RPC执行结果,Result: " + result);
 				RpcResponseBody body = result.getResponseBody();
 				ctx.writeAndFlush(body);

@@ -54,8 +54,9 @@
 		
 		<property name="sourceMap">
 			<map>
-				<entry key="port" value="8091"/>
-				<entry key="logOnOff" value="On"/> <!-- Netty内置日志打印开关.On(开),Off(关),默认关闭. -->
+				<entry key="port" value="8090"/>
+				<entry key="remoteAddress" value="127.0.0.1"/>
+				<entry key="logOnOff" value="Off"/> <!-- Netty内置日志打印开关.On(开),Off(关),默认关闭. -->
 			</map>
 		</property>    
 	</bean>  

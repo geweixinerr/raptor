@@ -1,11 +1,15 @@
 package raptor.core.client.handler;
 
+import javax.annotation.concurrent.ThreadSafe;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.SimpleChannelInboundHandler;
-import raptor.core.client.TestData;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
 import raptor.util.StringUtil;
@@ -13,21 +17,17 @@ import raptor.util.StringUtil;
 /**
  * @author gewx 客户端入站处理器
  **/
+@ThreadSafe
+@Sharable
 public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResponseBody> {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClientDispatcherHandler.class);
 
+	private ChannelHandlerContext ctx;
+	
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-		// 测试RPC调用.
-		for (int i = 0; i < 10000; i++) {
-			String message = "Netty RPC Send, Netty is VeryGood!";
-			RpcRequestBody requestBody = new RpcRequestBody();
-			requestBody.setBody(new Object[] { TestData.data, message });
-			requestBody.setRpcMethod("LoginAuth");
-			requestBody.setMessageId("MessageId-[" + i + "]");
-			ctx.writeAndFlush(requestBody);
-		}
+		this.ctx = ctx;
 	}
 
 	@Override
@@ -40,6 +40,23 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		String message = StringUtil.getErrorText(cause);
 		LOGGER.warn("RPC客户端异常,message: " + message);
+	}
+	
+	/**
+	 * @author gewx 消息推送服务.
+	 * **/
+	public void pushMessage(RpcRequestBody requestBody) {
+		ChannelFuture channelfuture = ctx.writeAndFlush(requestBody);
+		channelfuture.addListener(new ChannelFutureListener() {
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				if (future.isSuccess()) {
+					LOGGER.info("RPC 数据发送成功.");
+				} else {
+					LOGGER.info("RPC 数据发送失败, message : " + StringUtil.getErrorText(future.cause()));
+				}
+			}
+		});
 	}
 
 }

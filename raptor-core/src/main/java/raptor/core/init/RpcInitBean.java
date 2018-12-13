@@ -12,6 +12,11 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import raptor.core.annotation.RpcHandler;
+import raptor.core.client.NettyTestData;
+import raptor.core.client.RpcClient;
+import raptor.core.client.RpcClientHandlerRegistry;
+import raptor.core.client.handler.ClientDispatcherHandler;
+import raptor.core.message.RpcRequestBody;
 import raptor.core.server.RpcServer;
 import raptor.core.server.RpcServerTaskPool;
 
@@ -38,6 +43,8 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 		Map<String,String> clientConfig = (Map<String,String>) context.getBean("RpcClientConfig");
 		Map<String,String> serverConfig = (Map<String,String>) context.getBean("RpcServerConfig");
 		
+		RpcParameter.INSTANCE.initRpcParameter(clientConfig, serverConfig); //init参数
+
 		//step1.初始化建立服务端RPC映射关系
 		Map<String,Object> rpcMap = context.getBeansWithAnnotation(RpcHandler.class);
 		RpcMappingInit.initRpcMapping(rpcMap);
@@ -45,9 +52,11 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 		//step2.启动/初始化业务线程池.
 		RpcServerTaskPool.initPool();
 		
-		//step3.启动RPC服务
-		RpcParameter.INSTANCE.initRpcParameter(clientConfig, serverConfig);
-		RpcServer.start();
+		//step3.启动RPC服务服务端
+		RpcServer.start();		
+		
+		//step4. 启动RPC服务客户端
+		RpcClient.start();
 	}
 	
 	@Override
