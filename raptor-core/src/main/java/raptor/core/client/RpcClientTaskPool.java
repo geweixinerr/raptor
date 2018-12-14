@@ -1,6 +1,7 @@
 package raptor.core.client;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import raptor.core.AbstractCallBack;
 import raptor.core.init.RpcHandlerObject;
 import raptor.core.init.RpcMappingInit;
 import raptor.core.message.RpcRequestBody;
+import raptor.core.message.RpcResponseBody;
 
 /**
  * @author gewx RPC Client端业务线程池
@@ -28,9 +30,9 @@ public final class RpcClientTaskPool {
 	private static final ThreadPoolTaskExecutor POOLTASKEXECUTOR = new ThreadPoolTaskExecutor();
 
 	/**
-	 * RPC映射关系
+	 * 客户端请求MessageId与回调对应关系.
 	 * **/
-	private static final Map<String,RpcHandlerObject> RPC_MAPPING = RpcMappingInit.listRpcMapping();
+	private static final Map<String,RpcRequestBody> MESSAGEID_MAPPING = new ConcurrentHashMap<>(1024); 
 	
 	private RpcClientTaskPool() {
 	}
@@ -54,11 +56,19 @@ public final class RpcClientTaskPool {
 
 	/**
 	 * @author gewx 添加任务入业务线程池
-	 * @param Object
-	 *            obj 请求参数, AbstractCallBack call 业务回调对象.
+	 * @param responseBody 请求参数
 	 * @return void
 	 **/
-	public static void addTask(RpcRequestBody requestBody, AbstractCallBack call) {
- 
+	public static void addTask(RpcResponseBody responseBody) {
+		//客户端回调结果.
 	}
+	
+	/**
+	 * @author gewx 
+	 * @param requestBody 客户端请求入队列
+	 * **/
+	public static void pushTask(RpcRequestBody requestBody) {
+		MESSAGEID_MAPPING.put(requestBody.getMessageId(), requestBody);
+	}
+	
 }

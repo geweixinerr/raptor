@@ -11,6 +11,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.SimpleChannelInboundHandler;
 import raptor.core.RpcPushDefine;
+import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
 import raptor.util.StringUtil;
@@ -51,8 +52,8 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody msg) throws Exception {
-		RpcResponseBody body = (RpcResponseBody) msg;
-		System.out.println("RPC客户端响应: " + body);
+		RpcResponseBody responseBody = (RpcResponseBody) msg;
+		RpcClientTaskPool.addTask(responseBody); //入池处理.
 	}
 
 	@Override

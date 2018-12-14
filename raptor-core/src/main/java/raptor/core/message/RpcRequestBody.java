@@ -26,7 +26,7 @@ public final class RpcRequestBody implements RpcMessage , Serializable {
 	/**
 	 * Rpc MethodName
 	 * **/
-	private String rpcMethod;
+	private transient String rpcMethod;
 	
 	/**
 	 * 消息主体-请求参数
@@ -36,12 +36,12 @@ public final class RpcRequestBody implements RpcMessage , Serializable {
 	/**
 	 * 业务超时时间,默认5秒(单位:秒)
 	 * **/
-	private Integer timeOut; 
+	private transient Integer timeOut; 
 	
 	/**
 	 * 客户端调用回调对象
 	 * **/
-	private AbstractCallBack call;
+	private transient AbstractCallBack call;
 
 	public String getMessageId() {
 		return messageId;
