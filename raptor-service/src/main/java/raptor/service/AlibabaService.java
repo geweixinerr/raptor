@@ -29,7 +29,7 @@ public final class AlibabaService {
 	/**登录认证**/
 	@RpcMethod
 	public String LoginAuth(NettyTestData params,String authId) {
-		System.out.println("AlibabaService............." + params);
+		System.out.println("AlibabaService.............");
 		return "Netty is VeryGood!";
 	}
 	

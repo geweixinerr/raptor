@@ -320,7 +320,9 @@
 						  stopWait:等待Jetty停止确认的最大时间间隔，单位秒。如果为false或者为设置，那么插件将不会再发出命令后等待结果。
 					 -->
 				    <configuration>
-				        <scanIntervalSeconds>10</scanIntervalSeconds>
+				     <!-- 
+				   		<scanIntervalSeconds>10</scanIntervalSeconds>
+				     -->
 					    <stopPort>8081</stopPort>
 					    <stopKey>foo</stopKey>
 					    <stopWait>10</stopWait>

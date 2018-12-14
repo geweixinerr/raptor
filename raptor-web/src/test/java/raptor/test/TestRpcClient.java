@@ -1,7 +1,6 @@
-package raptor.core.client;
+package raptor.test;
 
 import java.net.InetSocketAddress;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,31 +14,34 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
-import raptor.core.Constants;
+import raptor.core.RpcPushDefine;
+import raptor.core.client.NettyTestData;
+import raptor.core.client.RpcClientRegistry;
 import raptor.core.client.handler.ClientDispatcherHandler;
 import raptor.core.handler.codec.RpcByteToMessageDecoder;
 import raptor.core.handler.codec.RpcMessageToByteEncoder;
-import raptor.core.init.RpcParameter;
-import raptor.core.init.RpcParameterEnum;
+import raptor.core.message.RpcRequestBody;
 import raptor.util.StringUtil;
 
 /**
- * @author gewx Netty客户端
+ * @author gewx Netty客户端测试类.
  **/
-public final class RpcClient {
+public final class TestRpcClient {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RpcClient.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TestRpcClient.class);
 
 	// 客户端分发器注册pipline Key
 	private static final String CLIENT_DISPATCHER = "clientDispatcher";
 
-	private static final String ADDRESS_KEY = "remoteAddress";
+	static {
+		try {
+			TestRpcClient.start();
+		} catch (InterruptedException e) {
+			System.out.println("服务启动失败,Message: " + e.getMessage());
+		}
+	}
 
-	private static final String PORT = "port";
-
-	private RpcClient() {
+	private TestRpcClient() {
 
 	}
 
@@ -49,20 +51,14 @@ public final class RpcClient {
 	 * @throws InterruptedException
 	 **/
 	public static void start() throws InterruptedException {
-		Map<String, String> clientConfig = RpcParameter.INSTANCE.getClientConfig(); // 客户端配置参数
 
 		Bootstrap boot = new Bootstrap();
 		EventLoopGroup eventGroup = new NioEventLoopGroup();
-		boot.group(eventGroup).channel(NioSocketChannel.class)
-				.remoteAddress(clientConfig.get(ADDRESS_KEY), Integer.parseInt(clientConfig.get(PORT)))
+		boot.group(eventGroup).channel(NioSocketChannel.class).remoteAddress("127.0.0.1", 8090)
 				.handler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
-						String logOnOff = clientConfig.get(RpcParameterEnum.LOGONOFF.getCode());
 						ChannelPipeline pipline = ch.pipeline();
-						if (Constants.LogOn.equals(logOnOff)) {
-							pipline.addLast(new LoggingHandler(LogLevel.INFO)); // 开启日志监控
-						}
 						pipline.addLast(new RpcByteToMessageDecoder());
 						pipline.addLast(new RpcMessageToByteEncoder());
 						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler());
@@ -70,6 +66,7 @@ public final class RpcClient {
 				});
 
 		ChannelFuture future = boot.connect().sync();
+
 		future.addListener(new ChannelFutureListener() {
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
@@ -87,5 +84,26 @@ public final class RpcClient {
 				}
 			}
 		});
+	}
+
+	@SuppressWarnings("unused")
+	public static void main(String[] args) {
+		RpcPushDefine rpcClient = null;
+		while ((rpcClient = RpcClientRegistry.INSTANCE.getRpcClient(RpcClientRegistry.rpcEnum.rpcPushDefine)) == null) {
+			if (rpcClient != null) {
+				break;
+			}
+		}
+		
+		//send message
+		for (int i = 0; i < 1000; i ++) {
+			String message = "Netty RPC Send, Netty is VeryGood!";
+			RpcRequestBody requestBody = new RpcRequestBody();
+			requestBody.setBody(new Object[] { new NettyTestData(), message });
+			requestBody.setRpcMethod("LoginAuth");
+			requestBody.setMessageId("MessageId-[" + i + "]");
+			
+			rpcClient.pushMessage(requestBody);
+		}
 	}
 }
