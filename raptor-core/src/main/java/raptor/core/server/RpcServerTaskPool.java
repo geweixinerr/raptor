@@ -52,7 +52,7 @@ public final class RpcServerTaskPool {
 		POOLTASKEXECUTOR.setCorePoolSize(CPU_CORE); // 核心线程数
 		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 3); // 最大线程数
 		// poolTaskExecutor.setKeepAliveSeconds(5000); //线程最大空闲时间-可回收
-		POOLTASKEXECUTOR.setThreadNamePrefix("TASK_RPC_SERVER"); // 线程名前缀.
+		POOLTASKEXECUTOR.setThreadNamePrefix("TASK_RPC_SERVER_"); // 线程名前缀.
 		POOLTASKEXECUTOR.initialize();
 
 		// 启动全部核心线程.

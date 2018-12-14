@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import raptor.core.annotation.RpcHandler;
 import raptor.core.client.RpcClient;
+import raptor.core.client.RpcClientTaskPool;
 import raptor.core.server.RpcServer;
 import raptor.core.server.RpcServerTaskPool;
 
@@ -47,6 +48,7 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 		
 		//step2.启动/初始化业务线程池.
 		RpcServerTaskPool.initPool();
+		RpcClientTaskPool.initPool();
 		
 		//step3.启动RPC服务服务端
 		RpcServer.start();		

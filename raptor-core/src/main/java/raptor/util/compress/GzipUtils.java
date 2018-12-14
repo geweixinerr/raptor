@@ -7,8 +7,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import raptor.exception.CompressException;
 
@@ -18,8 +16,6 @@ import raptor.exception.CompressException;
  **/
 
 public final class GzipUtils {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(GzipUtils.class);
 
 	private static final String GZIP_ENCODE_UTF_8 = "UTF-8";
 

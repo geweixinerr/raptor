@@ -15,14 +15,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
-import raptor.core.Constants;
 import raptor.core.client.handler.ClientDispatcherHandler;
 import raptor.core.handler.codec.RpcByteToMessageDecoder;
 import raptor.core.handler.codec.RpcMessageToByteEncoder;
 import raptor.core.init.RpcParameter;
-import raptor.core.init.RpcParameterEnum;
 import raptor.util.StringUtil;
 
 /**
@@ -35,10 +31,6 @@ public final class RpcClient {
 	// 客户端分发器注册pipline Key
 	private static final String CLIENT_DISPATCHER = "clientDispatcher";
 
-	private static final String ADDRESS_KEY = "remoteAddress";
-
-	private static final String PORT = "port";
-
 	private RpcClient() {
 
 	}
@@ -49,20 +41,16 @@ public final class RpcClient {
 	 * @throws InterruptedException
 	 **/
 	public static void start() throws InterruptedException {
-		Map<String, String> clientConfig = RpcParameter.INSTANCE.getClientConfig(); // 客户端配置参数
+		Map<String, String[]> clientConfig = RpcParameter.INSTANCE.getClientConfig(); // 客户端配置参数
 
 		Bootstrap boot = new Bootstrap();
 		EventLoopGroup eventGroup = new NioEventLoopGroup();
 		boot.group(eventGroup).channel(NioSocketChannel.class)
-				.remoteAddress(clientConfig.get(ADDRESS_KEY), Integer.parseInt(clientConfig.get(PORT)))
+				.remoteAddress(clientConfig.get("remote")[0], Integer.parseInt(clientConfig.get("remote")[1])) //TODO 先固定写死。
 				.handler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
-						String logOnOff = clientConfig.get(RpcParameterEnum.LOGONOFF.getCode());
 						ChannelPipeline pipline = ch.pipeline();
-						if (Constants.LogOn.equals(logOnOff)) {
-							pipline.addLast(new LoggingHandler(LogLevel.INFO)); // 开启日志监控
-						}
 						pipline.addLast(new RpcByteToMessageDecoder());
 						pipline.addLast(new RpcMessageToByteEncoder());
 						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler());

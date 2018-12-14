@@ -26,23 +26,6 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 
 	private ChannelHandlerContext ctx;
 	
-	@Override
-	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-		this.ctx = ctx;
-	}
-
-	@Override
-	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody msg) throws Exception {
-		RpcResponseBody body = (RpcResponseBody) msg;
-		System.out.println("RPC客户端响应: " + body);
-	}
-
-	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		String message = StringUtil.getErrorText(cause);
-		LOGGER.warn("RPC客户端异常,message: " + message);
-	}
-	
 	/**
 	 * @author gewx 消息推送
 	 * **/
@@ -59,6 +42,23 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 				}
 			}
 		});
+	}
+	
+	@Override
+	public void channelActive(ChannelHandlerContext ctx) throws Exception {
+		this.ctx = ctx;
+	}
+
+	@Override
+	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody msg) throws Exception {
+		RpcResponseBody body = (RpcResponseBody) msg;
+		System.out.println("RPC客户端响应: " + body);
+	}
+
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		String message = StringUtil.getErrorText(cause);
+		LOGGER.warn("RPC客户端异常,message: " + message);
 	}
 
 }
