@@ -7,11 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import raptor.core.AbstractCallBack;
-import raptor.core.init.RpcHandlerObject;
-import raptor.core.init.RpcMappingInit;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
+import raptor.core.server.RpcResult;
 
 /**
  * @author gewx RPC Client端业务线程池
@@ -55,12 +53,22 @@ public final class RpcClientTaskPool {
 	}
 
 	/**
-	 * @author gewx 添加任务入业务线程池
+	 * @author gewx 添加客户端请求回调任务入业务线程池
 	 * @param responseBody 请求参数
 	 * @return void
 	 **/
 	public static void addTask(RpcResponseBody responseBody) {
-		//客户端回调结果.
+		LOGGER.info("RPC调用响应:" + responseBody.getMessage() +", messageId: " + responseBody.getMessageId());
+				
+		RpcRequestBody requestBody = MESSAGEID_MAPPING.get(responseBody.getMessageId());
+		if (requestBody != null) {
+			RpcResult result = new RpcResult();
+			result.setMessageBody(responseBody);
+			result.setSuccess(responseBody.getSuccess());
+			requestBody.getCall().invoke(result);
+		} else {
+			LOGGER.info("RPC回调超时,messageId: " + responseBody.getMessageId());
+		}
 	}
 	
 	/**
@@ -71,4 +79,12 @@ public final class RpcClientTaskPool {
 		MESSAGEID_MAPPING.put(requestBody.getMessageId(), requestBody);
 	}
 	
+	/**
+	 * @author gew 获取客户端请求队列池
+	 * @param void
+	 * @return 客户端池
+	 * **/
+	public static Map<String,RpcRequestBody> getClientTaskPool() {
+		return MESSAGEID_MAPPING;
+	}
 }

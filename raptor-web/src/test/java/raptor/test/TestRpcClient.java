@@ -14,18 +14,20 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import raptor.core.AbstractCallBack;
 import raptor.core.RpcPushDefine;
 import raptor.core.client.NettyTestData;
 import raptor.core.client.RpcClientRegistry;
 import raptor.core.client.handler.ClientDispatcherHandler;
 import raptor.core.handler.codec.RpcByteToMessageDecoder;
 import raptor.core.handler.codec.RpcMessageToByteEncoder;
-import raptor.core.message.RpcRequestBody;
+import raptor.core.server.RpcResult;
 import raptor.util.StringUtil;
 
 /**
  * @author gewx Netty客户端测试类.
  **/
+@SuppressWarnings("unused")
 public final class TestRpcClient {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestRpcClient.class);
@@ -43,6 +45,16 @@ public final class TestRpcClient {
 
 	private TestRpcClient() {
 
+	}
+
+	private static void init() {
+		RpcPushDefine rpcClient = null;
+		while ((rpcClient = RpcClientRegistry.INSTANCE.getRpcClient(RpcClientRegistry.rpcEnum.rpcPushDefine)) == null) {
+			if (rpcClient != null) {
+				break;
+			}
+		}
+		TestRaptorRpc.rpcClient = rpcClient; // init
 	}
 
 	/**
@@ -86,24 +98,22 @@ public final class TestRpcClient {
 		});
 	}
 
-	@SuppressWarnings("unused")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void main(String[] args) {
-		RpcPushDefine rpcClient = null;
-		while ((rpcClient = RpcClientRegistry.INSTANCE.getRpcClient(RpcClientRegistry.rpcEnum.rpcPushDefine)) == null) {
-			if (rpcClient != null) {
-				break;
+		init();
+
+		TestRaptorRpc rpc = new TestRaptorRpc();
+
+		// 组装发送消息
+		String message = "Netty RPC Send, Netty is VeryGood!";
+		NettyTestData data = new NettyTestData();
+		// 发送异步消息.
+		rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
+			@Override
+			public void invoke(RpcResult result) {
+				System.out.println("请求结果: " + result);
 			}
-		}
-		
-		//send message
-		for (int i = 0; i < 1000; i ++) {
-			String message = "Netty RPC Send, Netty is VeryGood!";
-			RpcRequestBody requestBody = new RpcRequestBody();
-			requestBody.setBody(new Object[] { new NettyTestData(), message });
-			requestBody.setRpcMethod("LoginAuth");
-			requestBody.setMessageId("MessageId-[" + i + "]");
-			
-			rpcClient.pushMessage(requestBody);
-		}
+		}, data, message);
+
 	}
 }

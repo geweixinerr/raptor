@@ -22,14 +22,14 @@ import raptor.util.StringUtil;
 @ThreadSafe
 @Sharable
 public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResponseBody> implements RpcPushDefine {
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClientDispatcherHandler.class);
 
 	private ChannelHandlerContext ctx;
-	
+
 	/**
 	 * @author gewx 消息推送
-	 * **/
+	 **/
 	@Override
 	public void pushMessage(RpcRequestBody requestBody) {
 		ChannelFuture channelfuture = ctx.writeAndFlush(requestBody);
@@ -37,14 +37,15 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 				if (future.isSuccess()) {
-					LOGGER.info("RPC 数据发送成功.MessageId: " + requestBody.getMessageId());
+					LOGGER.info("RPC 数据发送成功,messageId: " + requestBody.getMessageId());
 				} else {
-					LOGGER.info("RPC 数据发送失败, MessageId: " + requestBody.getMessageId()+", message : " + StringUtil.getErrorText(future.cause()));
+					LOGGER.info("RPC 数据发送失败, messageId: " + requestBody.getMessageId() + ", message : "
+							+ StringUtil.getErrorText(future.cause()));
 				}
 			}
 		});
 	}
-	
+
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		this.ctx = ctx;
@@ -53,7 +54,7 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody msg) throws Exception {
 		RpcResponseBody responseBody = (RpcResponseBody) msg;
-		RpcClientTaskPool.addTask(responseBody); //入池处理.
+		RpcClientTaskPool.addTask(responseBody); // 入池处理.
 	}
 
 	@Override

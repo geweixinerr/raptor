@@ -2,6 +2,7 @@ package raptor.core.server;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -78,7 +79,6 @@ public final class RpcServerTaskPool {
 						if (handler == null) {
 							throw new RpcException("RPC参数缺失,RpcMethod is null !");
 						}
-						
 						Object result = null;
 						Object [] objArray = requestBody.getBody();
 						if (ArrayUtils.isNotEmpty(objArray)) {
@@ -95,6 +95,15 @@ public final class RpcServerTaskPool {
 						return body;
 					}
 				});
+//		/**
+//		 * 模拟服务器超时
+//		 * **/
+//		try {
+//			TimeUnit.SECONDS.sleep(6);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 		future.addCallback(new ListenableFutureCallback<RpcResponseBody>() {
 			final RpcResult result = new RpcResult();
@@ -102,7 +111,7 @@ public final class RpcServerTaskPool {
 			@Override
 			public void onSuccess(RpcResponseBody body) {
 				result.setSuccess(true);
-				result.setResponseBody(body);
+				result.setMessageBody(body);
 				call.invoke(result);
 			}
 
@@ -118,7 +127,7 @@ public final class RpcServerTaskPool {
 				
 				//Result
 				result.setSuccess(false);
-				result.setResponseBody(body);
+				result.setMessageBody(body);
 				result.setThrowable(throwable);
 				call.invoke(result);
 			}

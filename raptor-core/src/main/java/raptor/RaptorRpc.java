@@ -1,6 +1,7 @@
 package raptor;
 
 import java.io.Serializable;
+import java.util.Calendar;
 
 import com.eaio.uuid.UUID;
 
@@ -29,23 +30,29 @@ public final class RaptorRpc<T extends Serializable> {
 	 * 
 	 * @return void
 	 **/
-	public void sendSyncMessage(String serverName, String rpcMethodName, T[] body, Integer timeOut) {
+	@SuppressWarnings("unchecked")
+	public void sendSyncMessage(String serverName, String rpcMethodName, Integer timeOut, T... body) {
 		RpcPushDefine rpcClient = RpcClientRegistry.INSTANCE.getRpcClient(rpcEnum.rpcPushDefine);
 
+		//组装时间对象,并设置超时.
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.SECOND, timeOut);
+		
 		String uuid = new UUID().toString();
 		// 组装请求参数
 		RpcRequestBody requestBody = new RpcRequestBody();
 		requestBody.setMessageId(uuid);
 		requestBody.setBody(body);
 		requestBody.setRpcMethod(rpcMethodName);
-		requestBody.setTimeOut(timeOut);
+		requestBody.setTimeOut(cal.getTime());
 
 		rpcClient.pushMessage(requestBody); // 发送消息
 	}
 
 	// 重载同步方法
-	public void sendSyncMessage(String serverName, String rpcMethodName, T[] body) {
-		sendSyncMessage(serverName, rpcMethodName, body, TIME_OUT);
+	@SuppressWarnings("unchecked")
+	public void sendSyncMessage(String serverName, String rpcMethodName, T... body) {
+		sendSyncMessage(serverName, rpcMethodName, TIME_OUT, body);
 	}
 
 	/**
@@ -56,9 +63,14 @@ public final class RaptorRpc<T extends Serializable> {
 	 * 
 	 * @return void
 	 **/
-	public void sendAsyncMessage(String serverName, String rpcMethodName, T[] body, AbstractCallBack call,
-			Integer timeOut) {
+	@SuppressWarnings("unchecked")
+	public void sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, Integer timeOut,
+			T... body) {
 		RpcPushDefine rpcClient = RpcClientRegistry.INSTANCE.getRpcClient(rpcEnum.rpcPushDefine);
+
+		// 组装时间对象,并设置超时.
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.SECOND, timeOut);
 
 		String uuid = new UUID().toString();
 		// 组装请求参数
@@ -66,15 +78,17 @@ public final class RaptorRpc<T extends Serializable> {
 		requestBody.setMessageId(uuid);
 		requestBody.setBody(body);
 		requestBody.setRpcMethod(rpcMethodName);
-		requestBody.setTimeOut(timeOut);
+		requestBody.setTimeOut(cal.getTime());
+		requestBody.setCall(call);
 
 		rpcClient.pushMessage(requestBody); // 发送消息(异步发送)
-		RpcClientTaskPool.pushTask(requestBody); //入队列.
+		RpcClientTaskPool.pushTask(requestBody); // 入客户端队列.
 	}
 
 	// 重载异步方法
-	public void sendAsyncMessage(String serverName, String rpcMethodName, T[] body, AbstractCallBack call) {
-		sendAsyncMessage(serverName, rpcMethodName, body, call, TIME_OUT);
+	@SuppressWarnings("unchecked")
+	public void sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, T... body) {
+		sendAsyncMessage(serverName, rpcMethodName, call, TIME_OUT, body);
 	}
 
 }

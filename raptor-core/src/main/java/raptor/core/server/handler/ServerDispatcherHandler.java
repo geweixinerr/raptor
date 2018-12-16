@@ -31,7 +31,7 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 				MDC.put("invokeId", "invokeId-"+java.util.UUID.randomUUID().toString().replaceAll("-", "").toUpperCase());
 				
 				LOGGER.info("RPC执行结果,Result: " + result);
-				RpcResponseBody body = result.getResponseBody();
+				RpcResponseBody body = (RpcResponseBody) result.getMessageBody();
 				ctx.writeAndFlush(body);
 			}
 		});

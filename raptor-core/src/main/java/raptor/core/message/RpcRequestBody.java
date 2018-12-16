@@ -1,6 +1,7 @@
 package raptor.core.message;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -36,7 +37,7 @@ public final class RpcRequestBody implements RpcMessage , Serializable {
 	/**
 	 * 业务超时时间,默认5秒(单位:秒)
 	 * **/
-	private transient Integer timeOut; 
+	private transient Date timeOut; 
 	
 	/**
 	 * 客户端调用回调对象
@@ -59,11 +60,11 @@ public final class RpcRequestBody implements RpcMessage , Serializable {
 		this.body = body;
 	}
 
-	public Integer getTimeOut() {
+	public Date getTimeOut() {
 		return timeOut;
 	}
 
-	public void setTimeOut(Integer timeOut) {
+	public void setTimeOut(Date timeOut) {
 		this.timeOut = timeOut;
 	}
 
@@ -94,7 +95,6 @@ public final class RpcRequestBody implements RpcMessage , Serializable {
 		} else {
 			builder.append("body","");
 		}
-		builder.append("timeOut",timeOut);
 		sb.trimToSize();
 		return builder.toString();
 	}

@@ -3,7 +3,7 @@ package raptor.core.server;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import raptor.core.message.RpcResponseBody;
+import raptor.core.message.RpcMessage;
 
 /**
  * @author gewx RPC调用回调响应结果
@@ -16,9 +16,9 @@ public final class RpcResult {
 	private Boolean success;
 	
 	/**
-	 * 响应主体
+	 * 回调结果消息体
 	 * **/
-	private RpcResponseBody responseBody;
+	private RpcMessage messageBody;
 	
 	/**
 	 * 业务执行异常对象(如果有的话)
@@ -44,12 +44,12 @@ public final class RpcResult {
 		this.throwable = throwable;
 	}
 
-	public RpcResponseBody getResponseBody() {
-		return responseBody;
+	public RpcMessage getMessageBody() {
+		return messageBody;
 	}
 
-	public void setResponseBody(RpcResponseBody responseBody) {
-		this.responseBody = responseBody;
+	public void setMessageBody(RpcMessage messageBody) {
+		this.messageBody = messageBody;
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public final class RpcResult {
 		StringBuffer sb = new StringBuffer(512); // init
 		ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE, sb);
 		builder.append("success", success);
-		builder.append("responseBody", responseBody);
+		builder.append("messageBody", messageBody);
 		if (this.throwable != null) {
 			builder.append("throwable", this.throwable.getMessage());
 		} else {
