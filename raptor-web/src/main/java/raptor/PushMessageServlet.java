@@ -50,10 +50,8 @@ public class PushMessageServlet extends HttpServlet {
 		requestBody.setRpcMethod("LoginAuth");
 		requestBody.setMessageId("MessageId-[" + 0 + "]");
 		RpcPushDefine rpcClient = RpcClientRegistry.INSTANCE.getRpcClient(RpcClientRegistry.rpcEnum.rpcPushDefine);
-
-		for (int i = 0; i < 10000; i++) {
-			rpcClient.pushMessage(requestBody);
-		}
+		rpcClient.pushMessage(requestBody);
+		
 		response.getWriter().write("RPC execute ok!");
 
 	}

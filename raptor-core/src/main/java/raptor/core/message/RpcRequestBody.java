@@ -26,7 +26,7 @@ public final class RpcRequestBody implements RpcMessage , Serializable {
 	/**
 	 * Rpc MethodName
 	 * **/
-	private transient String rpcMethod;
+	private String rpcMethod;
 	
 	/**
 	 * 消息主体-请求参数

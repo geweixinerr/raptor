@@ -60,6 +60,12 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 			<version>${spring.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -323,7 +329,7 @@
 				     <!-- 
 				   		<scanIntervalSeconds>10</scanIntervalSeconds>
 				     -->
-					    <stopPort>8081</stopPort>
+					    <stopPort>9091</stopPort>
 					    <stopKey>foo</stopKey>
 					    <stopWait>10</stopWait>
 					    <webApp>
