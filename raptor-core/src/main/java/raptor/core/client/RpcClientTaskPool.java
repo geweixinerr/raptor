@@ -58,16 +58,21 @@ public final class RpcClientTaskPool {
 	 * @return void
 	 **/
 	public static void addTask(RpcResponseBody responseBody) {
-		LOGGER.info("RPC调用响应:" + responseBody.getMessage() +", messageId: " + responseBody.getMessageId());
+		LOGGER.info("RPC调用响应:" + responseBody);
 				
 		RpcRequestBody requestBody = MESSAGEID_MAPPING.get(responseBody.getMessageId());
 		if (requestBody != null) {
-			RpcResult result = new RpcResult();
-			result.setMessageBody(responseBody);
-			result.setSuccess(responseBody.getSuccess());
-			requestBody.getCall().invoke(result);
+			if (!requestBody.isMessageSend()) {
+				MESSAGEID_MAPPING.remove(responseBody.getMessageId()); //delete,mark:此处删除已回调信息,避免客户端扫描类重复读取到此信息.
+				
+				RpcResult result = new RpcResult();
+				result.setMessageBody(responseBody);
+				result.setSuccess(responseBody.getSuccess());
+				requestBody.getCall().invoke(result);
+				LOGGER.info("成功执行回调,messageId: " + responseBody.getMessageId());
+			}
 		} else {
-			LOGGER.info("RPC回调超时,messageId: " + responseBody.getMessageId());
+			//LOGGER.info("RPC回调超时,messageId: " + responseBody.getMessageId());
 		}
 	}
 	

@@ -47,7 +47,7 @@ public final class TestRpcClient {
 			System.out.println("服务启动失败,Message: " + e.getMessage());
 		}
 
-		// RpcClientTimeOutScan.scan();
+		 RpcClientTimeOutScan.scan();
 	}
 
 	private TestRpcClient() {

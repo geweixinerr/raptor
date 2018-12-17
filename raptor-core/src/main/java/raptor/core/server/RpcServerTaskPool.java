@@ -2,7 +2,6 @@ package raptor.core.server;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -95,16 +94,7 @@ public final class RpcServerTaskPool {
 						return body;
 					}
 				});
-//		/**
-//		 * 模拟服务器超时
-//		 * **/
-//		try {
-//			TimeUnit.SECONDS.sleep(6);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
+
 		future.addCallback(new ListenableFutureCallback<RpcResponseBody>() {
 			final RpcResult result = new RpcResult();
 

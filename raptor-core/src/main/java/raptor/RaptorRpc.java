@@ -3,6 +3,10 @@ package raptor;
 import java.io.Serializable;
 import java.util.Calendar;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.eaio.uuid.UUID;
 
 import raptor.core.AbstractCallBack;
@@ -17,6 +21,8 @@ import raptor.core.message.RpcRequestBody;
  **/
 public final class RaptorRpc<T extends Serializable> {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(RaptorRpc.class);
+
 	/**
 	 * 业务超时设置,默认5秒
 	 **/
@@ -30,6 +36,7 @@ public final class RaptorRpc<T extends Serializable> {
 	 * 
 	 * @return void
 	 **/
+	/*
 	@SuppressWarnings("unchecked")
 	public void sendSyncMessage(String serverName, String rpcMethodName, Integer timeOut, T... body) {
 		RpcPushDefine rpcClient = RpcClientRegistry.INSTANCE.getRpcClient(rpcEnum.rpcPushDefine);
@@ -54,7 +61,8 @@ public final class RaptorRpc<T extends Serializable> {
 	public void sendSyncMessage(String serverName, String rpcMethodName, T... body) {
 		sendSyncMessage(serverName, rpcMethodName, TIME_OUT, body);
 	}
-
+    */
+	
 	/**
 	 * @author gewx 异步发送消息
 	 * @param serverName
@@ -83,11 +91,16 @@ public final class RaptorRpc<T extends Serializable> {
 
 		rpcClient.pushMessage(requestBody); // 发送消息(异步发送)
 		RpcClientTaskPool.pushTask(requestBody); // 入客户端队列.
+		
+		LOGGER.info("RPC消息发送: " + requestBody);
 	}
 
 	// 重载异步方法
 	@SuppressWarnings("unchecked")
 	public void sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, T... body) {
+		if (StringUtils.isBlank(serverName) || StringUtils.isBlank(rpcMethodName) || call == null) {
+			throw new IllegalArgumentException("缺失服务请求参数,serverName/rpcMethodName/call isNotEmpty!");
+		}
 		sendAsyncMessage(serverName, rpcMethodName, call, TIME_OUT, body);
 	}
 

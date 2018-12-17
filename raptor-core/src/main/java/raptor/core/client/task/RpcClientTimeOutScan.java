@@ -2,7 +2,6 @@ package raptor.core.client.task;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,21 +61,22 @@ public final class RpcClientTimeOutScan {
 					RpcRequestBody requestBody = en.getValue();
 					// 如果当前时间已超过设置的超时时间,则为过期消息.
 					if (new Date().compareTo(requestBody.getTimeOut()) >= 0) {
-						requestPool.remove(messageId); // delete
+						if (!requestBody.isMessageSend()) { // 消息未发送
+							requestPool.remove(messageId); // delete,mark:此处删除已回调超时信息,避免客户端回调重复执行此信息.
 
-						final RpcResult result = new RpcResult();
+							final RpcResult result = new RpcResult();
+							// default
+							RpcResponseBody responseBody = new RpcResponseBody();
+							responseBody.setSuccess(false);
+							responseBody.setMessageId(requestBody.getMessageId());
+							responseBody.setMessage("RPC 服务调用失败,message:timeOut.");
 
-						// default
-						RpcResponseBody responseBody = new RpcResponseBody();
-						responseBody.setSuccess(false);
-						responseBody.setMessageId(requestBody.getMessageId());
-						responseBody.setMessage("RPC 服务调用失败,message:timeOut.");
+							result.setSuccess(false);
+							result.setMessageBody(responseBody);
 
-						result.setSuccess(false);
-						result.setMessageBody(responseBody);
-
-						requestBody.getCall().invoke(result); // 回调通知
-						LOGGER.info("清理超时消息...,messageId: " + messageId);
+							requestBody.getCall().invoke(result); // 回调通知
+							LOGGER.info("清理超时消息...,messageId: " + messageId);
+						}
 					}
 				}
 			}

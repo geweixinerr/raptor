@@ -44,6 +44,11 @@ public final class RpcRequestBody implements RpcMessage , Serializable {
 	 * **/
 	private transient AbstractCallBack call;
 
+	/**
+	 * 发送标记. true已发送,false未发送
+	 **/
+	private transient boolean send;
+	
 	public String getMessageId() {
 		return messageId;
 	}
@@ -82,6 +87,19 @@ public final class RpcRequestBody implements RpcMessage , Serializable {
 
 	public void setRpcMethod(String rpcMethod) {
 		this.rpcMethod = rpcMethod;
+	}
+	
+	/**
+	 * @author gewx 本方法作用在于串行化回调消息执行逻辑. 问题描述:
+	 *         假设调度线程与正常客户端回调线程同时处理某个回调对象,会产生客户端响应接收到两次的情况.
+	 **/
+	public synchronized boolean isMessageSend() {
+		if (this.send) { // 已发送
+			return true;
+		} else { // 未发送
+			this.send = true;
+			return false;
+		}
 	}
 
 	@Override
