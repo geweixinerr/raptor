@@ -16,20 +16,20 @@ public final class AlibabaService {
 	/**登录认证**/
 	@RpcMethod
 	public void LoginAuth(Map<String,String> params) {
-		System.out.println("AlibabaService.............");
+		System.out.println("AlibabaService.............ONE");
 	}
 	
 	/**登录认证**/
 	@RpcMethod
 	public String LoginAuth(Map<String,String> params,String authId) {
-		System.out.println("AlibabaService.............");
+		System.out.println("AlibabaService.............TWO");
 		return "Netty is VeryGood!";
 	}
 	
 	/**登录认证**/
 	@RpcMethod
 	public String LoginAuth(NettyTestData params,String authId) {
-		System.out.println("AlibabaService.............");
+		System.out.println("AlibabaService.............THREE");
 		return "Netty is VeryGood!";
 	}
 	

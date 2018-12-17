@@ -1,6 +1,7 @@
 package raptor.test;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import raptor.core.client.handler.ClientDispatcherHandler;
 import raptor.core.client.task.RpcClientTimeOutScan;
 import raptor.core.handler.codec.RpcByteToMessageDecoder;
 import raptor.core.handler.codec.RpcMessageToByteEncoder;
+import raptor.core.message.RpcResponseBody;
 import raptor.core.server.RpcResult;
 import raptor.util.StringUtil;
 
@@ -118,12 +120,15 @@ public final class TestRpcClient {
 		String message = "Netty RPC Send, Netty is VeryGood!";
 		NettyTestData data = new NettyTestData();
 		// 发送异步消息.
+		long start = System.currentTimeMillis();
 		rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
 			@Override
 			public void invoke(RpcResult result) {
-				System.out.println("请求结果: " + result);
+				long end = System.currentTimeMillis();
+			    RpcResponseBody responseBody =  (RpcResponseBody) result.getMessageBody();
+				System.out.println("请求结果: " + result.getSuccess() + "Result: "+ responseBody.getBody() +", RPC服务耗时: " + (end - start));
 			}
-		}, 60, data, message);
+		}, 5, data, message);
 
 	}
 }
