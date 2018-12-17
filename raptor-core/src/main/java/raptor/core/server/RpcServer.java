@@ -5,6 +5,7 @@ import java.util.Map;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -55,7 +56,6 @@ public final class RpcServer {
 		/**
 		 * Reactor主从多线程模型 接受客户端请求的线程池,无需太多,默认设置为物理机核心CPU数. IO处理线程池,默认为物理机核心CPU数 * 2.
 		 **/
-
 		Map<String, String> serverConfig = RpcParameter.INSTANCE.getServerConfig();
 		if (SystemUtils.IS_OS_LINUX) {
 			LOGGER.info("Linux系统下,RPC Server启动...");
@@ -70,17 +70,17 @@ public final class RpcServer {
 			server.group(acceptGroup, ioGroup).channel(NioServerSocketChannel.class);
 		}
 
-		server.option(ChannelOption.SO_BACKLOG, 100)
+		server.option(ChannelOption.SO_BACKLOG, 1024) // 服务端接受连接的队列长度，如果队列已满，客户端连接将被拒绝。默认值，Windows为200，其他为128。
+				.option(ChannelOption.SO_RCVBUF, 128 * 1024) // 该值设置的是由ServerSocketChannel使用accept接受的SocketChannel的接收缓冲区。
 				.localAddress(serverConfig.get(ADDRESS_KEY), Integer.parseInt(serverConfig.get(PORT)))
 				.childHandler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
-						String logOnOff  = serverConfig.get(RpcParameterEnum.LOGONOFF.getCode());
+						String logOnOff = serverConfig.get(RpcParameterEnum.LOGONOFF.getCode());
 						ChannelPipeline pipline = ch.pipeline();
 						if (Constants.LogOn.equals(logOnOff)) {
 							pipline.addLast(new LoggingHandler(LogLevel.INFO)); // 开启日志监控
 						}
-
 						pipline.addLast(new RpcByteToMessageDecoder());
 						pipline.addLast(new RpcMessageToByteEncoder());
 						pipline.addLast(new ServerDispatcherHandler());

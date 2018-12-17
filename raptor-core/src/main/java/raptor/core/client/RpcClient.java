@@ -10,6 +10,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -31,6 +32,9 @@ public final class RpcClient {
 	// 客户端分发器注册pipline Key
 	private static final String CLIENT_DISPATCHER = "clientDispatcher";
 
+	// 默认超时设置,5秒
+	private static final Integer DEFAULT_TIME_OUT = 5000;
+
 	private RpcClient() {
 
 	}
@@ -46,7 +50,10 @@ public final class RpcClient {
 		Bootstrap boot = new Bootstrap();
 		EventLoopGroup eventGroup = new NioEventLoopGroup();
 		boot.group(eventGroup).channel(NioSocketChannel.class)
-				.remoteAddress(clientConfig.get("remote")[0], Integer.parseInt(clientConfig.get("remote")[1])) //TODO 先固定写死。
+				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIME_OUT) // 设置连接超时5秒,默认值30000毫秒即30秒。
+				.option(ChannelOption.SO_RCVBUF, 128 * 1024) // Socket参数,TCP数据接收缓冲区大小。
+				.option(ChannelOption.SO_SNDBUF, 128 * 1024) // Socket参数，TCP数据发送缓冲区大小。
+				.remoteAddress(clientConfig.get("remote")[0], Integer.parseInt(clientConfig.get("remote")[1])) // TODO
 				.handler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
