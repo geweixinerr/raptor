@@ -1,6 +1,7 @@
 package raptor.test;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -19,6 +21,7 @@ import raptor.core.RpcPushDefine;
 import raptor.core.client.NettyTestData;
 import raptor.core.client.RpcClientRegistry;
 import raptor.core.client.handler.ClientDispatcherHandler;
+import raptor.core.client.task.RpcClientTimeOutScan;
 import raptor.core.handler.codec.RpcByteToMessageDecoder;
 import raptor.core.handler.codec.RpcMessageToByteEncoder;
 import raptor.core.server.RpcResult;
@@ -32,6 +35,8 @@ public final class TestRpcClient {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestRpcClient.class);
 
+	private static final Integer CPU_CORE = Runtime.getRuntime().availableProcessors();
+
 	// 客户端分发器注册pipline Key
 	private static final String CLIENT_DISPATCHER = "clientDispatcher";
 
@@ -41,6 +46,8 @@ public final class TestRpcClient {
 		} catch (InterruptedException e) {
 			System.out.println("服务启动失败,Message: " + e.getMessage());
 		}
+
+		// RpcClientTimeOutScan.scan();
 	}
 
 	private TestRpcClient() {
@@ -65,8 +72,11 @@ public final class TestRpcClient {
 	public static void start() throws InterruptedException {
 
 		Bootstrap boot = new Bootstrap();
-		EventLoopGroup eventGroup = new NioEventLoopGroup();
+		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 3);
 		boot.group(eventGroup).channel(NioSocketChannel.class).remoteAddress("127.0.0.1", 8090)
+				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+			    .option(ChannelOption.SO_SNDBUF, 128*1024) //设置发送缓冲大小
+			    .option(ChannelOption.SO_RCVBUF, 128*1024) //设置接收缓冲大小
 				.handler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
@@ -76,7 +86,7 @@ public final class TestRpcClient {
 						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler());
 					}
 				});
-
+		
 		ChannelFuture future = boot.connect().sync();
 
 		future.addListener(new ChannelFutureListener() {
@@ -113,7 +123,7 @@ public final class TestRpcClient {
 			public void invoke(RpcResult result) {
 				System.out.println("请求结果: " + result);
 			}
-		}, data, message);
+		}, 60, data, message);
 
 	}
 }

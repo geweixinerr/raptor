@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import raptor.core.annotation.RpcHandler;
 import raptor.core.client.RpcClient;
 import raptor.core.client.RpcClientTaskPool;
-import raptor.core.client.RpcClientTimeOutScan;
+import raptor.core.client.task.RpcClientTimeOutScan;
 import raptor.core.server.RpcServer;
 import raptor.core.server.RpcServerTaskPool;
 

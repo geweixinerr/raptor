@@ -60,13 +60,13 @@ public final class RpcServer {
 		if (SystemUtils.IS_OS_LINUX) {
 			LOGGER.info("Linux系统下,RPC Server启动...");
 			// Linux Epoll
-			EventLoopGroup acceptGroup = new EpollEventLoopGroup(CPU_CORE);
-			EventLoopGroup ioGroup = new EpollEventLoopGroup(CPU_CORE * 2);
+			EventLoopGroup acceptGroup = new EpollEventLoopGroup(2); // accept connection thread ,2个足矣.
+			EventLoopGroup ioGroup = new EpollEventLoopGroup(CPU_CORE * 3); //网络IO处理线程池
 			server.group(acceptGroup, ioGroup).channel(EpollServerSocketChannel.class);
 		} else {
 			LOGGER.info("非Linux系统下,RPC Server启动...");
-			EventLoopGroup acceptGroup = new NioEventLoopGroup(CPU_CORE);
-			EventLoopGroup ioGroup = new NioEventLoopGroup(CPU_CORE * 2);
+			EventLoopGroup acceptGroup = new NioEventLoopGroup(2); // accept connection thread ,2个足矣.
+			EventLoopGroup ioGroup = new NioEventLoopGroup(CPU_CORE * 3); //网络IO处理线程池
 			server.group(acceptGroup, ioGroup).channel(NioServerSocketChannel.class);
 		}
 

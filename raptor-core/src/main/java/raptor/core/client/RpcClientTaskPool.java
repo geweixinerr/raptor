@@ -30,7 +30,7 @@ public final class RpcClientTaskPool {
 	/**
 	 * 客户端请求MessageId与回调对应关系.
 	 * **/
-	private static final Map<String,RpcRequestBody> MESSAGEID_MAPPING = new ConcurrentHashMap<>(1024); 
+	private static final Map<String,RpcRequestBody> MESSAGEID_MAPPING = new ConcurrentHashMap<>(1024 * 10); 
 	
 	private RpcClientTaskPool() {
 	}
