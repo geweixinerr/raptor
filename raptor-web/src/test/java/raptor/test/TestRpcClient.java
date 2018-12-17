@@ -3,6 +3,10 @@ package raptor.test;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,21 +118,41 @@ public final class TestRpcClient {
 	public static void main(String[] args) {
 		init();
 
+		HashMap<String,String> map = new HashMap<String,String>();
+		map.put("userName", "geweixin");
+		
 		TestRaptorRpc rpc = new TestRaptorRpc();
 
 		// 组装发送消息
 		String message = "Netty RPC Send, Netty is VeryGood!";
 		NettyTestData data = new NettyTestData();
-		// 发送异步消息.
-		long start = System.currentTimeMillis();
-		rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
-			@Override
-			public void invoke(RpcResult result) {
-				long end = System.currentTimeMillis();
-			    RpcResponseBody responseBody =  (RpcResponseBody) result.getMessageBody();
-				System.out.println("请求结果: " + result.getSuccess() + "Result: "+ responseBody.getBody() +", RPC服务耗时: " + (end - start));
-			}
-		}, 5, data, message);
+		
+		Executor execute = Executors.newFixedThreadPool(CPU_CORE * 2);
+		CyclicBarrier latch = new CyclicBarrier(CPU_CORE * 2);
 
+		for (int i = 0; i < CPU_CORE * 2; i++) {
+			execute.execute(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						latch.await();
+						// 发送异步消息.
+						for (int j = 0; j< 10000; j++) {
+							long start = System.currentTimeMillis();
+							rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
+								@Override
+								public void invoke(RpcResult result) {
+									long end = System.currentTimeMillis();
+								    RpcResponseBody responseBody =  (RpcResponseBody) result.getMessageBody();
+									System.out.println("请求结果: " + result.getSuccess() + ", Message: " + responseBody.getMessage() + ", Result: "+ responseBody.getBody() +", RPC服务耗时: " + (end - start));
+								}
+							}, 5, data, message);
+						}
+					} catch (InterruptedException | BrokenBarrierException e) {
+						
+					}
+				}
+			});
+		}
 	}
 }
