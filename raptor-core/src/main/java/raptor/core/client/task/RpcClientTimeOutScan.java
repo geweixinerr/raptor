@@ -60,9 +60,9 @@ public final class RpcClientTimeOutScan {
 					RpcRequestBody requestBody = en.getValue();
 					// 如果当前时间已超过设置的超时时间,则为过期消息.
 					if (new Date().compareTo(requestBody.getTimeOut()) >= 0) {
+						requestPool.remove(messageId); // delete,mark:此处删除已回调超时信息,避免客户端回调重复执行此信息.
+						
 						if (!requestBody.isMessageSend()) { // 消息未发送
-							requestPool.remove(messageId); // delete,mark:此处删除已回调超时信息,避免客户端回调重复执行此信息.
-
 							RpcResponseBody responseBody = new RpcResponseBody();
 							responseBody.setSuccess(false);
 							responseBody.setMessageId(requestBody.getMessageId());
