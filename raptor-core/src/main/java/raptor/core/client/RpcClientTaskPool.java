@@ -59,10 +59,9 @@ public final class RpcClientTaskPool {
 	public static void addTask(RpcResponseBody responseBody) {
 		LOGGER.info("RPC调用响应:" + responseBody);
 				
-		RpcRequestBody requestBody = MESSAGEID_MAPPING.get(responseBody.getMessageId());
+		RpcRequestBody requestBody = MESSAGEID_MAPPING.remove(responseBody.getMessageId());
 		if (requestBody != null) {
 			if (!requestBody.isMessageSend()) {
-				MESSAGEID_MAPPING.remove(responseBody.getMessageId()); //delete,mark:此处删除已回调信息,避免客户端扫描类重复读取到此信息.
 				requestBody.getCall().invoke(responseBody);
 				LOGGER.info("成功执行回调,messageId: " + responseBody.getMessageId());
 			}
