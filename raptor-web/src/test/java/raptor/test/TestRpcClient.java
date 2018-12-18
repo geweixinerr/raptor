@@ -78,7 +78,7 @@ public final class TestRpcClient {
 
 		Bootstrap boot = new Bootstrap();
 		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 3);
-		boot.group(eventGroup).channel(NioSocketChannel.class).remoteAddress("127.0.0.1", 8090)
+		boot.group(eventGroup).channel(NioSocketChannel.class).remoteAddress("10.19.181.45", 8090)
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000).option(ChannelOption.SO_SNDBUF, 128 * 1024) // 设置发送缓冲大小
 				.option(ChannelOption.SO_RCVBUF, 128 * 1024) // 设置接收缓冲大小
 				.handler(new ChannelInitializer<SocketChannel>() {
@@ -124,8 +124,8 @@ public final class TestRpcClient {
 		// 组装发送消息
 		String message = "Netty RPC Send, Netty is VeryGood!";
 		NettyTestData data = new NettyTestData();
-
-		 
+		
+		/* 
 		Executor execute = Executors.newFixedThreadPool(CPU_CORE * 2);
 		CyclicBarrier latch = new CyclicBarrier(CPU_CORE * 2);
 
@@ -151,6 +151,7 @@ public final class TestRpcClient {
 				}
 			});
 		}
+		*/
 		
 		/*
 		for (int j = 0; j < 10000; j++) {
@@ -164,5 +165,12 @@ public final class TestRpcClient {
 		}
 		*/
 		
+		rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
+			@Override
+			public void invoke(RpcResponseBody responseBody) {
+				System.out.println("请求结果: " + responseBody.getSuccess() + ", Message: "
+						+ responseBody.getMessage() + ", Result: " + responseBody.getBody());
+			}
+		}, 5, data, message);
 	}
 }
