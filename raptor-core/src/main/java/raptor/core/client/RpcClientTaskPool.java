@@ -37,7 +37,7 @@ public final class RpcClientTaskPool {
 	/**
 	 * 一个基于链接节点的无界线程安全队列。此队列按照 FIFO（先进先出）原则对元素进行排序
 	 **/
-	private static final ConcurrentLinkedQueue<RpcRequestBody> CLIENT_POOL_QUEUE = new ConcurrentLinkedQueue<RpcRequestBody>();
+//	private static final ConcurrentLinkedQueue<RpcRequestBody> CLIENT_POOL_QUEUE = new ConcurrentLinkedQueue<RpcRequestBody>();
 
 	private RpcClientTaskPool() {
 	}
@@ -105,7 +105,7 @@ public final class RpcClientTaskPool {
 	 **/
 	public static void pushTask(RpcRequestBody requestBody) {
 		MESSAGEID_MAPPING.put(requestBody.getMessageId(), requestBody);
-		CLIENT_POOL_QUEUE.offer(requestBody); // 入队列.
+	//	CLIENT_POOL_QUEUE.offer(requestBody); // 入队列.
 	}
 
 	/**
@@ -123,7 +123,7 @@ public final class RpcClientTaskPool {
 	 * @return ConcurrentLinkedQueue Object
 	 * 
 	 **/
-	public static ConcurrentLinkedQueue<RpcRequestBody> listQueuePool() {
-		return CLIENT_POOL_QUEUE;
-	}
+//	private static ConcurrentLinkedQueue<RpcRequestBody> listQueuePool() {
+//		return CLIENT_POOL_QUEUE;
+//	}
 }
