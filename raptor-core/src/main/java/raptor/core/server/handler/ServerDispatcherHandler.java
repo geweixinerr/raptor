@@ -9,7 +9,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import raptor.core.AbstractCallBack;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
-import raptor.core.server.RpcResult;
 import raptor.core.server.RpcServerTaskPool;
 import raptor.util.StringUtil;
 
@@ -27,12 +26,9 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 		 * **/
 		RpcServerTaskPool.addTask(msg, new AbstractCallBack() {
 			@Override
-			public void invoke(RpcResult result) {
+			public void invoke(RpcResponseBody responseBody) {
 				MDC.put("invokeId", "invokeId-"+java.util.UUID.randomUUID().toString().replaceAll("-", "").toUpperCase());
-				
-				LOGGER.info("RPC执行结果,Result: " + result);
-				RpcResponseBody body = (RpcResponseBody) result.getMessageBody();
-				ctx.writeAndFlush(body);
+				ctx.writeAndFlush(responseBody);
 			}
 		});
 	}

@@ -11,7 +11,6 @@ import org.springframework.scheduling.concurrent.ScheduledExecutorTask;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
-import raptor.core.server.RpcResult;
 
 /**
  * @author gewx RPC请求客户端超时扫描: 本线程执行过期消息清理.
@@ -64,17 +63,12 @@ public final class RpcClientTimeOutScan {
 						if (!requestBody.isMessageSend()) { // 消息未发送
 							requestPool.remove(messageId); // delete,mark:此处删除已回调超时信息,避免客户端回调重复执行此信息.
 
-							final RpcResult result = new RpcResult();
-							// default
 							RpcResponseBody responseBody = new RpcResponseBody();
 							responseBody.setSuccess(false);
 							responseBody.setMessageId(requestBody.getMessageId());
 							responseBody.setMessage("RPC 服务调用失败,message:timeOut.");
 
-							result.setSuccess(false);
-							result.setMessageBody(responseBody);
-
-							requestBody.getCall().invoke(result); // 回调通知
+							requestBody.getCall().invoke(responseBody); // 回调通知
 							LOGGER.info("清理超时消息...,messageId: " + messageId);
 						}
 					}

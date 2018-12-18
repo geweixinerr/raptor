@@ -30,7 +30,6 @@ import raptor.core.client.task.RpcClientTimeOutScan;
 import raptor.core.handler.codec.RpcByteToMessageDecoder;
 import raptor.core.handler.codec.RpcMessageToByteEncoder;
 import raptor.core.message.RpcResponseBody;
-import raptor.core.server.RpcResult;
 import raptor.util.StringUtil;
 
 /**
@@ -53,7 +52,7 @@ public final class TestRpcClient {
 			System.out.println("服务启动失败,Message: " + e.getMessage());
 		}
 
-		 RpcClientTimeOutScan.scan();
+		RpcClientTimeOutScan.scan();
 	}
 
 	private TestRpcClient() {
@@ -80,9 +79,8 @@ public final class TestRpcClient {
 		Bootstrap boot = new Bootstrap();
 		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 3);
 		boot.group(eventGroup).channel(NioSocketChannel.class).remoteAddress("127.0.0.1", 8090)
-				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-			    .option(ChannelOption.SO_SNDBUF, 128*1024) //设置发送缓冲大小
-			    .option(ChannelOption.SO_RCVBUF, 128*1024) //设置接收缓冲大小
+				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000).option(ChannelOption.SO_SNDBUF, 128 * 1024) // 设置发送缓冲大小
+				.option(ChannelOption.SO_RCVBUF, 128 * 1024) // 设置接收缓冲大小
 				.handler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
@@ -92,7 +90,7 @@ public final class TestRpcClient {
 						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler());
 					}
 				});
-		
+
 		ChannelFuture future = boot.connect().sync();
 
 		future.addListener(new ChannelFutureListener() {
@@ -118,15 +116,16 @@ public final class TestRpcClient {
 	public static void main(String[] args) {
 		init();
 
-		HashMap<String,String> map = new HashMap<String,String>();
+		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("userName", "geweixin");
-		
+
 		TestRaptorRpc rpc = new TestRaptorRpc();
 
 		// 组装发送消息
 		String message = "Netty RPC Send, Netty is VeryGood!";
 		NettyTestData data = new NettyTestData();
-		
+
+		/*
 		Executor execute = Executors.newFixedThreadPool(CPU_CORE * 2);
 		CyclicBarrier latch = new CyclicBarrier(CPU_CORE * 2);
 
@@ -137,22 +136,28 @@ public final class TestRpcClient {
 					try {
 						latch.await();
 						// 发送异步消息.
-						for (int j = 0; j< 10000; j++) {
-							long start = System.currentTimeMillis();
+						for (int j = 0; j < 10000; j++) {
 							rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
 								@Override
-								public void invoke(RpcResult result) {
-									long end = System.currentTimeMillis();
-								    RpcResponseBody responseBody =  (RpcResponseBody) result.getMessageBody();
-									System.out.println("请求结果: " + result.getSuccess() + ", Message: " + responseBody.getMessage() + ", Result: "+ responseBody.getBody() +", RPC服务耗时: " + (end - start));
+								public void invoke(RpcResponseBody responseBody) {
+									System.out.println("请求结果: " + responseBody.getSuccess() + ", Message: "
+											+ responseBody.getMessage() + ", Result: " + responseBody.getBody());
 								}
 							}, 5, data, message);
 						}
 					} catch (InterruptedException | BrokenBarrierException e) {
-						
+
 					}
 				}
 			});
 		}
+		*/
+		rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
+			@Override
+			public void invoke(RpcResponseBody responseBody) {
+				System.out.println("请求结果: " + responseBody.getSuccess() + ", Message: "
+						+ responseBody.getMessage() + ", Result: " + responseBody.getBody());
+			}
+		}, 5, data, message);
 	}
 }

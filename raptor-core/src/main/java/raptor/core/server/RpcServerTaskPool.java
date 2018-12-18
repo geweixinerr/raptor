@@ -96,13 +96,10 @@ public final class RpcServerTaskPool {
 				});
 
 		future.addCallback(new ListenableFutureCallback<RpcResponseBody>() {
-			final RpcResult result = new RpcResult();
 
 			@Override
 			public void onSuccess(RpcResponseBody body) {
-				result.setSuccess(true);
-				result.setMessageBody(body);
-				call.invoke(result);
+				call.invoke(body);
 			}
 
 			@Override
@@ -115,11 +112,7 @@ public final class RpcServerTaskPool {
 				body.setMessageId(requestBody.getMessageId());
 				body.setMessage("RPC 服务调用失败,message:[" + throwable.getMessage() + "]");
 				
-				//Result
-				result.setSuccess(false);
-				result.setMessageBody(body);
-				result.setThrowable(throwable);
-				call.invoke(result);
+				call.invoke(body);
 			}
 		});
 	}

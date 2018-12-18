@@ -9,7 +9,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
-import raptor.core.server.RpcResult;
 
 /**
  * @author gewx RPC Client端业务线程池
@@ -64,11 +63,7 @@ public final class RpcClientTaskPool {
 		if (requestBody != null) {
 			if (!requestBody.isMessageSend()) {
 				MESSAGEID_MAPPING.remove(responseBody.getMessageId()); //delete,mark:此处删除已回调信息,避免客户端扫描类重复读取到此信息.
-				
-				RpcResult result = new RpcResult();
-				result.setMessageBody(responseBody);
-				result.setSuccess(responseBody.getSuccess());
-				requestBody.getCall().invoke(result);
+				requestBody.getCall().invoke(responseBody);
 				LOGGER.info("成功执行回调,messageId: " + responseBody.getMessageId());
 			}
 		} else {

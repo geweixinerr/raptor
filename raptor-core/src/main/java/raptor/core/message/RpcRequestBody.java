@@ -1,6 +1,5 @@
 package raptor.core.message;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -12,12 +11,11 @@ import raptor.core.AbstractCallBack;
 /**
  * @author gewx RPC消息发送主体
  * **/
-public final class RpcRequestBody implements RpcMessage , Serializable {
+public final class RpcRequestBody implements RpcMessage {
 
 	/**
-	 * serializable Id
 	 */
-	private static final long serialVersionUID = -1741781103121149152L;
+	private static final long serialVersionUID = 1584389395921234145L;
 
 	/**
 	 * 消息Id

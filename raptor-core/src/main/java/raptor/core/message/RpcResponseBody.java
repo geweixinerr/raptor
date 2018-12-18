@@ -1,19 +1,16 @@
 package raptor.core.message;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
  * @author gewx RPC消息响应主体
  * **/
-public final class RpcResponseBody implements RpcMessage , Serializable {
+public final class RpcResponseBody implements RpcMessage {
 
 	/**
-	 * serializable Id
 	 */
-	private static final long serialVersionUID = -3021071133415309824L;
+	private static final long serialVersionUID = 495386357818590739L;
 
 	/**
 	 * 消息Id
