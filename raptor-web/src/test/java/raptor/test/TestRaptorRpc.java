@@ -2,6 +2,7 @@ package raptor.test;
 
 import java.io.Serializable;
 import java.util.Calendar;
+import java.util.Date;
 
 import com.eaio.uuid.UUID;
 
@@ -38,6 +39,7 @@ public final class TestRaptorRpc<T extends Serializable> {
 			T... body) {
 		// 组装时间对象,并设置超时.
 		Calendar cal = Calendar.getInstance();
+		Date thisDate = cal.getTime();
 		cal.add(Calendar.SECOND, timeOut);
 		
 		String uuid = new UUID().toString();
@@ -46,6 +48,7 @@ public final class TestRaptorRpc<T extends Serializable> {
 		requestBody.setMessageId(uuid);
 		requestBody.setBody(body);
 		requestBody.setRpcMethod(rpcMethodName);
+		requestBody.setRequestTime(thisDate);
 		requestBody.setTimeOut(cal.getTime());
 		requestBody.setCall(call);
 

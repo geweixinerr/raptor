@@ -1,5 +1,6 @@
 package raptor.core.message;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -47,6 +48,17 @@ public final class RpcRequestBody implements RpcMessage {
 	 **/
 	private transient boolean send;
 	
+	/**
+	 * 业务请求时间
+	 * **/
+	private transient Date requestTime; 
+	
+	/**
+	 * 业务请求-客户端回调时间.
+	 * **/
+	private transient Date responseTime; 
+	
+	
 	public String getMessageId() {
 		return messageId;
 	}
@@ -87,6 +99,22 @@ public final class RpcRequestBody implements RpcMessage {
 		this.rpcMethod = rpcMethod;
 	}
 	
+	public Date getRequestTime() {
+		return requestTime;
+	}
+
+	public void setRequestTime(Date requestTime) {
+		this.requestTime = requestTime;
+	}
+
+	public Date getResponseTime() {
+		return responseTime;
+	}
+
+	public void setResponseTime(Date responseTime) {
+		this.responseTime = responseTime;
+	}
+	
 	/**
 	 * @author gewx 本方法作用在于串行化回调消息执行逻辑. 问题描述:
 	 *         假设调度线程与正常客户端回调线程同时处理某个回调对象,会产生客户端响应接收到两次的情况.
@@ -102,15 +130,30 @@ public final class RpcRequestBody implements RpcMessage {
 
 	@Override
 	public String toString() {
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+		
 		StringBuffer sb = new StringBuffer(256);
 		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE,sb);
 		builder.append("messageId",messageId);
 		builder.append("rpcMethod",rpcMethod);
+		/*
 		if (body != null) {
 			builder.append("body",ArrayUtils.toStringArray(body));
 		} else {
 			builder.append("body","");
 		}
+		*/
+		if (this.timeOut != null) {
+			builder.append("timeOut",format.format(this.timeOut));
+		}
+		if (this.requestTime != null) {
+			builder.append("requestTime", format.format(this.requestTime));
+		}
+		
+		if (this.responseTime != null) {
+			builder.append("responseTime", format.format(this.responseTime));
+		}
+		
 		sb.trimToSize();
 		return builder.toString();
 	}

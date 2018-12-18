@@ -2,6 +2,7 @@ package raptor;
 
 import java.io.Serializable;
 import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -78,6 +79,8 @@ public final class RaptorRpc<T extends Serializable> {
 
 		// 组装时间对象,并设置超时.
 		Calendar cal = Calendar.getInstance();
+		Date thisDate = cal.getTime();
+		
 		cal.add(Calendar.SECOND, timeOut);
 
 		String uuid = new UUID().toString();
@@ -86,6 +89,7 @@ public final class RaptorRpc<T extends Serializable> {
 		requestBody.setMessageId(uuid);
 		requestBody.setBody(body);
 		requestBody.setRpcMethod(rpcMethodName);
+		requestBody.setRequestTime(thisDate);
 		requestBody.setTimeOut(cal.getTime());
 		requestBody.setCall(call);
 

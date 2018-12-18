@@ -1,5 +1,6 @@
 package raptor.core.client;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -61,6 +62,8 @@ public final class RpcClientTaskPool {
 				
 		RpcRequestBody requestBody = MESSAGEID_MAPPING.remove(responseBody.getMessageId());
 		if (requestBody != null && !requestBody.isMessageSend()) {
+			requestBody.setResponseTime(new Date()); //客户端回调时间
+			System.out.println("客户端执行时间-----------> " + requestBody);
 			requestBody.getCall().invoke(responseBody);
 			LOGGER.info("成功执行回调,messageId: " + responseBody.getMessageId());
 		} else {
