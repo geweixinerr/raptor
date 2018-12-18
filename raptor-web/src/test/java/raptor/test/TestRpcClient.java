@@ -25,6 +25,7 @@ import raptor.core.AbstractCallBack;
 import raptor.core.RpcPushDefine;
 import raptor.core.client.NettyTestData;
 import raptor.core.client.RpcClientRegistry;
+import raptor.core.client.RpcClientTaskPool;
 import raptor.core.client.handler.ClientDispatcherHandler;
 import raptor.core.client.task.RpcClientTimeOutScan;
 import raptor.core.handler.codec.RpcByteToMessageDecoder;
@@ -52,7 +53,8 @@ public final class TestRpcClient {
 			System.out.println("服务启动失败,Message: " + e.getMessage());
 		}
 
-		RpcClientTimeOutScan.scan();
+	//	RpcClientTimeOutScan.scan();
+		RpcClientTaskPool.initPool();
 	}
 
 	private TestRpcClient() {
@@ -77,7 +79,7 @@ public final class TestRpcClient {
 	public static void start() throws InterruptedException {
 
 		Bootstrap boot = new Bootstrap();
-		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 3);
+		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 6);
 		boot.group(eventGroup).channel(NioSocketChannel.class).remoteAddress("10.19.181.45", 8090)
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000).option(ChannelOption.SO_SNDBUF, 128 * 1024) // 设置发送缓冲大小
 				.option(ChannelOption.SO_RCVBUF, 128 * 1024) // 设置接收缓冲大小
@@ -140,7 +142,7 @@ public final class TestRpcClient {
 								@Override
 								public void invoke(RpcResponseBody responseBody) {
 									System.out.println("请求结果: " + responseBody.getSuccess() + ", Message: "
-											+ responseBody.getMessage() + ", Result: " + responseBody.getBody());
+											+ responseBody.getMessageId() + ", Result: " + responseBody.getBody());
 								}
 							}, 5, data, message);
 						}
@@ -150,7 +152,6 @@ public final class TestRpcClient {
 				}
 			});
 		}
-		
 		  
 		/*
 		for (int j = 0; j < 10000; j++) {
