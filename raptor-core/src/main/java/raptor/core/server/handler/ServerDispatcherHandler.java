@@ -1,5 +1,6 @@
 package raptor.core.server.handler;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -21,6 +22,8 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcRequestBody msg) throws Exception {
+		msg.setResponseTime(new DateTime());
+		LOGGER.info("服务端收到信息: " + msg);
 		/**
 		 * 业务请求入池,与IO线程池隔离.执行完毕回调.
 		 * **/

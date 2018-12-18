@@ -48,7 +48,7 @@ public final class RpcServerTaskPool {
 	 **/
 	public static void initPool() {
 		LOGGER.info("初始化RPC Server业务线程池对象...");
-		POOLTASKEXECUTOR.setQueueCapacity(CPU_CORE * 1024); //队列深度
+		POOLTASKEXECUTOR.setQueueCapacity(CPU_CORE * 1024 * 10); //队列深度
 		POOLTASKEXECUTOR.setCorePoolSize(CPU_CORE); // 核心线程数
 		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 3); // 最大线程数
 		// poolTaskExecutor.setKeepAliveSeconds(5000); //线程最大空闲时间-可回收
@@ -66,7 +66,7 @@ public final class RpcServerTaskPool {
 	 * @return void
 	 **/
 	public static void addTask(RpcRequestBody requestBody, AbstractCallBack call) {
-		LOGGER.info("RPC请求任务入池,MessageId: " + requestBody.getMessageId());
+		//LOGGER.info("RPC请求任务入池,MessageId: " + requestBody.getMessageId());
 		ListenableFuture<RpcResponseBody> future = POOLTASKEXECUTOR
 				.submitListenable(new Callable<RpcResponseBody>() {
 					@Override

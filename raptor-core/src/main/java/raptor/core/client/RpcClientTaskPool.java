@@ -1,9 +1,7 @@
 package raptor.core.client;
 
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -34,11 +32,6 @@ public final class RpcClientTaskPool {
 	 **/
 	private static final Map<String, RpcRequestBody> MESSAGEID_MAPPING = new ConcurrentHashMap<>(1024 * 10);
 
-	/**
-	 * 一个基于链接节点的无界线程安全队列。此队列按照 FIFO（先进先出）原则对元素进行排序
-	 **/
-//	private static final ConcurrentLinkedQueue<RpcRequestBody> CLIENT_POOL_QUEUE = new ConcurrentLinkedQueue<RpcRequestBody>();
-
 	private RpcClientTaskPool() {
 	}
 
@@ -48,7 +41,7 @@ public final class RpcClientTaskPool {
 	 **/
 	public static void initPool() {
 		LOGGER.info("初始化RPC Client业务线程池对象...");
-		POOLTASKEXECUTOR.setQueueCapacity(CPU_CORE * 1024); // 队列深度
+		POOLTASKEXECUTOR.setQueueCapacity(CPU_CORE * 1024 * 10); // 队列深度
 		POOLTASKEXECUTOR.setCorePoolSize(CPU_CORE); // 核心线程数
 		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 3); // 最大线程数
 		// poolTaskExecutor.setKeepAliveSeconds(5000); //线程最大空闲时间-可回收
@@ -67,10 +60,11 @@ public final class RpcClientTaskPool {
 	 * @return void
 	 **/
 	public static void addTask(RpcResponseBody responseBody) {
-		LOGGER.info("RPC调用响应:" + responseBody);
-		POOLTASKEXECUTOR.submitListenable(new Callable<RpcResponseBody>() {
+		//LOGGER.info("RPC调用响应:" + responseBody);
+		POOLTASKEXECUTOR.execute(new Runnable() {
+			
 			@Override
-			public RpcResponseBody call() throws Exception {
+			public void run() {
 				/**
 				 * 实际客户端回调处理
 				 **/
@@ -91,11 +85,8 @@ public final class RpcClientTaskPool {
 				} else {
 					// 此处消息超时.
 				}
-				
-				return null;
 			}
 		});
-
 	}
 
 	/**
@@ -105,7 +96,6 @@ public final class RpcClientTaskPool {
 	 **/
 	public static void pushTask(RpcRequestBody requestBody) {
 		MESSAGEID_MAPPING.put(requestBody.getMessageId(), requestBody);
-	//	CLIENT_POOL_QUEUE.offer(requestBody); // 入队列.
 	}
 
 	/**
@@ -116,14 +106,4 @@ public final class RpcClientTaskPool {
 	public static Map<String, RpcRequestBody> listMapPool() {
 		return MESSAGEID_MAPPING;
 	}
-
-	/**
-	 * @author gewx 获取Queue队列
-	 * @param void
-	 * @return ConcurrentLinkedQueue Object
-	 * 
-	 **/
-//	private static ConcurrentLinkedQueue<RpcRequestBody> listQueuePool() {
-//		return CLIENT_POOL_QUEUE;
-//	}
 }

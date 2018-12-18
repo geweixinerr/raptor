@@ -53,7 +53,8 @@ public final class RpcClientTimeOutScan {
 					for (Map.Entry<String, RpcRequestBody> en : requestPool.entrySet()) {
 						RpcRequestBody requestBody = en.getValue(); 
 						// 如果当前时间已超过设置的超时时间,则为过期消息.
-						if (new DateTime().compareTo(requestBody.getTimeOut()) >= 0) {
+						DateTime thisDate = new DateTime();
+						if (thisDate.compareTo(requestBody.getTimeOut()) >= 0) {
 							String messageId = requestBody.getMessageId();
 							requestPool.remove(messageId); // delete,mark:此处删除已回调超时信息,避免客户端回调重复执行此信息.
 							
@@ -61,12 +62,11 @@ public final class RpcClientTimeOutScan {
 								RpcResponseBody responseBody = new RpcResponseBody();
 								responseBody.setSuccess(false);
 								responseBody.setMessageId(requestBody.getMessageId());
-								responseBody.setMessage("RPC 服务调用失败,message:timeOut.");
-								requestBody.setResponseTime(new DateTime());
-								
-								System.out.println("客户端执行超时-----------> " + requestBody);
+								responseBody.setMessage("RPC 服务调用失败,message:timeOut");
+								requestBody.setResponseTime(thisDate);
+						
 								requestBody.getCall().invoke(responseBody); // 回调通知
-								LOGGER.info("清理超时消息...,messageId: " + messageId);
+								LOGGER.info("清理超时消息...,messageId: " + requestBody);
 							}
 						}				
 					}

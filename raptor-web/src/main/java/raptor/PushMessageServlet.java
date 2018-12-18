@@ -73,8 +73,7 @@ public class PushMessageServlet extends HttpServlet {
 							rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
 								@Override
 								public void invoke(RpcResponseBody responseBody) {
-									System.out.println("请求结果: " + responseBody.getSuccess() + ", Message: "
-											+ responseBody.getMessage() + ", Result: " + responseBody.getBody());
+									System.out.println("请求结果: " + responseBody.getSuccess() + ", messageId: "+ responseBody.getMessageId());
 								}
 							}, 5, data, message);
 						}
