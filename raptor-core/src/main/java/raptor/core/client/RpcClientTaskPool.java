@@ -2,6 +2,7 @@ package raptor.core.client;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -31,6 +32,11 @@ public final class RpcClientTaskPool {
 	 * 客户端请求MessageId与回调对应关系.
 	 * **/
 	private static final Map<String,RpcRequestBody> MESSAGEID_MAPPING = new ConcurrentHashMap<>(1024 * 10); 
+	
+	/**
+	 * 一个基于链接节点的无界线程安全队列。此队列按照 FIFO（先进先出）原则对元素进行排序
+	 * **/
+	private static final ConcurrentLinkedQueue<RpcRequestBody> CLIENT_POOL_QUEUE = new  ConcurrentLinkedQueue<RpcRequestBody>();
 	
 	private RpcClientTaskPool() {
 	}
@@ -63,7 +69,6 @@ public final class RpcClientTaskPool {
 		RpcRequestBody requestBody = MESSAGEID_MAPPING.remove(responseBody.getMessageId());
 		if (requestBody != null && !requestBody.isMessageSend()) {
 			requestBody.setResponseTime(new DateTime()); //客户端回调时间
-			System.out.println("客户端执行时间-----------> " + requestBody);
 			requestBody.getCall().invoke(responseBody);
 			LOGGER.info("成功执行回调,messageId: " + responseBody.getMessageId());
 		} else {
@@ -77,6 +82,7 @@ public final class RpcClientTaskPool {
 	 * **/
 	public static void pushTask(RpcRequestBody requestBody) {
 		MESSAGEID_MAPPING.put(requestBody.getMessageId(), requestBody);
+		CLIENT_POOL_QUEUE.offer(requestBody); //入队列.
 	}
 	
 	/**
@@ -84,7 +90,17 @@ public final class RpcClientTaskPool {
 	 * @param void
 	 * @return 客户端池
 	 * **/
-	public static Map<String,RpcRequestBody> getClientTaskPool() {
+	public static Map<String,RpcRequestBody> listClientTaskMapPool() {
 		return MESSAGEID_MAPPING;
+	}
+	
+	/**
+	 * @author gewx 获取Queue队列 
+	 * @param void 
+	 * @return ConcurrentLinkedQueue Object 
+	 * 
+	 * **/
+	public static ConcurrentLinkedQueue<RpcRequestBody> listClientTaskQueuePool() {
+		return CLIENT_POOL_QUEUE;
 	}
 }

@@ -125,7 +125,6 @@ public final class TestRpcClient {
 		String message = "Netty RPC Send, Netty is VeryGood!";
 		NettyTestData data = new NettyTestData();
 		
-		/* 
 		Executor execute = Executors.newFixedThreadPool(CPU_CORE * 2);
 		CyclicBarrier latch = new CyclicBarrier(CPU_CORE * 2);
 
@@ -151,8 +150,8 @@ public final class TestRpcClient {
 				}
 			});
 		}
-		*/
 		
+		  
 		/*
 		for (int j = 0; j < 10000; j++) {
 			rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
@@ -164,7 +163,8 @@ public final class TestRpcClient {
 			}, 5, data, message);
 		}
 		*/
-		
+	
+		/*
 		rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
 			@Override
 			public void invoke(RpcResponseBody responseBody) {
@@ -172,5 +172,6 @@ public final class TestRpcClient {
 						+ responseBody.getMessage() + ", Result: " + responseBody.getBody());
 			}
 		}, 5, data, message);
+		*/
 	}
 }
