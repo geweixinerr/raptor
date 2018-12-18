@@ -60,11 +60,9 @@ public final class RpcClientTaskPool {
 		LOGGER.info("RPC调用响应:" + responseBody);
 				
 		RpcRequestBody requestBody = MESSAGEID_MAPPING.remove(responseBody.getMessageId());
-		if (requestBody != null) {
-			if (!requestBody.isMessageSend()) {
-				requestBody.getCall().invoke(responseBody);
-				LOGGER.info("成功执行回调,messageId: " + responseBody.getMessageId());
-			}
+		if (requestBody != null && !requestBody.isMessageSend()) {
+			requestBody.getCall().invoke(responseBody);
+			LOGGER.info("成功执行回调,messageId: " + responseBody.getMessageId());
 		} else {
 			//LOGGER.info("RPC回调超时,messageId: " + responseBody.getMessageId());
 		}
