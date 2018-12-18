@@ -1,11 +1,10 @@
 package raptor.core.message;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import raptor.core.AbstractCallBack;
 
@@ -14,6 +13,12 @@ import raptor.core.AbstractCallBack;
  * **/
 public final class RpcRequestBody implements RpcMessage {
 
+	
+	/**
+	 * 线程安全格式化类-Joda API
+	 * **/
+    private  static transient DateTimeFormatter dateTimeFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss:SSS");
+    
 	/**
 	 */
 	private static final long serialVersionUID = 1584389395921234145L;
@@ -36,7 +41,7 @@ public final class RpcRequestBody implements RpcMessage {
 	/**
 	 * 业务超时时间,默认5秒(单位:秒)
 	 * **/
-	private transient Date timeOut; 
+	private transient DateTime timeOut; 
 	
 	/**
 	 * 客户端调用回调对象
@@ -51,12 +56,12 @@ public final class RpcRequestBody implements RpcMessage {
 	/**
 	 * 业务请求时间
 	 * **/
-	private transient Date requestTime; 
+	private transient DateTime requestTime; 
 	
 	/**
 	 * 业务请求-客户端回调时间.
 	 * **/
-	private transient Date responseTime; 
+	private transient DateTime responseTime; 
 	
 	
 	public String getMessageId() {
@@ -75,14 +80,6 @@ public final class RpcRequestBody implements RpcMessage {
 		this.body = body;
 	}
 
-	public Date getTimeOut() {
-		return timeOut;
-	}
-
-	public void setTimeOut(Date timeOut) {
-		this.timeOut = timeOut;
-	}
-
 	public AbstractCallBack getCall() {
 		return call;
 	}
@@ -99,22 +96,30 @@ public final class RpcRequestBody implements RpcMessage {
 		this.rpcMethod = rpcMethod;
 	}
 	
-	public Date getRequestTime() {
+	public DateTime getTimeOut() {
+		return timeOut;
+	}
+
+	public void setTimeOut(DateTime timeOut) {
+		this.timeOut = timeOut;
+	}
+
+	public DateTime getRequestTime() {
 		return requestTime;
 	}
 
-	public void setRequestTime(Date requestTime) {
+	public void setRequestTime(DateTime requestTime) {
 		this.requestTime = requestTime;
 	}
 
-	public Date getResponseTime() {
+	public DateTime getResponseTime() {
 		return responseTime;
 	}
 
-	public void setResponseTime(Date responseTime) {
+	public void setResponseTime(DateTime responseTime) {
 		this.responseTime = responseTime;
 	}
-	
+
 	/**
 	 * @author gewx 本方法作用在于串行化回调消息执行逻辑. 问题描述:
 	 *         假设调度线程与正常客户端回调线程同时处理某个回调对象,会产生客户端响应接收到两次的情况.
@@ -130,8 +135,6 @@ public final class RpcRequestBody implements RpcMessage {
 
 	@Override
 	public String toString() {
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-		
 		StringBuffer sb = new StringBuffer(256);
 		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE,sb);
 		builder.append("messageId",messageId);
@@ -144,14 +147,14 @@ public final class RpcRequestBody implements RpcMessage {
 		}
 		*/
 		if (this.timeOut != null) {
-			builder.append("timeOut",format.format(this.timeOut));
+			builder.append("timeOut",this.timeOut.toString(dateTimeFormat));
 		}
 		if (this.requestTime != null) {
-			builder.append("requestTime", format.format(this.requestTime));
+			builder.append("requestTime", this.requestTime.toString(dateTimeFormat));
 		}
 		
 		if (this.responseTime != null) {
-			builder.append("responseTime", format.format(this.responseTime));
+			builder.append("responseTime", this.responseTime.toString(dateTimeFormat));
 		}
 		
 		sb.trimToSize();

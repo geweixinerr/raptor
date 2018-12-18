@@ -40,7 +40,7 @@
 		<property name="sourceMap">
 			<map>
 				<entry key="port" value="8090"/> <!-- 服务端口号 -->
-				<entry key="localAddress" value="127.0.0.1"/> <!-- 绑定的服务器IP地址 -->
+				<entry key="localAddress" value="10.19.181.45"/> <!-- 绑定的服务器IP地址 -->
 				<entry key="logOnOff" value="Off"/> <!-- Netty内置日志打印开关.On(开),Off(关),默认关闭. -->
 			</map>
 		</property>    
@@ -54,7 +54,7 @@
 		
 		<property name="sourceMap">
 			<map>
-				<entry key="remote" value="127.0.0.1:8090"/> <!-- key:服务名,value:地址 -->
+				<entry key="remote" value="10.19.181.45:8090"/> <!-- key:服务名,value:地址 -->
 			</map>
 		</property>    
 	</bean>  

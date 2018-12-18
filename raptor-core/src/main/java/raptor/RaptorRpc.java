@@ -1,10 +1,9 @@
 package raptor;
 
 import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,12 +75,8 @@ public final class RaptorRpc<T extends Serializable> {
 	public void sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, Integer timeOut,
 			T... body) {
 		RpcPushDefine rpcClient = RpcClientRegistry.INSTANCE.getRpcClient(rpcEnum.rpcPushDefine);
-
-		// 组装时间对象,并设置超时.
-		Calendar cal = Calendar.getInstance();
-		Date thisDate = cal.getTime();
 		
-		cal.add(Calendar.SECOND, timeOut);
+        DateTime reqDate = new DateTime(); //请求时间
 
 		String uuid = new UUID().toString();
 		// 组装请求参数
@@ -89,8 +84,8 @@ public final class RaptorRpc<T extends Serializable> {
 		requestBody.setMessageId(uuid);
 		requestBody.setBody(body);
 		requestBody.setRpcMethod(rpcMethodName);
-		requestBody.setRequestTime(thisDate);
-		requestBody.setTimeOut(cal.getTime());
+		requestBody.setRequestTime(reqDate);
+		requestBody.setTimeOut(reqDate.plusSeconds(timeOut));
 		requestBody.setCall(call);
 
 		rpcClient.pushMessage(requestBody); // 发送消息(异步发送)

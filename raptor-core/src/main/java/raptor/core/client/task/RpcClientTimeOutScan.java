@@ -1,8 +1,8 @@
 package raptor.core.client.task;
 
-import java.util.Date;
 import java.util.Map;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean;
@@ -59,7 +59,7 @@ public final class RpcClientTimeOutScan {
 					String messageId = en.getKey();
 					RpcRequestBody requestBody = en.getValue();
 					// 如果当前时间已超过设置的超时时间,则为过期消息.
-					if (new Date().compareTo(requestBody.getTimeOut()) >= 0) {
+					if (new DateTime().compareTo(requestBody.getTimeOut()) >= 0) {
 						requestPool.remove(messageId); // delete,mark:此处删除已回调超时信息,避免客户端回调重复执行此信息.
 						
 						if (!requestBody.isMessageSend()) { // 消息未发送
@@ -68,7 +68,7 @@ public final class RpcClientTimeOutScan {
 							responseBody.setMessageId(requestBody.getMessageId());
 							responseBody.setMessage("RPC 服务调用失败,message:timeOut.");
 
-							requestBody.setResponseTime(new Date());
+							requestBody.setResponseTime(new DateTime());
 							System.out.println("扫描客户端执行时间-----------> " + requestBody);
 							requestBody.getCall().invoke(responseBody); // 回调通知
 							LOGGER.info("清理超时消息...,messageId: " + messageId);
