@@ -53,8 +53,7 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody msg) throws Exception {
-		RpcResponseBody responseBody = (RpcResponseBody) msg;
-		RpcClientTaskPool.addTask(responseBody); // 入池处理.
+		RpcClientTaskPool.addTask(msg); // 入池处理.
 	}
 
 	@Override
