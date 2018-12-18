@@ -146,13 +146,14 @@ public final class RpcRequestBody implements RpcMessage {
 			builder.append("body","");
 		}
 		*/
-		if (this.timeOut != null) {
-			builder.append("timeOut",this.timeOut.toString(dateTimeFormat));
-		}
 		if (this.requestTime != null) {
 			builder.append("requestTime", this.requestTime.toString(dateTimeFormat));
 		}
 		
+		if (this.timeOut != null) {
+			builder.append("timeOut",this.timeOut.toString(dateTimeFormat));
+		}
+
 		if (this.responseTime != null) {
 			builder.append("responseTime", this.responseTime.toString(dateTimeFormat));
 		}
