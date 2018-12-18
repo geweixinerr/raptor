@@ -80,7 +80,7 @@ public final class RpcClientTaskPool {
 						requestBody.setResponseTime(new DateTime()); // 客户端回调时间
 						requestBody.getCall().invoke(responseBody);
 						System.out.println("客户端-服务器执行耗时: " + requestBody);
-						LOGGER.info("成功执行回调,messageId: " + responseBody.getMessageId());
+						LOGGER.info("成功执行回调,messageId: " + requestBody);
 					}
 				} else {
 					// 此处消息超时.
