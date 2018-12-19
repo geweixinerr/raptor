@@ -69,15 +69,17 @@ public final class RpcServer {
 			EventLoopGroup ioGroup = new NioEventLoopGroup(CPU_CORE * 3); //网络IO处理线程池
 			server.group(acceptGroup, ioGroup).channel(NioServerSocketChannel.class);
 		}
-
+		
 		server.option(ChannelOption.SO_BACKLOG, 1024) // 服务端接受连接的队列长度，如果队列已满，客户端连接将被拒绝。默认值，Windows为200，其他为128。
-				.option(ChannelOption.SO_RCVBUF, 128 * 1024) // 该值设置的是由ServerSocketChannel使用accept接受的SocketChannel的接收缓冲区。
+				.option(ChannelOption.SO_RCVBUF, 256 * 1024) // 该值设置的是由ServerSocketChannel使用accept接受的SocketChannel的接收缓冲区。
+			//	.option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(1024 * 1024 * 60,1024 * 1024 * 60))
 				.localAddress(serverConfig.get(ADDRESS_KEY), Integer.parseInt(serverConfig.get(PORT)))
 				.childHandler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
 						String logOnOff = serverConfig.get(RpcParameterEnum.LOGONOFF.getCode());
 						ChannelPipeline pipline = ch.pipeline();
+						pipline.channel().config().setOption(ChannelOption.SO_SNDBUF, 256 * 1024);
 						if (Constants.LogOn.equals(logOnOff)) {
 							pipline.addLast(new LoggingHandler(LogLevel.INFO)); // 开启日志监控
 						}
@@ -91,7 +93,7 @@ public final class RpcServer {
 		server.bind().sync().addListener(new ChannelFutureListener() {
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
-				if (future.isSuccess()) {
+				if (future.isSuccess()) {					
 					LOGGER.info("RPC 服务启动成功!");
 				} else {
 					String message = StringUtil.getErrorText(future.cause());

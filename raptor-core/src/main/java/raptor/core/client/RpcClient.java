@@ -54,8 +54,8 @@ public final class RpcClient {
 		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 3);//网络IO处理线程池
 		boot.group(eventGroup).channel(NioSocketChannel.class)
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIME_OUT) // 设置连接超时5秒,默认值30000毫秒即30秒。
-				.option(ChannelOption.SO_RCVBUF, 128 * 1024) // Socket参数,TCP数据接收缓冲区大小。
-				.option(ChannelOption.SO_SNDBUF, 128 * 1024) // Socket参数，TCP数据发送缓冲区大小。
+				.option(ChannelOption.SO_RCVBUF, 256 * 1024) // Socket参数,TCP数据接收缓冲区大小。
+				.option(ChannelOption.SO_SNDBUF, 256 * 1024) // Socket参数，TCP数据发送缓冲区大小。
 				.remoteAddress(clientConfig.get("remote")[0], Integer.parseInt(clientConfig.get("remote")[1])) // TODO
 				.handler(new ChannelInitializer<SocketChannel>() {
 					@Override
