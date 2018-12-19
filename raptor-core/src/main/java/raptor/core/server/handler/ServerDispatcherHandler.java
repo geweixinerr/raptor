@@ -30,7 +30,7 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 			@Override
 			public void invoke(RpcResponseBody responseBody) {
 				//MDC.put("invokeId", "invokeId-"+java.util.UUID.randomUUID().toString().replaceAll("-", "").toUpperCase());
-				ctx.writeAndFlush(ctx);
+				ctx.writeAndFlush(responseBody);
 			}
 		});
 	}
