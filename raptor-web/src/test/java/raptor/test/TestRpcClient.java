@@ -83,13 +83,13 @@ public final class TestRpcClient {
 	public static void start() throws InterruptedException {
 
 		Bootstrap boot = new Bootstrap();
-		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 6);
+		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 2);
 		boot.group(eventGroup).channel(NioSocketChannel.class).remoteAddress("10.19.181.109", 8090)
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000).option(ChannelOption.SO_SNDBUF, 128 * 1024) // 设置发送缓冲大小
 				.option(ChannelOption.SO_RCVBUF, 256 * 1024) // Socket参数,TCP数据接收缓冲区大小。
 				.option(ChannelOption.SO_SNDBUF, 256 * 1024) // Socket参数，TCP数据发送缓冲区大小。
 				//默认WriteBufferWaterMark(low: 32768, high: 65536)
-			    .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(32 * 32 * 1024 ,32 * 64 * 1024))
+			    .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(8 * 32 * 1024 ,8 * 64 * 1024))
 				.handler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {

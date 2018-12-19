@@ -61,18 +61,17 @@ public final class RpcServer {
 			LOGGER.info("Linux系统下,RPC Server启动...");
 			// Linux Epoll
 			EventLoopGroup acceptGroup = new EpollEventLoopGroup(1); // accept connection thread ,1个足矣.
-			EventLoopGroup ioGroup = new EpollEventLoopGroup(CPU_CORE * 3); //网络IO处理线程池
+			EventLoopGroup ioGroup = new EpollEventLoopGroup(CPU_CORE * 2); //网络IO处理线程池
 			server.group(acceptGroup, ioGroup).channel(EpollServerSocketChannel.class);
 		} else {
 			LOGGER.info("非Linux系统下,RPC Server启动...");
 			EventLoopGroup acceptGroup = new NioEventLoopGroup(1); // accept connection thread ,1个足矣.
-			EventLoopGroup ioGroup = new NioEventLoopGroup(CPU_CORE * 3); //网络IO处理线程池
+			EventLoopGroup ioGroup = new NioEventLoopGroup(CPU_CORE * 2); //网络IO处理线程池
 			server.group(acceptGroup, ioGroup).channel(NioServerSocketChannel.class);
 		}
 		
 		server.option(ChannelOption.SO_BACKLOG, 1024) // 服务端接受连接的队列长度，如果队列已满，客户端连接将被拒绝。默认值，Windows为200，其他为128。
 				.option(ChannelOption.SO_RCVBUF, 256 * 1024) // 该值设置的是由ServerSocketChannel使用accept接受的SocketChannel的接收缓冲区。
-			//	.option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(1024 * 1024 * 60,1024 * 1024 * 60))
 				.localAddress(serverConfig.get(ADDRESS_KEY), Integer.parseInt(serverConfig.get(PORT)))
 				.childHandler(new ChannelInitializer<SocketChannel>() {
 					@Override
