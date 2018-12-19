@@ -15,6 +15,7 @@ import raptor.core.client.RpcClientRegistry;
 import raptor.core.client.RpcClientRegistry.rpcEnum;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
+import raptor.core.message.RpcResponseBody;
 
 /**
  * @author gewx Raptor消息发送入口类,消息的包装发送.
@@ -90,9 +91,18 @@ public final class RaptorRpc<T extends Serializable> {
 
 		boolean isMessageSend = rpcClient.pushMessage(requestBody); // 发送消息(异步发送)
 		if (isMessageSend) {
-			LOGGER.info("RPC消息发送: " + requestBody);
 			RpcClientTaskPool.pushTask(requestBody); // 入客户端队列.	
+		} else {
+			/**
+			 * 客户端异步请求达到Netty Buffer高水平线,阻流.
+			 * **/
+			RpcResponseBody responseBody = new RpcResponseBody();
+			responseBody.setSuccess(false);
+			responseBody.setMessageId(requestBody.getMessageId());
+			responseBody.setMessage("RPC 服务调用失败,message:[Netty Buffer高水平线,阻流]");
+			call.invoke(responseBody); //直接回调输出结果.
 		}
+		
 		return isMessageSend;
 	}
 

@@ -13,6 +13,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.WriteBufferWaterMark;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -56,6 +57,8 @@ public final class RpcClient {
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIME_OUT) // 设置连接超时5秒,默认值30000毫秒即30秒。
 				.option(ChannelOption.SO_RCVBUF, 256 * 1024) // Socket参数,TCP数据接收缓冲区大小。
 				.option(ChannelOption.SO_SNDBUF, 256 * 1024) // Socket参数，TCP数据发送缓冲区大小。
+				//默认WriteBufferWaterMark(low: 32768, high: 65536)
+			    .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(32 * 32 * 1024 ,32 * 64 * 1024))
 				.remoteAddress(clientConfig.get("remote")[0], Integer.parseInt(clientConfig.get("remote")[1])) // TODO
 				.handler(new ChannelInitializer<SocketChannel>() {
 					@Override
