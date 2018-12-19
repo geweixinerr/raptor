@@ -4,7 +4,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import raptor.core.AbstractCallBack;
@@ -31,14 +30,7 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 			@Override
 			public void invoke(RpcResponseBody responseBody) {
 				//MDC.put("invokeId", "invokeId-"+java.util.UUID.randomUUID().toString().replaceAll("-", "").toUpperCase());
-				//直接放入channel所对应的EventLoop的执行队列,避免线程上下文切换.
-				Channel channel = ctx.channel();
-				channel.eventLoop().execute(new Runnable() {
-					@Override
-					public void run() {
-						channel.writeAndFlush(responseBody);
-					}
-				});
+				ctx.writeAndFlush(ctx);
 			}
 		});
 	}

@@ -5,10 +5,9 @@ import javax.annotation.concurrent.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import raptor.core.RpcPushDefine;
 import raptor.core.client.RpcClientTaskPool;
@@ -32,18 +31,12 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 	 **/
 	@Override
 	public void pushMessage(RpcRequestBody requestBody) {
-		ChannelFuture channelfuture = ctx.writeAndFlush(requestBody);
-		channelfuture.addListener(new ChannelFutureListener() {
-			@Override
-			public void operationComplete(ChannelFuture future) throws Exception {
-				if (future.isSuccess()) {
-					LOGGER.info("RPC 数据发送成功,messageId: " + requestBody.getMessageId());
-				} else {
-					LOGGER.info("RPC 数据发送失败, messageId: " + requestBody.getMessageId() + ", message : "
-							+ StringUtil.getErrorText(future.cause()));
-				}
-			}
-		});
+		Channel channel = ctx.channel();
+		if (channel.isWritable()) {
+			ctx.writeAndFlush(requestBody); 
+		} else {
+			//
+		}
 	}
 
 	@Override
