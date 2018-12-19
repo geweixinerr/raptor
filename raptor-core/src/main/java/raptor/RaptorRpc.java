@@ -69,10 +69,10 @@ public final class RaptorRpc<T extends Serializable> {
 	 *            服务名(配置在客户端配置当中), rpcMethodName 调用服务方法名, body 消息主体内容, call 回调对象,
 	 *            timeOut 业务超时设置,单位/秒(默认5秒)
 	 * 
-	 * @return void
+	 * @return 服务请求受理结果, true : 受理成功, false: 受理失败,服务拒绝[超过raptor中间件发送的数据包上限,参考属性: ChannelOption.WRITE_BUFFER_WATER_MARK]
 	 **/
 	@SuppressWarnings("unchecked")
-	public void sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, Integer timeOut,
+	public boolean sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, Integer timeOut,
 			T... body) {
 		RpcPushDefine rpcClient = RpcClientRegistry.INSTANCE.getRpcClient(rpcEnum.rpcPushDefine);
 		
@@ -88,19 +88,21 @@ public final class RaptorRpc<T extends Serializable> {
 		requestBody.setTimeOut(reqDate.plusSeconds(timeOut));
 		requestBody.setCall(call);
 
-		rpcClient.pushMessage(requestBody); // 发送消息(异步发送)
-		RpcClientTaskPool.pushTask(requestBody); // 入客户端队列.
-		
-		LOGGER.info("RPC消息发送: " + requestBody);
+		boolean isMessageSend = rpcClient.pushMessage(requestBody); // 发送消息(异步发送)
+		if (isMessageSend) {
+			LOGGER.info("RPC消息发送: " + requestBody);
+			RpcClientTaskPool.pushTask(requestBody); // 入客户端队列.	
+		}
+		return isMessageSend;
 	}
 
 	// 重载异步方法
 	@SuppressWarnings("unchecked")
-	public void sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, T... body) {
+	public boolean sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, T... body) {
 		if (StringUtils.isBlank(serverName) || StringUtils.isBlank(rpcMethodName) || call == null) {
 			throw new IllegalArgumentException("缺失服务请求参数,serverName/rpcMethodName/call isNotEmpty!");
 		}
-		sendAsyncMessage(serverName, rpcMethodName, call, TIME_OUT, body);
+		return sendAsyncMessage(serverName, rpcMethodName, call, TIME_OUT, body);
 	}
 
 }
