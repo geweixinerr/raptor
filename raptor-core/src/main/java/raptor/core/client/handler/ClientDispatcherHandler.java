@@ -30,12 +30,16 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 	 * @author gewx 消息推送
 	 **/
 	@Override
-	public void pushMessage(RpcRequestBody requestBody) {
+	public boolean pushMessage(RpcRequestBody requestBody) {
 		Channel channel = ctx.channel();
 		if (channel.isWritable()) {
 			ctx.writeAndFlush(requestBody); 
+			return true;
 		} else {
-			//
+			/**
+			 * 超过Netty write buffer上限,阻流.
+			 * **/
+		    return false;
 		}
 	}
 
