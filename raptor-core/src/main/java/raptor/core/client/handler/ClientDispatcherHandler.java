@@ -36,9 +36,6 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 			ctx.writeAndFlush(requestBody); 
 			return true;
 		} else {
-			/**
-			 * 超过Netty write buffer上限,阻流.
-			 * **/
 		    return false;
 		}
 	}
