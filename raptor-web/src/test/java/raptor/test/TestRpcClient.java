@@ -15,7 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.AdaptiveRecvByteBufAllocator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -23,6 +25,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.PreferHeapByteBufAllocator;
+import io.netty.channel.RecvByteBufAllocator;
 import io.netty.channel.WriteBufferWaterMark;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -83,7 +86,6 @@ public final class TestRpcClient {
 	 * @throws InterruptedException
 	 **/
 	public static void start() throws InterruptedException {
-
 		Bootstrap boot = new Bootstrap();
 		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 2);
 		boot.group(eventGroup).channel(NioSocketChannel.class).remoteAddress("10.19.181.22", 8090)
@@ -103,7 +105,7 @@ public final class TestRpcClient {
 				});
 
 		ChannelFuture future = boot.connect().sync();
-
+		
 		future.addListener(new ChannelFutureListener() {
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
@@ -181,7 +183,7 @@ public final class TestRpcClient {
 			}, 5, data, String.valueOf(j));
 		}
 		*/
-	 
+		
 		System.out.println("执行-start");
 		for (int i = 0; i < 100000; i++) {
 			rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {

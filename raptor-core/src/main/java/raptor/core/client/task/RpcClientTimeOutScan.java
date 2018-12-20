@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean;
 import org.springframework.scheduling.concurrent.ScheduledExecutorTask;
 
+import raptor.core.RpcResult;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
@@ -63,6 +64,7 @@ public final class RpcClientTimeOutScan {
 								responseBody.setSuccess(false);
 								responseBody.setMessageId(requestBody.getMessageId());
 								responseBody.setMessage("RPC 服务调用失败,message:timeOut");
+								responseBody.setRpcCode(RpcResult.TIME_OUT);
 								requestBody.setResponseTime(thisDate);
 						
 								requestBody.getCall().invoke(responseBody); // 回调通知

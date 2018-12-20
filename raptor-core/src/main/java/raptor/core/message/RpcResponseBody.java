@@ -3,6 +3,8 @@ package raptor.core.message;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import raptor.core.RpcResult;
+
 /**
  * @author gewx RPC消息响应主体
  * **/
@@ -32,6 +34,11 @@ public final class RpcResponseBody implements RpcMessage {
 	 * **/
 	private Boolean success;
 
+	/**
+	 * RPC响应码
+	 * **/
+	private transient RpcResult rpcCode;
+	
 	public String getMessage() {
 		return message;
 	}
@@ -64,6 +71,14 @@ public final class RpcResponseBody implements RpcMessage {
 		this.success = success;
 	}
 
+	public RpcResult getRpcCode() {
+		return rpcCode;
+	}
+
+	public void setRpcCode(RpcResult rpcCode) {
+		this.rpcCode = rpcCode;
+	}
+
 	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer(256);
@@ -72,6 +87,9 @@ public final class RpcResponseBody implements RpcMessage {
 		builder.append("messageId",messageId);
 		builder.append("success",success);
 		builder.append("body",body);
+		if (this.rpcCode != null) {
+			builder.append("rpcCode",rpcCode.getComment());	
+		}
 		sb.trimToSize();
 		return builder.toString();
 	}

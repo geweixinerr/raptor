@@ -11,6 +11,7 @@ import com.eaio.uuid.UUID;
 
 import raptor.core.AbstractCallBack;
 import raptor.core.RpcPushDefine;
+import raptor.core.RpcResult;
 import raptor.core.client.RpcClientRegistry;
 import raptor.core.client.RpcClientRegistry.rpcEnum;
 import raptor.core.client.RpcClientTaskPool;
@@ -100,6 +101,7 @@ public final class RaptorRpc<T extends Serializable> {
 			responseBody.setSuccess(false);
 			responseBody.setMessageId(requestBody.getMessageId());
 			responseBody.setMessage("RPC 服务调用失败,message:[Netty Buffer高水平线,阻流]");
+			responseBody.setRpcCode(RpcResult.FLOWER_CONTROL);
 			call.invoke(responseBody); //直接回调输出结果.
 		}
 		
