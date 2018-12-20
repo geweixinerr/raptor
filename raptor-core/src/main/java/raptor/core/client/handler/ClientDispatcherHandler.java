@@ -31,6 +31,16 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 	 **/
 	@Override
 	public boolean pushMessage(RpcRequestBody requestBody) {
+		/*
+		 * 这种写法并不会存在所谓的减少线程上下文切换.
+		ctx.channel().eventLoop().execute(new Runnable() {
+			@Override
+			public void run() {
+				ctx.channel().writeAndFlush("");
+			}
+		});
+		*/
+		
 		Channel channel = ctx.channel();
 		if (channel.isWritable()) {
 			ctx.writeAndFlush(requestBody); 

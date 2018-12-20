@@ -32,6 +32,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import raptor.core.AbstractCallBack;
 import raptor.core.RpcPushDefine;
+import raptor.core.RpcResult;
 import raptor.core.client.NettyTestData;
 import raptor.core.client.RpcClientRegistry;
 import raptor.core.client.RpcClientTaskPool;
@@ -190,7 +191,9 @@ public final class TestRpcClient {
 				@Override
 				public void invoke(RpcResponseBody responseBody) {
 					if (responseBody.getSuccess() == false) {
-						System.out.println("请求结果,超时: " + responseBody.getMessageId());
+						if (RpcResult.FLOWER_CONTROL.equals(responseBody.getRpcCode())) {
+							System.out.println("请求结果,流控超时: " + responseBody.getMessageId());	
+						}
 					}
 				}
 			}, 5, map, message);
