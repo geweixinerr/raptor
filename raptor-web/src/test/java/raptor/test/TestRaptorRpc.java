@@ -63,9 +63,8 @@ public final class TestRaptorRpc<T extends Serializable> {
 			responseBody.setSuccess(false);
 			responseBody.setMessageId(requestBody.getMessageId());
 			responseBody.setMessage("RPC 服务调用失败,message:[Netty Buffer高水平线,阻流]");
-			responseBody.setBody("timeOut123");			
 			responseBody.setRpcCode(RpcResult.FLOWER_CONTROL);
-			call.invoke(responseBody); //直接回调输出结果.
+			call.invoke(requestBody,responseBody); //直接回调输出结果.
 		}
 		
 		return isMessageSend;

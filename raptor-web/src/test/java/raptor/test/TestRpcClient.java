@@ -40,6 +40,7 @@ import raptor.core.client.handler.ClientDispatcherHandler;
 import raptor.core.client.task.RpcClientTimeOutScan;
 import raptor.core.handler.codec.RpcByteToMessageDecoder;
 import raptor.core.handler.codec.RpcMessageToByteEncoder;
+import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
 import raptor.util.StringUtil;
 
@@ -189,11 +190,19 @@ public final class TestRpcClient {
 		for (int i = 0; i < 100000; i++) {
 			rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
 				@Override
-				public void invoke(RpcResponseBody responseBody) {
-					if (responseBody.getSuccess() == false) {
-						if (RpcResult.FLOWER_CONTROL.equals(responseBody.getRpcCode())) {
-							System.out.println("请求结果,流控超时: " + responseBody.getMessageId());	
+				public void invoke(RpcResponseBody resp) {
+
+				}
+				
+				//流控回调.仅仅测试使用.
+				@Override
+				public void invoke(RpcRequestBody req , RpcResponseBody resp) {
+					if (resp.getSuccess() == false) {
+						if (RpcResult.TIME_OUT.equals(resp.getRpcCode())) {
+							System.out.println("请求结果,回调超时: " + req);	
 						}
+					} else {
+						System.out.println("响应数据 : " + resp);
 					}
 				}
 			}, 5, map, message);
