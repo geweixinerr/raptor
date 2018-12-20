@@ -202,7 +202,7 @@ public final class TestRpcClient {
 							System.out.println("请求结果,回调超时: " + req);	
 						}
 					} else {
-						System.out.println("响应数据 : " + resp);
+						System.out.println("正常响应数据 : " + req);
 					}
 				}
 			}, 5, map, message);

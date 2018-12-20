@@ -72,8 +72,8 @@ public final class RpcServer {
 		
 		
 		server.option(ChannelOption.SO_BACKLOG, 1024) // 服务端接受连接的队列长度，如果队列已满，客户端连接将被拒绝。默认值，Windows为200，其他为128。
-				.childOption(ChannelOption.SO_RCVBUF,  1024 * 1024) // 接受窗口(window size value),设置为1MB
-				.childOption(ChannelOption.SO_SNDBUF,  1024 * 1024) // 接受窗口(window size value),设置为1MB
+				.childOption(ChannelOption.SO_RCVBUF,  512 * 1024) // 接受窗口(window size value),设置为1MB
+				.childOption(ChannelOption.SO_SNDBUF,  512 * 1024) // 接受窗口(window size value),设置为1MB
 				
 				.localAddress(serverConfig.get(ADDRESS_KEY), Integer.parseInt(serverConfig.get(PORT)))
 				.childHandler(new ChannelInitializer<SocketChannel>() {
