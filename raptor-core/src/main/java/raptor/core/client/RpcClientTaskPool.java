@@ -79,7 +79,6 @@ public final class RpcClientTaskPool {
 					if (!requestBody.isMessageSend()) {
 						requestBody.setResponseTime(new DateTime()); // 客户端回调时间
 						requestBody.getCall().invoke(responseBody);
-//						System.out.println("客户端-服务器执行耗时: " + requestBody);
 						LOGGER.info("成功执行回调,messageId: " + requestBody);
 					}
 				} else {
