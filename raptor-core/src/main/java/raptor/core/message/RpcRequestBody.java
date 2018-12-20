@@ -41,7 +41,17 @@ public final class RpcRequestBody implements RpcMessage {
 	/**
 	 * 业务超时时间,默认5秒(单位:秒)
 	 * **/
-	private  DateTime timeOut; 
+	private transient DateTime timeOut; 
+	
+	/**
+	 * 业务请求时间
+	 * **/
+	private  transient DateTime requestTime; 
+	
+	/**
+	 * 业务请求-客户端回调时间.
+	 * **/
+	private  transient DateTime responseTime; 
 	
 	/**
 	 * 客户端调用回调对象
@@ -52,17 +62,6 @@ public final class RpcRequestBody implements RpcMessage {
 	 * 发送标记. true已发送,false未发送
 	 **/
 	private transient boolean send;
-	
-	/**
-	 * 业务请求时间
-	 * **/
-	private  DateTime requestTime; 
-	
-	/**
-	 * 业务请求-客户端回调时间.
-	 * **/
-	private  DateTime responseTime; 
-	
 	
 	public String getMessageId() {
 		return messageId;
