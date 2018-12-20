@@ -15,12 +15,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.PreferHeapByteBufAllocator;
 import io.netty.channel.WriteBufferWaterMark;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -84,12 +86,12 @@ public final class TestRpcClient {
 
 		Bootstrap boot = new Bootstrap();
 		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 2);
-		boot.group(eventGroup).channel(NioSocketChannel.class).remoteAddress("10.19.181.109", 8090)
+		boot.group(eventGroup).channel(NioSocketChannel.class).remoteAddress("10.19.181.22", 8090)
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000).option(ChannelOption.SO_SNDBUF, 128 * 1024) // 设置发送缓冲大小
 				.option(ChannelOption.SO_RCVBUF, 256 * 1024) // Socket参数,TCP数据接收缓冲区大小。
 				.option(ChannelOption.SO_SNDBUF, 256 * 1024) // Socket参数，TCP数据发送缓冲区大小。
 				//默认WriteBufferWaterMark(low: 32768, high: 65536)
-			    .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(8 * 32 * 1024 ,8 * 64 * 1024))
+//			    .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(8 * 32 * 1024 ,8 * 64 * 1024))
 				.handler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
@@ -137,7 +139,7 @@ public final class TestRpcClient {
 		String message = "Netty RPC Send, Netty is VeryGood!";
 		NettyTestData data = new NettyTestData();
 		
-	
+	    /*
 		Executor execute = Executors.newFixedThreadPool(CPU_CORE * 2);
 		CyclicBarrier latch = new CyclicBarrier(CPU_CORE * 2);
 
@@ -165,13 +167,13 @@ public final class TestRpcClient {
 				}
 			});
 		}
-		
+		*/
 		/*
 		for (int j = 0; j < 100000; j++) {
 			rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
 				@Override
 				public void invoke(RpcResponseBody responseBody) {
-					if (responseBody.getSuccess() == false && "RPC 服务调用失败,message:timeOut".equals(responseBody.getMessage())) {
+					if (responseBody.getSuccess() == false) {
 						System.out.println("超时请求结果: " + responseBody.getSuccess() + ", Message: "
 								+ responseBody.getMessage() + ", Result: " + responseBody.getMessageId());
 					}				
@@ -179,16 +181,17 @@ public final class TestRpcClient {
 			}, 5, data, String.valueOf(j));
 		}
 		*/
-		
-	    /*
+	 
 		System.out.println("执行-start");
-		rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
-			@Override
-			public void invoke(RpcResponseBody responseBody) {
-				System.out.println("请求结果: " + responseBody.getSuccess() + ", Message: "
-						+ responseBody.getMessage() + ", MessageId: " + responseBody.getMessageId());
-			}
-		}, 5, data, message);
-	    */
+		for (int i = 0; i < 100000; i++) {
+			rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
+				@Override
+				public void invoke(RpcResponseBody responseBody) {
+					if (responseBody.getSuccess() == false) {
+						System.out.println("请求结果,超时: " + responseBody.getMessageId());
+					}
+				}
+			}, 5, map, message);
+		}
 	} 
 }

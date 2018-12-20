@@ -70,15 +70,16 @@ public final class RpcServer {
 			server.group(acceptGroup, ioGroup).channel(NioServerSocketChannel.class);
 		}
 		
+		
 		server.option(ChannelOption.SO_BACKLOG, 1024) // 服务端接受连接的队列长度，如果队列已满，客户端连接将被拒绝。默认值，Windows为200，其他为128。
-				.option(ChannelOption.SO_RCVBUF, 256 * 1024) // 该值设置的是由ServerSocketChannel使用accept接受的SocketChannel的接收缓冲区。
+				.childOption(ChannelOption.SO_RCVBUF, 10 * 1024 * 1024)// 接受窗口(window size value)
+				.childOption(ChannelOption.SO_SNDBUF, 10 * 1024 * 1024)// 发送窗口(window size value)
 				.localAddress(serverConfig.get(ADDRESS_KEY), Integer.parseInt(serverConfig.get(PORT)))
 				.childHandler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
 						String logOnOff = serverConfig.get(RpcParameterEnum.LOGONOFF.getCode());
 						ChannelPipeline pipline = ch.pipeline();
-						pipline.channel().config().setOption(ChannelOption.SO_SNDBUF, 256 * 1024);
 						if (Constants.LogOn.equals(logOnOff)) {
 							pipline.addLast(new LoggingHandler(LogLevel.INFO)); // 开启日志监控
 						}
