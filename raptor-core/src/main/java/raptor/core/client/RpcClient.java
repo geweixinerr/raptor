@@ -39,6 +39,15 @@ public final class RpcClient {
 	// 默认超时设置,5秒
 	private static final Integer DEFAULT_TIME_OUT = 5000;
 
+	/**
+	 * TCP参数配置
+	 * **/
+	private static final Integer ONE_KB = 1024; //1KB数值常量.
+	
+	private static final Integer SO_RCVBUF = 512; //socket buffer数据接收窗口
+	
+	private static final Integer SO_SNDBUF = 256; //socket buffer数据发送窗口 
+	
 	private RpcClient() {
 
 	}
@@ -55,10 +64,18 @@ public final class RpcClient {
 		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 2);//网络IO处理线程池
 		boot.group(eventGroup).channel(NioSocketChannel.class)
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIME_OUT) // 设置连接超时5秒,默认值30000毫秒即30秒。
-				.option(ChannelOption.SO_RCVBUF,  512 * 1024) // 接受窗口(window size value),设置为1MB
-				.option(ChannelOption.SO_SNDBUF,  512 * 1024) // 接受窗口(window size value),设置为1MB
+				/**
+				 * 经过精密计算,服务器处理数据能力为客户端的3/5(序列化与反序列化性能差异),所以这里信息推送的socket buffer为服务器的3/5略少
+				 * **/
+				.option(ChannelOption.SO_RCVBUF,  SO_RCVBUF * ONE_KB) // 接受窗口(window size value),设置为512kb
+				.option(ChannelOption.SO_SNDBUF,  SO_SNDBUF * ONE_KB) // 发送窗口(window size value),设置为256kb
+				.option(ChannelOption.TCP_NODELAY, false) //启用/禁用 TCP_NODELAY（启用/禁用 Nagle 算法）。
+
 				//默认WriteBufferWaterMark(low: 32768, high: 65536)
-			    .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(8 * 32 * 1024 ,8 * 64 * 1024))
+				/**
+				 * 基于socket buffer设置Netty Buffer.  高水平线为socket buffer的 80% ,低水平线为高位水平线的1/2.
+				 * **/
+			    .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(((int)(SO_SNDBUF * 0.8))/2 * ONE_KB ,((int)(SO_SNDBUF * 0.8)) * ONE_KB))
 				.remoteAddress(clientConfig.get("remote")[0], Integer.parseInt(clientConfig.get("remote")[1])) // TODO
 				.handler(new ChannelInitializer<SocketChannel>() {
 					@Override
