@@ -90,12 +90,12 @@ public final class TestRpcClient {
 	public static void start() throws InterruptedException {
 		Bootstrap boot = new Bootstrap();
 		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 2);
-		boot.group(eventGroup).channel(NioSocketChannel.class).remoteAddress("10.19.181.22", 8090)
+		boot.group(eventGroup).channel(NioSocketChannel.class).remoteAddress("10.19.181.106", 8090)
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000).option(ChannelOption.SO_SNDBUF, 128 * 1024) // 设置发送缓冲大小
-				.option(ChannelOption.SO_RCVBUF, 256 * 1024) // Socket参数,TCP数据接收缓冲区大小。
-				.option(ChannelOption.SO_SNDBUF, 256 * 1024) // Socket参数，TCP数据发送缓冲区大小。
+				.option(ChannelOption.SO_RCVBUF, 512 * 1024) // Socket参数,TCP数据接收缓冲区大小。
+				.option(ChannelOption.SO_SNDBUF, 512 * 1024) // Socket参数，TCP数据发送缓冲区大小。
 				//默认WriteBufferWaterMark(low: 32768, high: 65536)
-//			    .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(8 * 32 * 1024 ,8 * 64 * 1024))
+			    .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(64 * 1024 ,128 * 1024))
 				.handler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
@@ -186,23 +186,25 @@ public final class TestRpcClient {
 		}
 		*/
 		
-		rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
-			@Override
-			public void invoke(RpcResponseBody resp) {
+		for (int i = 0; i < 10; i++) {
+			rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
+				@Override
+				public void invoke(RpcResponseBody resp) {
 
-			}
-			
-			//流控回调.仅仅测试使用.
-			@Override
-			public void invoke(RpcRequestBody req , RpcResponseBody resp) {
-				if (resp.getSuccess() == false) {
-					if (RpcResult.TIME_OUT.equals(resp.getRpcCode())) {
-						System.out.println("请求结果,回调超时: " + req);	
-					}
-				} else {
-					System.out.println("正常响应数据 : " + req);
 				}
-			}
-		}, 5, data, message);
+				
+				//流控回调.仅仅测试使用.
+				@Override
+				public void invoke(RpcRequestBody req , RpcResponseBody resp) {
+					if (resp.getSuccess() == false) {
+						if (RpcResult.TIME_OUT.equals(resp.getRpcCode())) {
+							System.out.println("请求结果,回调超时: " + req);	
+						}
+					} else {
+						System.out.println("正常响应数据 : " + req);
+					}
+				}
+			}, 5, data, message);	
+		}
 	} 
 }
