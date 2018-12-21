@@ -186,26 +186,23 @@ public final class TestRpcClient {
 		}
 		*/
 		
-		System.out.println("执行-start");
-		for (int i = 0; i < 100000; i++) {
-			rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
-				@Override
-				public void invoke(RpcResponseBody resp) {
+		rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
+			@Override
+			public void invoke(RpcResponseBody resp) {
 
-				}
-				
-				//流控回调.仅仅测试使用.
-				@Override
-				public void invoke(RpcRequestBody req , RpcResponseBody resp) {
-					if (resp.getSuccess() == false) {
-						if (RpcResult.TIME_OUT.equals(resp.getRpcCode())) {
-							System.out.println("请求结果,回调超时: " + req);	
-						}
-					} else {
-						System.out.println("正常响应数据 : " + req);
+			}
+			
+			//流控回调.仅仅测试使用.
+			@Override
+			public void invoke(RpcRequestBody req , RpcResponseBody resp) {
+				if (resp.getSuccess() == false) {
+					if (RpcResult.TIME_OUT.equals(resp.getRpcCode())) {
+						System.out.println("请求结果,回调超时: " + req);	
 					}
+				} else {
+					System.out.println("正常响应数据 : " + req);
 				}
-			}, 5, map, message);
-		}
+			}
+		}, 5, data, message);
 	} 
 }
