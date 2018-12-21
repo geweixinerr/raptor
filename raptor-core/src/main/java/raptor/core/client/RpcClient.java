@@ -62,7 +62,7 @@ public final class RpcClient {
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIME_OUT) // 设置连接超时5秒,默认值30000毫秒即30秒。
 				.option(ChannelOption.SO_RCVBUF,  512 * ONE_KB) // 接受窗口(window size value),设置为512kb
 				.option(ChannelOption.SO_SNDBUF,  512 * ONE_KB) // 发送窗口(window size value),设置为256kb
-				.option(ChannelOption.TCP_NODELAY, false) //启用/禁用 TCP_NODELAY（启用/禁用 Nagle 算法）。
+				.option(ChannelOption.TCP_NODELAY, true) //启用/禁用 TCP_NODELAY（启用/禁用 Nagle 算法）。
 
 				//默认WriteBufferWaterMark(low: 32768, high: 65536)
 			    .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(64 * ONE_KB ,128 * ONE_KB))
