@@ -50,11 +50,6 @@ public final class RpcServer {
 	 * **/
 	private static final Integer ONE_KB = 1024; //1KB数值常量.
 	
-	private static final Integer SO_RCVBUF = 512; //socket buffer数据接收窗口
-	
-	private static final Integer SO_SNDBUF = 256; //socket buffer数据发送窗口 
-	
-	
 	private RpcServer() {
 	}
 
@@ -83,13 +78,12 @@ public final class RpcServer {
 		
 		
 		server.option(ChannelOption.SO_BACKLOG, 1024) // 服务端接受连接的队列长度，如果队列已满，客户端连接将被拒绝。默认值，Windows为200，其他为128。
-				.childOption(ChannelOption.SO_RCVBUF,  SO_RCVBUF * 10 * ONE_KB) // 接受窗口(window size value),设置为512kb
-				.childOption(ChannelOption.SO_SNDBUF,  SO_SNDBUF * 10 *  ONE_KB) // 发送窗口(window size value),设置为256kb
+				.childOption(ChannelOption.SO_RCVBUF, 14 * ONE_KB * ONE_KB) // 接受窗口(window size value),设置为512kb
+				.childOption(ChannelOption.SO_SNDBUF, 10 * ONE_KB * ONE_KB) // 发送窗口(window size value),设置为256kb
 				.childOption(ChannelOption.TCP_NODELAY, false) //启用/禁用 TCP_NODELAY（启用/禁用 Nagle 算法）。
 				/**
 				 * 基于socket buffer设置Netty Buffer.  高水平线为socket buffer的 80% ,低水平线为高位水平线的1/2.
 				 * **/
-			    .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark( (SO_SNDBUF / 2) * ONE_KB ,SO_SNDBUF * ONE_KB))
 				.localAddress(serverConfig.get(ADDRESS_KEY), Integer.parseInt(serverConfig.get(PORT)))
 				.childHandler(new ChannelInitializer<SocketChannel>() {
 					@Override
