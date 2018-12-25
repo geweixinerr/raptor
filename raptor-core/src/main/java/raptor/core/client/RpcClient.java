@@ -1,49 +1,74 @@
 package raptor.core.client;
 
-import java.net.InetSocketAddress;
+import static org.junit.Assert.assertArrayEquals;
+
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.pool2.ObjectPool;
+import org.apache.commons.pool2.PooledObjectFactory;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.WriteBufferWaterMark;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import raptor.core.client.handler.ClientDispatcherHandler;
-import raptor.core.handler.codec.RpcByteToMessageDecoder;
-import raptor.core.handler.codec.RpcMessageToByteEncoder;
+import raptor.core.RpcPushDefine;
 import raptor.core.init.RpcParameter;
-import raptor.util.StringUtil;
+import raptor.core.pool.NettyPoolFactory;
 
 /**
- * @author gewx Netty客户端
+ * @author gewx Netty客户端类
  **/
 public final class RpcClient {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(RpcClient.class);
 	
-	// CPU核心数
-	private static final Integer CPU_CORE = Runtime.getRuntime().availableProcessors();
+	/**
+	 * @author gewx 多客户端配置与连接池映射关系.
+	 * **/
+	private static final Map<String,ObjectPool<RpcPushDefine>> RPC_OBJECT_POOL = new ConcurrentHashMap<String,ObjectPool<RpcPushDefine>>();
 	
-	// 客户端分发器注册pipline Key
-	private static final String CLIENT_DISPATCHER = "clientDispatcher";
-
-	// 默认超时设置,5秒
-	private static final Integer DEFAULT_TIME_OUT = 5000;
+	/**
+	 * 远程服务器地址配置key
+	 * **/
+	private static final String REMOTE_ADDR = "remote";
+	
+	/**
+	 * 远程服务器地址端口配置key
+	 * **/
+	private static final String PORT = "port";
+	
+	/**
+	 * 客户端标识
+	 * **/
+	private static final String CLIENT_NAME = "clientName";
+	
+	/**
+	 * 最大连接数
+	 * **/
+	private static final String MAX_CLIENTS = "maxclients";
+	
 
 	/**
-	 * TCP参数配置
+	 * 最大连接数-默认值
 	 * **/
-	private static final Integer ONE_KB = 1024; //1KB数值常量.
+	private static final String DEFAULT_MAX_CLIENTS = "64";
 	
+	/**
+	 * 最小连接数
+	 * **/
+	private static final String MIN_CLIENTS = "minclients";
+	
+	/**
+	 * 最小连接数-默认值
+	 * **/
+	private static final String DEFAULT_MIN_CLIENTS = "6";
+	
+	/**
+	 * 从池中获取对象,最大等待时间 MAXWAIT_MILLIS,默认1000毫秒
+	 * **/
+	private static final Integer DEFAULT_MAXWAIT_MILLIS = 1000;
+	
+
 	private RpcClient() {
 
 	}
@@ -53,45 +78,46 @@ public final class RpcClient {
 	 * 
 	 * @throws InterruptedException
 	 **/
-	public static void start() throws InterruptedException {
-		Map<String, String[]> clientConfig = RpcParameter.INSTANCE.getClientConfig(); // 客户端配置参数
+	@SuppressWarnings({ "rawtypes", "unchecked"})
+	public static void start() throws Exception {
+		List<Map<String, String>> clientConfig = RpcParameter.INSTANCE.getClientConfig(); // 客户端配置参数
+		for (Map<String,String> en : clientConfig) {
+	    	PooledObjectFactory poolFactory = new NettyPoolFactory(en.get(REMOTE_ADDR),Integer.parseInt(en.get(PORT)));
+	    	
+	    	//最大连接数
+	    	String maxclients = ObjectUtils.defaultIfNull(en.get(MAX_CLIENTS),DEFAULT_MAX_CLIENTS);
+	    	//最小连接数
+	    	String minclients = ObjectUtils.defaultIfNull(en.get(MIN_CLIENTS),DEFAULT_MIN_CLIENTS);
+	    	//对象池配置
+	    	GenericObjectPoolConfig conf = new GenericObjectPoolConfig();
+	    	conf.setMaxTotal(Integer.parseInt(maxclients));  //池中最多可用的实例个数
+	    	conf.setMaxIdle(Integer.parseInt(maxclients)); //连接池中最大空闲的连接数,默认为8
+	    	conf.setMinIdle(Integer.parseInt(minclients)); //连接池中最少空闲的连接数,默认为0
+	    	conf.setBlockWhenExhausted(false); //是否堵塞等待连接创建. (true:等待,false:不等待)
+	    	conf.setMaxWaitMillis(DEFAULT_MAXWAIT_MILLIS); //调用borrowObject方法时，需要等待的最长时间. 单位:毫秒
+	    	conf.setMinEvictableIdleTimeMillis(-1); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除 （-1 :不移除,使用setSoftMinEvictableIdleTimeMillis配置）
+	    	conf.setSoftMinEvictableIdleTimeMillis(5000); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除
+	    	conf.setTimeBetweenEvictionRunsMillis(8000); //闲置实例校验器启动的时间间隔,单位是毫秒
+	    	ObjectPool<RpcPushDefine> pool = new GenericObjectPool<RpcPushDefine>(poolFactory,conf);
 
-		Bootstrap boot = new Bootstrap();
-		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 2);//网络IO处理线程池
-		boot.group(eventGroup).channel(NioSocketChannel.class)
-				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIME_OUT) // 设置连接超时5秒,默认值30000毫秒即30秒。
-				.option(ChannelOption.SO_RCVBUF,  256 * ONE_KB) // 接受窗口(window size value),设置为512kb
-				.option(ChannelOption.SO_SNDBUF,  256 * ONE_KB) // 发送窗口(window size value),设置为256kb
-				//默认WriteBufferWaterMark(low: 32768, high: 65536)
-			    .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(64 * ONE_KB ,128 * ONE_KB))
-				.remoteAddress(clientConfig.get("remote")[0], Integer.parseInt(clientConfig.get("remote")[1])) // TODO
-				.handler(new ChannelInitializer<SocketChannel>() {
-					@Override
-					protected void initChannel(SocketChannel ch) throws Exception {
-						ChannelPipeline pipline = ch.pipeline();
-						pipline.addLast(new RpcByteToMessageDecoder());
-						pipline.addLast(new RpcMessageToByteEncoder());
-						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler());
-					}
-				});
-
-		ChannelFuture future = boot.connect().sync();
-		future.addListener(new ChannelFutureListener() {
-			@Override
-			public void operationComplete(ChannelFuture future) throws Exception {
-				if (future.isSuccess()) {
-					InetSocketAddress local = (InetSocketAddress) future.channel().localAddress();
-					InetSocketAddress remote = (InetSocketAddress) future.channel().remoteAddress();
-					LOGGER.info("客户端连接成功,localAddress: " + local.getAddress() + ":" + local.getPort()
-							+ ", remoteAddress: " + remote.getAddress() + ":" + remote.getPort());
-					ClientDispatcherHandler handler = (ClientDispatcherHandler) future.channel().pipeline()
-							.get(CLIENT_DISPATCHER);
-					RpcClientRegistry.INSTANCE.registry(RpcClientRegistry.rpcEnum.rpcPushDefine, handler);
-					LOGGER.info("客户端服务注册成功.");
-				} else {
-					LOGGER.info("客户端连接失败,message: " + StringUtil.getErrorText(future.cause()));
-				}
-			}
-		});
+	    	RPC_OBJECT_POOL.put(en.get(CLIENT_NAME), pool); //入池
+	    		    	
+	    	/**
+	    	 * init 初始化
+	    	 * **/
+	    
+//	    	int num = Integer.parseInt(minclients);
+	    	int num = 10;
+	    	for (int i = 0; i < num; i++) {
+				pool.addObject();
+	    	}
+		}
+	}
+	
+	/**
+	 * @author gewx 返回映射关系
+	 * **/
+	public static Map<String,ObjectPool<RpcPushDefine>> getRpcPoolMapping() {
+		return Collections.unmodifiableMap(RPC_OBJECT_POOL);
 	}
 }

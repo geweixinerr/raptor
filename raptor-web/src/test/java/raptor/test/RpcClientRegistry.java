@@ -1,4 +1,4 @@
-package raptor.core.client;
+package raptor.test;
 
 import java.util.Collections;
 import java.util.EnumMap;

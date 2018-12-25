@@ -3,6 +3,7 @@ package raptor;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.pool2.ObjectPool;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,11 +13,12 @@ import com.eaio.uuid.UUID;
 import raptor.core.AbstractCallBack;
 import raptor.core.RpcPushDefine;
 import raptor.core.RpcResult;
-import raptor.core.client.RpcClientRegistry;
-import raptor.core.client.RpcClientRegistry.rpcEnum;
+import raptor.core.client.RpcClient;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
+import raptor.exception.RpcException;
+import raptor.util.StringUtil;
 
 /**
  * @author gewx Raptor消息发送入口类,消息的包装发送.
@@ -76,7 +78,23 @@ public final class RaptorRpc<T extends Serializable> {
 	@SuppressWarnings("unchecked")
 	public boolean sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, Integer timeOut,
 			T... body) {
-		RpcPushDefine rpcClient = RpcClientRegistry.INSTANCE.getRpcClient(rpcEnum.rpcPushDefine);
+		ObjectPool<RpcPushDefine> pool = RpcClient.getRpcPoolMapping().get(serverName);
+		if (pool == null) {
+			LOGGER.error("RPC服务器映射不存在,请检查配置. serverName : " + serverName);
+			throw new RpcException("RPC服务器映射不存在,请检查配置. serverName : " + serverName);
+		}
+		
+		System.out.println("激活数量: " + pool.getNumActive());
+		System.out.println("空闲数量: " + pool.getNumIdle());
+		
+		RpcPushDefine rpc = null;
+		try {
+			rpc = pool.borrowObject();
+		} catch (Exception e) {
+			String message = StringUtil.getErrorText(e);
+			LOGGER.error("RPC 连接池获取对象失败,message: " + message);
+			throw new RpcException("RPC 连接池获取对象失败,message: " + message);
+		}
 		
         DateTime reqDate = new DateTime(); //请求时间
 
@@ -90,7 +108,18 @@ public final class RaptorRpc<T extends Serializable> {
 		requestBody.setTimeOut(reqDate.plusSeconds(timeOut));
 		requestBody.setCall(call);
 
-		boolean isMessageSend = rpcClient.pushMessage(requestBody); // 发送消息(异步发送)
+		boolean isMessageSend = false;
+		try {
+			isMessageSend = rpc.pushMessage(requestBody); // 发送消息(异步发送)
+		} finally {
+			try {
+				pool.returnObject(rpc);
+			} catch (Exception e) {
+				//资源回收异常,默认不处理.
+				LOGGER.error("资源池回收异常,message : " + StringUtil.getErrorText(e));
+			}
+		}
+		
 		if (isMessageSend) {
 			RpcClientTaskPool.pushTask(requestBody); // 入客户端队列.	
 		} else {

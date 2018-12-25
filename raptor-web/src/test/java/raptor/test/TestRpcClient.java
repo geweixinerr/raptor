@@ -34,7 +34,6 @@ import raptor.core.AbstractCallBack;
 import raptor.core.RpcPushDefine;
 import raptor.core.RpcResult;
 import raptor.core.client.NettyTestData;
-import raptor.core.client.RpcClientRegistry;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.client.handler.ClientDispatcherHandler;
 import raptor.core.client.task.RpcClientTimeOutScan;
