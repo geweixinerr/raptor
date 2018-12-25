@@ -27,6 +27,11 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClientDispatcherHandler.class);
 
 	private ChannelHandlerContext ctx;
+	
+	@Override
+	public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+		this.ctx = ctx;
+	}
 
 	/**
 	 * @author gewx 消息推送
@@ -38,8 +43,11 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 			future.addListener(new ChannelFutureListener() {
 				@Override
 				public void operationComplete(ChannelFuture future) throws Exception {
-					if (!future.isSuccess()) {
+					if (future.isSuccess()) {
 					   //放入数据推送结果,推送失败，客户端可以直接获取到推送失败结果.
+					} else {
+						System.out.println("数据推送失败,message: " + StringUtil.getErrorText(future.cause()));
+//						System.exit(0);
 					}
 				}
 			});
@@ -67,12 +75,6 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 	@Override
 	public boolean isWritable() {
 		return ctx.channel().isWritable();
-	}
-
-
-	@Override
-	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-		this.ctx = ctx;
 	}
 
 	@Override
