@@ -1,5 +1,6 @@
 package raptor.core.init;
 
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		LOGGER.info("应用服务器启动,RPC客户端/服务端参数初始化...");
-		Map<String,String> clientConfig = (Map<String,String>) context.getBean("RpcClientConfig");
+		List<Map<String,String>> clientConfig = (List<Map<String,String>>) context.getBean("NettyPoolConfig");
 		Map<String,String> serverConfig = (Map<String,String>) context.getBean("RpcServerConfig");
 		
 		RpcParameter.INSTANCE.initRpcParameter(clientConfig, serverConfig); //init参数

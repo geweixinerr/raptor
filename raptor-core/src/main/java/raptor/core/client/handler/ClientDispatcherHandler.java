@@ -43,12 +43,7 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 			future.addListener(new ChannelFutureListener() {
 				@Override
 				public void operationComplete(ChannelFuture future) throws Exception {
-					if (future.isSuccess()) {
-					   //放入数据推送结果,推送失败，客户端可以直接获取到推送失败结果.
-					} else {
-						System.out.println("数据推送失败,message: " + StringUtil.getErrorText(future.cause()));
-//						System.exit(0);
-					}
+
 				}
 			});
 		} finally {

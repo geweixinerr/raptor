@@ -90,7 +90,8 @@ public final class RaptorRpc<T extends Serializable> {
 				if (rpc.isWritable()) {
 					break;
 				} else {
-					//入队列等待不可写变为可写后释放.
+					//入池等待数据可推送.
+					pool.returnObject(rpc); 
 				}
 			}
 		} catch (Exception e) {
@@ -99,7 +100,6 @@ public final class RaptorRpc<T extends Serializable> {
 			throw new RpcException("RPC 连接池获取对象失败,message: " + message);
 		}
 		
-		 
         DateTime reqDate = new DateTime(); //请求时间
 
 		String uuid = new UUID().toString();
