@@ -12,10 +12,16 @@ public interface RpcPushDefine {
 	 * @param RpcRequestBody RPC请求对象
 	 * @return 服务请求受理结果, true : 受理成功, false: 受理失败,服务拒绝[超过raptor中间件发送的数据包上限,参考属性: ChannelOption.WRITE_BUFFER_WATER_MARK]
 	 * **/
-	boolean pushMessage(RpcRequestBody requestBody);
+	void pushMessage(RpcRequestBody requestBody, PushMessageCallBack call);
 	
 	/**
 	 * @author gewx 资源关闭
 	 * **/
 	void close();
+	
+	/**
+	 * @author gewx 池中对象,是否可写.
+	 * */
+	boolean isWritable();
+	
 }

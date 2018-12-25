@@ -68,7 +68,7 @@ public final class RpcClientTimeOutScan {
 								requestBody.setResponseTime(thisDate);
 						
 								requestBody.getCall().invoke(responseBody); // 回调通知
-								LOGGER.info("清理超时消息...,messageId: " + requestBody);
+								LOGGER.warn("清理超时消息...,messageId: " + requestBody);
 							}
 						}				
 					}

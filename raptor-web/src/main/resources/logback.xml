@@ -38,16 +38,23 @@
 
 	<!-- 异步输出 -->
 	<appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
-		<!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+		<!-- 不丢失日志.默认的. 如果discardingThreshold大于0,队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
 		<discardingThreshold>0</discardingThreshold>
 		<!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
-		<queueSize>512</queueSize>
+		<queueSize>1024</queueSize>
+		<!-- neverBlock默认值false, 设置为true防止日志写入Queue队列堵塞,存在丢日志的可能 -->
+		<!--
+		<neverBlock>true</neverBlock> 
+		 -->
+		<!-- immediateFlush参数默认是true，代表是否立即刷新OutputStream中的信息。如果设置为false，会在OutputStream放满或隔断时间进行flush，具体由OutputStream类决定,
+		         据说设置为false之后输出日志的效率能提高为原来的4倍。 -->
+		<immediateFlush>false</immediateFlush>
 		<!-- 添加附加的appender,最多只能添加一个 -->
 		<appender-ref ref="FILE" />
 	</appender>
 
-	<root level="INFO">
-		<appender-ref ref="STDOUT" />
+	<root level="WARN">
+		<appender-ref ref="ASYNC" />
 	</root>
 
 </configuration>

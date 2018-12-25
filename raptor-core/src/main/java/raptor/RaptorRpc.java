@@ -11,12 +11,11 @@ import org.slf4j.LoggerFactory;
 import com.eaio.uuid.UUID;
 
 import raptor.core.AbstractCallBack;
+import raptor.core.PushMessageCallBack;
 import raptor.core.RpcPushDefine;
-import raptor.core.RpcResult;
 import raptor.core.client.RpcClient;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
-import raptor.core.message.RpcResponseBody;
 import raptor.exception.RpcException;
 import raptor.util.StringUtil;
 
@@ -76,26 +75,31 @@ public final class RaptorRpc<T extends Serializable> {
 	 * @return 服务请求受理结果, true : 受理成功, false: 受理失败,服务拒绝[超过raptor中间件发送的数据包上限,参考属性: ChannelOption.WRITE_BUFFER_WATER_MARK]
 	 **/
 	@SuppressWarnings("unchecked")
-	public boolean sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, Integer timeOut,
+	public void sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, Integer timeOut,
 			T... body) {
 		ObjectPool<RpcPushDefine> pool = RpcClient.getRpcPoolMapping().get(serverName);
 		if (pool == null) {
 			LOGGER.error("RPC服务器映射不存在,请检查配置. serverName : " + serverName);
 			throw new RpcException("RPC服务器映射不存在,请检查配置. serverName : " + serverName);
 		}
-		
-		System.out.println("激活数量: " + pool.getNumActive());
-		System.out.println("空闲数量: " + pool.getNumIdle());
-		
+
 		RpcPushDefine rpc = null;
 		try {
-			rpc = pool.borrowObject();
+			while (true) {
+				rpc = pool.borrowObject();
+				if (rpc.isWritable()) {
+					break;
+				} else {
+					//入队列等待不可写变为可写后释放.
+				}
+			}
 		} catch (Exception e) {
 			String message = StringUtil.getErrorText(e);
 			LOGGER.error("RPC 连接池获取对象失败,message: " + message);
 			throw new RpcException("RPC 连接池获取对象失败,message: " + message);
 		}
 		
+		 
         DateTime reqDate = new DateTime(); //请求时间
 
 		String uuid = new UUID().toString();
@@ -108,42 +112,43 @@ public final class RaptorRpc<T extends Serializable> {
 		requestBody.setTimeOut(reqDate.plusSeconds(timeOut));
 		requestBody.setCall(call);
 
-		boolean isMessageSend = false;
-		try {
-			isMessageSend = rpc.pushMessage(requestBody); // 发送消息(异步发送)
-		} finally {
-			try {
-				pool.returnObject(rpc);
-			} catch (Exception e) {
-				//资源回收异常,默认不处理.
-				LOGGER.error("资源池回收异常,message : " + StringUtil.getErrorText(e));
+		// 发送消息(异步发送)
+		rpc.pushMessage(requestBody, new PushMessageCallBack(rpc) {
+			@Override
+			public void invoke() {
+				//tcp连接入池,释放当前tcp连接占用.
+				try {
+					pool.returnObject(this.getRpcObject());
+				} catch (Exception e) {
+					//资源回收异常,默认不处理.
+					LOGGER.error("资源池回收异常,requestBody: " + requestBody + ", message : " + StringUtil.getErrorText(e));
+				}
 			}
-		}
+		}); 
 		
-		if (isMessageSend) {
-			RpcClientTaskPool.pushTask(requestBody); // 入客户端队列.	
-		} else {
-			/**
-			 * 客户端异步请求达到Netty Buffer高水平线,阻流.
-			 * **/
-			RpcResponseBody responseBody = new RpcResponseBody();
-			responseBody.setSuccess(false);
-			responseBody.setMessageId(requestBody.getMessageId());
-			responseBody.setMessage("RPC 服务调用失败,message:[Netty Buffer高水平线,阻流]");
-			responseBody.setRpcCode(RpcResult.FLOWER_CONTROL);
-			call.invoke(responseBody); //直接回调输出结果.
-		}
+		RpcClientTaskPool.pushTask(requestBody); // 入客户端队列,定时扫描.
 		
-		return isMessageSend;
+		/**
+		 * 客户端异步请求达到Netty Buffer高水平线,阻流.
+		 * **/
+		/*
+		RpcResponseBody responseBody = new RpcResponseBody();
+		responseBody.setSuccess(false);
+		responseBody.setMessageId(requestBody.getMessageId());
+		responseBody.setMessage("RPC 服务调用失败,message:[Netty Buffer高水平线,阻流]");
+		responseBody.setRpcCode(RpcResult.FLOWER_CONTROL);
+		call.invoke(responseBody); //直接回调输出结果.
+		*/
 	}
 
 	// 重载异步方法
 	@SuppressWarnings("unchecked")
-	public boolean sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, T... body) {
+	public void sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, T... body) {
 		if (StringUtils.isBlank(serverName) || StringUtils.isBlank(rpcMethodName) || call == null) {
 			throw new IllegalArgumentException("缺失服务请求参数,serverName/rpcMethodName/call isNotEmpty!");
 		}
-		return sendAsyncMessage(serverName, rpcMethodName, call, TIME_OUT, body);
+		
+	    sendAsyncMessage(serverName, rpcMethodName, call, TIME_OUT, body);
 	}
-
+	
 }

@@ -1,7 +1,5 @@
 package raptor.core.client;
 
-import static org.junit.Assert.assertArrayEquals;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +10,8 @@ import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import raptor.core.RpcPushDefine;
 import raptor.core.init.RpcParameter;
@@ -22,6 +22,8 @@ import raptor.core.pool.NettyPoolFactory;
  **/
 public final class RpcClient {
 	
+	private static final Logger LOGGER = LoggerFactory.getLogger(RpcClient.class);
+
 	/**
 	 * @author gewx 多客户端配置与连接池映射关系.
 	 * **/
@@ -51,7 +53,7 @@ public final class RpcClient {
 	/**
 	 * 最大连接数-默认值
 	 * **/
-	private static final String DEFAULT_MAX_CLIENTS = "64";
+	private static final Integer DEFAULT_MAX_CLIENTS = 12040;
 	
 	/**
 	 * 最小连接数
@@ -61,7 +63,7 @@ public final class RpcClient {
 	/**
 	 * 最小连接数-默认值
 	 * **/
-	private static final String DEFAULT_MIN_CLIENTS = "6";
+	private static final Integer DEFAULT_MIN_CLIENTS = 6;
 	
 	/**
 	 * 从池中获取对象,最大等待时间 MAXWAIT_MILLIS,默认1000毫秒
@@ -85,11 +87,12 @@ public final class RpcClient {
 	    	PooledObjectFactory poolFactory = new NettyPoolFactory(en.get(REMOTE_ADDR),Integer.parseInt(en.get(PORT)));
 	    	
 	    	//最大连接数
-	    	String maxclients = ObjectUtils.defaultIfNull(en.get(MAX_CLIENTS),DEFAULT_MAX_CLIENTS);
+	    	String maxclients = ObjectUtils.defaultIfNull(en.get(MAX_CLIENTS),String.valueOf(DEFAULT_MAX_CLIENTS));
 	    	//最小连接数
-	    	String minclients = ObjectUtils.defaultIfNull(en.get(MIN_CLIENTS),DEFAULT_MIN_CLIENTS);
+	    	String minclients = ObjectUtils.defaultIfNull(en.get(MIN_CLIENTS),String.valueOf(DEFAULT_MIN_CLIENTS));
 	    	//对象池配置
 	    	GenericObjectPoolConfig conf = new GenericObjectPoolConfig();
+	    	conf.setLifo(false); //池中实例的操作是否按照LIFO（后进先出）的原则,默认true
 	    	conf.setMaxTotal(Integer.parseInt(maxclients));  //池中最多可用的实例个数
 	    	conf.setMaxIdle(Integer.parseInt(maxclients)); //连接池中最大空闲的连接数,默认为8
 	    	conf.setMinIdle(Integer.parseInt(minclients)); //连接池中最少空闲的连接数,默认为0
@@ -105,9 +108,8 @@ public final class RpcClient {
 	    	/**
 	    	 * init 初始化
 	    	 * **/
-	    
-//	    	int num = Integer.parseInt(minclients);
-	    	int num = 10;
+	        LOGGER.info("初始化客户端:" + en.get(CLIENT_NAME) +", tcp连接池最小连接数: " + minclients);
+	    	int num = Integer.parseInt(minclients);	    	
 	    	for (int i = 0; i < num; i++) {
 				pool.addObject();
 	    	}

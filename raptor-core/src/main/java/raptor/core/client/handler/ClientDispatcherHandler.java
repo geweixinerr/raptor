@@ -5,12 +5,12 @@ import javax.annotation.concurrent.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import raptor.core.PushMessageCallBack;
 import raptor.core.RpcPushDefine;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
@@ -32,16 +32,19 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 	 * @author gewx 消息推送
 	 **/
 	@Override
-	public boolean pushMessage(RpcRequestBody requestBody) {
-		Channel channel = ctx.channel();
-		if (channel.isWritable()) {
-			ctx.writeAndFlush(requestBody); 
-			return true;
-		} else {
-			/**
-			 * 客户端异步请求达到Netty Buffer高水平线,阻流.
-			 * **/
-		    return false;
+	public void pushMessage(RpcRequestBody requestBody, PushMessageCallBack call) {
+		ChannelFuture future = ctx.writeAndFlush(requestBody);
+		try {
+			future.addListener(new ChannelFutureListener() {
+				@Override
+				public void operationComplete(ChannelFuture future) throws Exception {
+					if (!future.isSuccess()) {
+					   //放入数据推送结果,推送失败，客户端可以直接获取到推送失败结果.
+					}
+				}
+			});
+		} finally {
+			call.invoke(); //回调,tcp连接资源入池.
 		}
 	}
 	
@@ -59,6 +62,11 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 				}
 			}
 		});
+	}
+
+	@Override
+	public boolean isWritable() {
+		return ctx.channel().isWritable();
 	}
 
 

@@ -41,10 +41,10 @@ public final class RpcClientTaskPool {
 	 **/
 	public static void initPool() {
 		LOGGER.info("初始化RPC Client业务线程池对象...");
-		POOLTASKEXECUTOR.setQueueCapacity(CPU_CORE * 1024 * 10); // 队列深度
+		POOLTASKEXECUTOR.setQueueCapacity(CPU_CORE * 1024 * 100); // 队列深度
 		POOLTASKEXECUTOR.setCorePoolSize(CPU_CORE); // 核心线程数
-		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 3); // 最大线程数
-		// poolTaskExecutor.setKeepAliveSeconds(5000); //线程最大空闲时间-可回收
+		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 2); // 最大线程数
+		POOLTASKEXECUTOR.setKeepAliveSeconds(5000); //线程最大空闲时间-可回收
 		POOLTASKEXECUTOR.setThreadNamePrefix("TASK_RPC_CLIENT_"); // 线程名前缀.
 		
 		POOLTASKEXECUTOR.initialize();
@@ -79,10 +79,10 @@ public final class RpcClientTaskPool {
 					if (!requestBody.isMessageSend()) {
 						requestBody.setResponseTime(new DateTime()); // 客户端回调时间
 						requestBody.getCall().invoke(responseBody);
-						LOGGER.info("成功执行回调,messageId: " + requestBody);
+						LOGGER.warn("成功执行回调,messageId: " + requestBody);
 					}
 				} else {
-					// 此处消息超时.
+					// 此处消息超时,或者消息未成功到达服务器(异常),并已响应客户端.
 				}
 			}
 		});

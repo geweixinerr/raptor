@@ -1,5 +1,6 @@
 package raptor.core.message;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.joda.time.DateTime;
@@ -138,6 +139,7 @@ public final class RpcRequestBody implements RpcMessage {
 		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE,sb);
 		builder.append("messageId",messageId);
 		builder.append("rpcMethod",rpcMethod);
+		
 		/*
 		if (body != null) {
 			builder.append("body",ArrayUtils.toStringArray(body));
@@ -145,6 +147,7 @@ public final class RpcRequestBody implements RpcMessage {
 			builder.append("body","");
 		}
 		*/
+		
 		if (this.requestTime != null) {
 			builder.append("requestTime", this.requestTime.toString(dateTimeFormat));
 		}

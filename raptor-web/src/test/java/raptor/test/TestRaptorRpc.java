@@ -37,7 +37,7 @@ public final class TestRaptorRpc<T extends Serializable> {
 	 * @return 服务请求受理结果, true : 受理成功, false: 受理失败,服务拒绝[超过raptor中间件发送的数据包上限,参考属性: ChannelOption.WRITE_BUFFER_WATER_MARK]
 	 **/
 	@SuppressWarnings("unchecked")
-	public boolean sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, Integer timeOut,
+	public void sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, Integer timeOut,
 			T... body) {
 		
         DateTime reqDate = new DateTime(); //请求时间
@@ -52,28 +52,13 @@ public final class TestRaptorRpc<T extends Serializable> {
 		requestBody.setTimeOut(reqDate.plusSeconds(timeOut));
 		requestBody.setCall(call);
 
-		boolean isMessageSend = rpcClient.pushMessage(requestBody); // 发送消息(异步发送)
-		if (isMessageSend) {
-			RpcClientTaskPool.pushTask(requestBody); // 入客户端队列.	
-		} else {
-			/**
-			 * 客户端异步请求达到Netty Buffer高水平线,阻流.
-			 * **/
-			RpcResponseBody responseBody = new RpcResponseBody();
-			responseBody.setSuccess(false);
-			responseBody.setMessageId(requestBody.getMessageId());
-			responseBody.setMessage("RPC 服务调用失败,message:[Netty Buffer高水平线,阻流]");
-			responseBody.setRpcCode(RpcResult.FLOWER_CONTROL);
-			call.invoke(requestBody,responseBody); //直接回调输出结果.
-		}
-		
-		return isMessageSend;
+ 
 	}
 
 	// 重载异步方法
 	@SuppressWarnings("unchecked")
-	public boolean sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, T... body) {
-		return sendAsyncMessage(serverName, rpcMethodName, call, TIME_OUT, body);
+	public void sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, T... body) {
+		sendAsyncMessage(serverName, rpcMethodName, call, TIME_OUT, body);
 	}
 
 }

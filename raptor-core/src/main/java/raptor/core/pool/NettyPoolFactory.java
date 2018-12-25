@@ -68,10 +68,10 @@ public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefin
 		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 2);// 网络IO处理线程池
 		boot.group(eventGroup).channel(NioSocketChannel.class)
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIME_OUT) // 设置连接超时5秒,默认值30000毫秒即30秒。
-				.option(ChannelOption.SO_RCVBUF, 256 * ONE_KB) // 接受窗口(window size value),设置为512kb
-				.option(ChannelOption.SO_SNDBUF, 256 * ONE_KB) // 发送窗口(window size value),设置为256kb
+				.option(ChannelOption.SO_RCVBUF, 64 * ONE_KB) // 接受窗口(window size value),设置为512kb
+				.option(ChannelOption.SO_SNDBUF, 64 * ONE_KB) // 发送窗口(window size value),设置为256kb
 				// 默认WriteBufferWaterMark(low: 32768, high: 65536)
-				.option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(64 * ONE_KB, 128 * ONE_KB))
+				.option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(8 * ONE_KB, 16 * ONE_KB))
 				.remoteAddress(remoteAddr, port).handler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
