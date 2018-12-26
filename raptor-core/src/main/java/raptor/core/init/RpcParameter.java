@@ -25,6 +25,14 @@ public final class RpcParameter {
         serverConfig = Collections.unmodifiableMap(server);
 	}
 	
+	public void initRpcParameter(List<Map<String,String>> client) {			
+		clientConfig = Collections.unmodifiableList(client);
+	}
+	
+	public void initRpcParameter(Map<String,String> server) {			
+        serverConfig = Collections.unmodifiableMap(server);
+	}
+	
 	/**
 	 * 获取client参数配置
 	 * **/

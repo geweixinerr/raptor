@@ -84,16 +84,6 @@ public class PushMessageServlet extends HttpServlet {
 			});
 		}
 		
-		/*
-		@SuppressWarnings("rawtypes")
-		RaptorRpc rpc = new RaptorRpc();
-		rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
-			@Override
-			public void invoke(RpcResponseBody responseBody) {
-				System.out.println("请求结果: " + responseBody);
-			}
-		}, 5, data, message);
-        */
 		response.getWriter().write("RPC execute ok!");
 
 	}
