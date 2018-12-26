@@ -1,6 +1,8 @@
 package raptor;
 
 import java.io.Serializable;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.ObjectPool;
@@ -74,7 +76,7 @@ public final class RaptorRpc<T extends Serializable> {
 	 * 
 	 * @return 服务请求受理结果, true : 受理成功, false: 受理失败,服务拒绝[超过raptor中间件发送的数据包上限,参考属性: ChannelOption.WRITE_BUFFER_WATER_MARK]
 	 **/
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked"})
 	public void sendAsyncMessage(String serverName, String rpcMethodName, AbstractCallBack call, Integer timeOut,
 			T... body) {
 		ObjectPool<RpcPushDefine> pool = RpcClient.getRpcPoolMapping().get(serverName);
@@ -83,6 +85,7 @@ public final class RaptorRpc<T extends Serializable> {
 			throw new RpcException("RPC服务器映射不存在,请检查配置. serverName : " + serverName);
 		}
 
+		Queue<RpcPushDefine> cacheRpcQueue = new ArrayDeque<RpcPushDefine>(32); //缓存暂时无法使用的池内对象.
 		RpcPushDefine rpc = null;
 		try {
 			while (true) {
@@ -90,16 +93,28 @@ public final class RaptorRpc<T extends Serializable> {
 				if (rpc.isWritable()) {
 					break;
 				} else {
-					//入池等待数据可推送.
-					pool.returnObject(rpc); 
+					/**
+					 * 入池等待数据可推送.按照FIFO规则入池,这里存在一个问题,简单描述如下：
+					 * 这里入池后直至出池这段时间数据,假如rpc对象push不及时,则会再度入池,依次循环. 存在较大时间的循环获取池内对象的可能性
+					 * pool.returnObject(rpc); //不推荐直接入池 
+					 * 建议采用如下的编码方式,强制创建新tcp连接发送数据.
+					 * **/
+					cacheRpcQueue.add(rpc); //推荐! 将无法使用的对象先入缓存器,强制tcp连接池创建更多的有效连接.
 				}
 			}
+			
+			//有效连接获取成功,释放缓存区内连接。
+			RpcPushDefine releaseObject = null;
+			while ((releaseObject = cacheRpcQueue.poll()) != null) {
+				pool.returnObject(releaseObject);
+			}
+			
 		} catch (Exception e) {
 			String message = StringUtil.getErrorText(e);
 			LOGGER.error("RPC 连接池获取对象失败,message: " + message);
 			throw new RpcException("RPC 连接池获取对象失败,message: " + message);
 		}
-		
+					
         DateTime reqDate = new DateTime(); //请求时间
 
 		String uuid = new UUID().toString();

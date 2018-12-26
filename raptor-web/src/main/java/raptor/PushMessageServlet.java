@@ -69,7 +69,7 @@ public class PushMessageServlet extends HttpServlet {
 					try {
 						latch.await();
 						// 发送异步消息.
-						for (int j = 0; j < 2; j++) {
+						for (int j = 0; j < 10000; j++) {
 							rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
 								@Override
 								public void invoke(RpcResponseBody responseBody) {

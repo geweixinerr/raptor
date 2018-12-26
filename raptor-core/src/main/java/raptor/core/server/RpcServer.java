@@ -1,7 +1,9 @@
 package raptor.core.server;
 
+import java.net.InetSocketAddress;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,11 +77,18 @@ public final class RpcServer {
 			server.group(acceptGroup, ioGroup).channel(NioServerSocketChannel.class);
 		}
 		
+		//根据配置信息绑定本地IP地址/端口.
+		InetSocketAddress localAddress = null;
+		if (StringUtils.isNotBlank(serverConfig.get(ADDRESS_KEY))) {
+			localAddress = new InetSocketAddress(serverConfig.get(ADDRESS_KEY),Integer.parseInt(serverConfig.get(PORT)));
+		} else {
+			localAddress = new InetSocketAddress(Integer.parseInt(serverConfig.get(PORT)));
+		}
 		
 		server.option(ChannelOption.SO_BACKLOG, 1024) // 服务端接受连接的队列长度，如果队列已满，客户端连接将被拒绝。默认值，Windows为200，其他为128。
 				.childOption(ChannelOption.SO_RCVBUF, 128 * ONE_KB) // 接受窗口(window size value),设置为512kb
 				.childOption(ChannelOption.SO_SNDBUF, 128 * ONE_KB) // 发送窗口(window size value),设置为512kb
-				.localAddress(serverConfig.get(ADDRESS_KEY), Integer.parseInt(serverConfig.get(PORT)))
+				.localAddress(localAddress)
 				.childHandler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
