@@ -40,17 +40,17 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 	public void afterPropertiesSet() throws Exception {
 		LOGGER.info("应用服务器启动,RPC客户端/服务端参数初始化...");
 		
-		List<Map<String,String>> clientConfig = (List<Map<String,String>>) context.getBean("NettyPoolConfig");
-		Map<String,String> serverConfig = (Map<String,String>) context.getBean("RpcServerConfig");
-		
 		//服务器启动
-		if (serverConfig != null) {
+		if (context.containsBean("RpcServerConfig")) {
+			Map<String,String> serverConfig = (Map<String,String>) context.getBean("RpcServerConfig");
 			RpcParameter.INSTANCE.initRpcParameter(serverConfig);
 			RpcServerTaskPool.initPool();
 			RpcServer.start();	
 		}
 		
-		if (clientConfig != null) {
+		//客户端启动
+		if (context.containsBean("NettyPoolConfig")) {
+			List<Map<String,String>> clientConfig = (List<Map<String,String>>) context.getBean("NettyPoolConfig");
 			RpcParameter.INSTANCE.initRpcParameter(clientConfig);		
 			RpcClientTaskPool.initPool();	
 			RpcClientTimeOutScan.scan(); //启动客户端超时请求清理器
