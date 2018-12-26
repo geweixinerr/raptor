@@ -103,12 +103,6 @@ public final class RaptorRpc<T extends Serializable> {
 				}
 			}
 			
-			//有效连接获取成功,释放缓存区内连接。
-			RpcPushDefine releaseObject = null;
-			while ((releaseObject = cacheRpcQueue.poll()) != null) {
-				pool.returnObject(releaseObject);
-			}
-			
 		} catch (Exception e) {
 			String message = StringUtil.getErrorText(e);
 			LOGGER.error("RPC 连接池获取对象失败,message: " + message);
@@ -134,6 +128,12 @@ public final class RaptorRpc<T extends Serializable> {
 				//tcp连接入池,释放当前tcp连接占用.
 				try {
 					pool.returnObject(this.getRpcObject());
+					
+					//有效连接push成功,释放缓存区内连接。
+					RpcPushDefine releaseObject = null;
+					while ((releaseObject = cacheRpcQueue.poll()) != null) {
+						pool.returnObject(releaseObject);
+					}
 				} catch (Exception e) {
 					//资源回收异常,默认不处理.
 					LOGGER.error("资源池回收异常,requestBody: " + requestBody + ", message : " + StringUtil.getErrorText(e));

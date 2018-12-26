@@ -4,6 +4,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.joda.time.DateTime;
+import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -152,12 +153,20 @@ public final class RpcRequestBody implements RpcMessage {
 			builder.append("requestTime", this.requestTime.toString(dateTimeFormat));
 		}
 		
+		/*
 		if (this.timeOut != null) {
 			builder.append("timeOut",this.timeOut.toString(dateTimeFormat));
 		}
+		*/
 
 		if (this.responseTime != null) {
 			builder.append("responseTime", this.responseTime.toString(dateTimeFormat));
+		}
+		
+		if(this.requestTime != null && this.responseTime != null) {
+			Period p2 = new Period(this.requestTime, this.responseTime);
+			int seconds = p2.getSeconds(); //相差的秒
+			builder.append("consumeTime: " + (seconds * 1000 + p2.getMillis()));
 		}
 		
 		sb.trimToSize();

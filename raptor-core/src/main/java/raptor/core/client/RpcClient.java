@@ -99,7 +99,7 @@ public final class RpcClient {
 	    	conf.setBlockWhenExhausted(false); //是否堵塞等待连接创建. (true:等待,false:不等待)
 	    	conf.setMaxWaitMillis(DEFAULT_MAXWAIT_MILLIS); //调用borrowObject方法时，需要等待的最长时间. 单位:毫秒
 	    	conf.setMinEvictableIdleTimeMillis(-1); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除 （-1 :不移除,使用setSoftMinEvictableIdleTimeMillis配置）
-	    	conf.setSoftMinEvictableIdleTimeMillis(5000); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除
+	    	conf.setSoftMinEvictableIdleTimeMillis(1000 * 60 * 5); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除
 	    	conf.setTimeBetweenEvictionRunsMillis(8000); //闲置实例校验器启动的时间间隔,单位是毫秒
 	    	ObjectPool<RpcPushDefine> pool = new GenericObjectPool<RpcPushDefine>(poolFactory,conf);
 

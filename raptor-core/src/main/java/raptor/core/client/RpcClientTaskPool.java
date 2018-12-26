@@ -42,7 +42,7 @@ public final class RpcClientTaskPool {
 	public static void initPool() {
 		LOGGER.info("初始化RPC Client业务线程池对象...");
 		POOLTASKEXECUTOR.setQueueCapacity(CPU_CORE * 1024 * 100); // 队列深度
-		POOLTASKEXECUTOR.setCorePoolSize(CPU_CORE * 2); // 核心线程数
+		POOLTASKEXECUTOR.setCorePoolSize(CPU_CORE); // 核心线程数
 		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 8); // 最大线程数
 		POOLTASKEXECUTOR.setKeepAliveSeconds(5000); //线程最/大空闲时间-可回收
 		POOLTASKEXECUTOR.setThreadNamePrefix("TASK_RPC_CLIENT_"); // 线程名前缀.
