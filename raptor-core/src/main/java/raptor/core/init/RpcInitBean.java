@@ -38,10 +38,9 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 	@SuppressWarnings("unchecked")
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		LOGGER.info("应用服务器启动,RPC客户端/服务端参数初始化...");
-		
 		//服务器启动
 		if (context.containsBean("RpcServerConfig")) {
+			LOGGER.info("应用服务器启动,RPC服务端参数初始化...");
 			Map<String,String> serverConfig = (Map<String,String>) context.getBean("RpcServerConfig");
 			RpcParameter.INSTANCE.initRpcParameter(serverConfig);
 			RpcServerTaskPool.initPool();
@@ -50,6 +49,7 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 		
 		//客户端启动
 		if (context.containsBean("NettyPoolConfig")) {
+			LOGGER.info("应用服务器启动,RPC客户端参数初始化...");
 			List<Map<String,String>> clientConfig = (List<Map<String,String>>) context.getBean("NettyPoolConfig");
 			RpcParameter.INSTANCE.initRpcParameter(clientConfig);		
 			RpcClientTaskPool.initPool();	
