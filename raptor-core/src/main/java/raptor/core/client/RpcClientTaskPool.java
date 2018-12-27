@@ -31,7 +31,7 @@ public final class RpcClientTaskPool {
 	/**
 	 * 客户端请求MessageId与回调对应关系.
 	 **/
-	private static final Map<String, RpcRequestBody> MESSAGEID_MAPPING = new ConcurrentHashMap<String, RpcRequestBody>(1024 * 10);
+	private static final Map<String, RpcRequestBody> MESSAGEID_MAPPING = new ConcurrentHashMap<String, RpcRequestBody>(1024 * 100);
 	
 	private RpcClientTaskPool() {
 	}
@@ -61,18 +61,13 @@ public final class RpcClientTaskPool {
 	 * @return void
 	 **/
 	public static void addTask(RpcResponseBody responseBody) {
-		//LOGGER.info("RPC调用响应:" + responseBody);
-		POOLTASKEXECUTOR.execute(new Runnable() {
-			
+		POOLTASKEXECUTOR.submit(new Runnable() {
 			@Override
 			public void run() {
-				/**
-				 * 实际客户端回调处理
-				 **/
 				RpcRequestBody requestBody = MESSAGEID_MAPPING.remove(responseBody.getMessageId());
 
 				/**
-				 * 此处逻辑描述: 
+				 * 实际客户端回调处理,此处逻辑描述: 
 				 * 1.客户端任务池存在未超时的回调任务,判断当前任务时间是否超时。
 				 * 2.未超时则判断当前消息是否已发送(消息对象(RpcRequestBody)存在并发调用,串行化控制消息的发送)。 
 				 * 3.清理队列中已发送的消息对象。
