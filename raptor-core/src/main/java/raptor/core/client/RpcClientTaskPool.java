@@ -2,6 +2,8 @@ package raptor.core.client;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -42,11 +44,20 @@ public final class RpcClientTaskPool {
 	 **/
 	public static void initPool() {
 		LOGGER.info("初始化RPC Client业务线程池对象...");
-		POOLTASKEXECUTOR.setQueueCapacity(CPU_CORE * 1024 * 100); // 队列深度
-		POOLTASKEXECUTOR.setCorePoolSize(CPU_CORE); // 核心线程数
-		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 8); // 最大线程数
+		POOLTASKEXECUTOR.setQueueCapacity(CPU_CORE * 10240); // 队列深度
+		POOLTASKEXECUTOR.setCorePoolSize(CPU_CORE * 4); // 核心线程数
+		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 12); // 最大线程数
 		POOLTASKEXECUTOR.setKeepAliveSeconds(5000); //线程最/大空闲时间-可回收
 		POOLTASKEXECUTOR.setThreadNamePrefix("TASK_RPC_CLIENT_"); // 线程名前缀.
+		POOLTASKEXECUTOR.setRejectedExecutionHandler(new RejectedExecutionHandler() {
+			@Override
+			public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+				LOGGER.warn("客户端线程池自动伸缩[before],maxPoolSize: " + POOLTASKEXECUTOR.getMaxPoolSize());
+				POOLTASKEXECUTOR.setMaxPoolSize(POOLTASKEXECUTOR.getMaxPoolSize() * 2); //max pool double
+				POOLTASKEXECUTOR.submit(r); //再度入池.
+				LOGGER.warn("客户端线程池自动伸缩[after],maxPoolSize: " + POOLTASKEXECUTOR.getMaxPoolSize());
+			}
+		});
 		
 		POOLTASKEXECUTOR.initialize();
 
@@ -61,19 +72,20 @@ public final class RpcClientTaskPool {
 	 * @return void
 	 **/
 	public static void addTask(RpcResponseBody responseBody) {
-		POOLTASKEXECUTOR.submit(new Runnable() {
-			@Override
-			public void run() {
-				RpcRequestBody requestBody = MESSAGEID_MAPPING.remove(responseBody.getMessageId());
+		RpcRequestBody requestBody = MESSAGEID_MAPPING.remove(responseBody.getMessageId());
 
-				/**
-				 * 实际客户端回调处理,此处逻辑描述: 
-				 * 1.客户端任务池存在未超时的回调任务,判断当前任务时间是否超时。
-				 * 2.未超时则判断当前消息是否已发送(消息对象(RpcRequestBody)存在并发调用,串行化控制消息的发送)。 
-				 * 3.清理队列中已发送的消息对象。
-				 * 
-				 **/
-				if (requestBody != null) {
+		if (requestBody != null) {
+			requestBody.setClientTime(responseBody.getResponseTime());//服务器输出到客户端时间
+			POOLTASKEXECUTOR.submit(new Runnable() {
+				@Override
+				public void run() {
+					/**
+					 * 实际客户端回调处理,此处逻辑描述: 
+					 * 1.客户端任务池存在未超时的回调任务,判断当前任务时间是否超时。
+					 * 2.未超时则判断当前消息是否已发送(消息对象(RpcRequestBody)存在并发调用,串行化控制消息的发送)。 
+					 * 3.清理队列中已发送的消息对象。
+					 * 
+					 **/
 					requestBody.setResponseTime(new DateTime()); // 客户端回调时间
 					
 					if (new DateTime().compareTo(requestBody.getTimeOut()) <= 0) { //是否超时
@@ -87,17 +99,17 @@ public final class RpcClientTaskPool {
 						responseBody.setSuccess(false);
 						responseBody.setMessage("RPC 服务调用超时,message:timeOut");
 						responseBody.setRpcCode(RpcResult.TIME_OUT);
-						requestBody.getCall().invoke(responseBody);
+						requestBody.getCall().invoke(responseBody);						
 						LOGGER.warn("成功执行回调-已超时,messageId: " + requestBody);
 					}
 				}
-				/***
-				else {
-					//requestBody is null, 则已超时[已反馈给调用客户端]
-				}
-				***/
-			}
-		});
+			});
+		}
+		/***
+		else {
+			//requestBody is null, 则已超时[已反馈给调用客户端]
+		}
+		***/
 	}
 
 	/**

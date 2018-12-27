@@ -8,6 +8,8 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eaio.uuid.UUID;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -78,7 +80,7 @@ public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefin
 						ChannelPipeline pipline = ch.pipeline();
 						pipline.addLast(new RpcByteToMessageDecoder());
 						pipline.addLast(new RpcMessageToByteEncoder());
-						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler());
+						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString()));
 					}
 				});
 

@@ -24,4 +24,8 @@ public interface RpcPushDefine {
 	 * */
 	boolean isWritable();
 	
+	/**
+	 * @author gewx tcp连接唯一Id
+	 * **/
+	String getTcpId();
 }

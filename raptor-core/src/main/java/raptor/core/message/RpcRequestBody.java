@@ -46,14 +46,19 @@ public final class RpcRequestBody implements RpcMessage {
 	private transient DateTime timeOut; 
 	
 	/**
-	 * 业务请求时间
+	 * 业务-->请求时间 [仅测试使用]
 	 * **/
 	private  transient DateTime requestTime; 
 	
 	/**
-	 * 业务请求-客户端回调时间.
+	 * 业务-->客户端回调时间. [仅测试使用]
 	 * **/
 	private  transient DateTime responseTime; 
+	
+	/**
+	 * 业务-->服务器响应达到客户端时间. [仅测试使用]
+	 * **/
+	private  transient DateTime clientTime; 
 	
 	/**
 	 * 客户端调用回调对象
@@ -121,6 +126,14 @@ public final class RpcRequestBody implements RpcMessage {
 		this.responseTime = responseTime;
 	}
 
+	public DateTime getClientTime() {
+		return clientTime;
+	}
+
+	public void setClientTime(DateTime clientTime) {
+		this.clientTime = clientTime;
+	}
+
 	/**
 	 * @author gewx 本方法作用在于串行化回调消息执行逻辑. 问题描述:
 	 *         假设调度线程与正常客户端回调线程同时处理某个回调对象,会产生客户端响应接收到两次的情况.
@@ -158,7 +171,10 @@ public final class RpcRequestBody implements RpcMessage {
 			builder.append("timeOut",this.timeOut.toString(dateTimeFormat));
 		}
 		*/
-
+		if (this.clientTime != null) {
+			builder.append("clientTime", this.clientTime.toString(dateTimeFormat));
+		}
+		
 		if (this.responseTime != null) {
 			builder.append("responseTime", this.responseTime.toString(dateTimeFormat));
 		}

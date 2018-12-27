@@ -2,6 +2,7 @@ package raptor.core.client.handler;
 
 import javax.annotation.concurrent.ThreadSafe;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,7 @@ import raptor.core.RpcPushDefine;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
+import raptor.exception.RpcException;
 import raptor.util.StringUtil;
 
 /**
@@ -29,9 +31,15 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 
 	private ChannelHandlerContext ctx;
 	
+	private final String tcp_id; //tcp连接唯一标识
+	
+	public ClientDispatcherHandler(String tcp_id) {
+		this.tcp_id = tcp_id;
+	}
+
 	@Override
-	public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-		this.ctx = ctx;
+	public String getTcpId() {
+		return this.tcp_id;
 	}
 
 	/**
@@ -78,12 +86,18 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 		if (isWritable && isOpen && isActive) {
 			return true;
 		} else {
-			return false;
+		    return false;
 		}
 	}
 
 	@Override
+	public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+		this.ctx = ctx;
+	}
+	
+	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody msg) throws Exception {
+		msg.setResponseTime(new DateTime());		
 		RpcClientTaskPool.addTask(msg); // 入池处理.
 	}
 

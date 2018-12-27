@@ -2,6 +2,8 @@ package raptor.core.server;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -48,11 +50,23 @@ public final class RpcServerTaskPool {
 	 **/
 	public static void initPool() {
 		LOGGER.info("初始化RPC Server业务线程池对象...");
-		POOLTASKEXECUTOR.setQueueCapacity(CPU_CORE * 1024 * 100); //队列深度
-		POOLTASKEXECUTOR.setCorePoolSize(CPU_CORE); // 核心线程数
-		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 8); // 最大线程数
+		POOLTASKEXECUTOR.setQueueCapacity(CPU_CORE * 10240); //队列深度
+		POOLTASKEXECUTOR.setCorePoolSize(CPU_CORE * 4); // 核心线程数
+		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 12); // 最大线程数
 		POOLTASKEXECUTOR.setKeepAliveSeconds(5000); //线程最大空闲时间-可回收
 		POOLTASKEXECUTOR.setThreadNamePrefix("TASK_RPC_SERVER_"); // 线程名前缀.
+		
+		POOLTASKEXECUTOR.setRejectedExecutionHandler(new RejectedExecutionHandler() {
+			@Override
+			public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+				LOGGER.warn("服务端线程池自动伸缩[before],maxPoolSize: " + POOLTASKEXECUTOR.getMaxPoolSize());
+				POOLTASKEXECUTOR.setMaxPoolSize(POOLTASKEXECUTOR.getMaxPoolSize() * 2); //max pool double
+				POOLTASKEXECUTOR.submit(r); //再度入池.
+				LOGGER.warn("服务端线程池自动伸缩[after],maxPoolSize: " + POOLTASKEXECUTOR.getMaxPoolSize());
+			}
+		});
+		
+		
 		POOLTASKEXECUTOR.initialize();
 
 		// 启动全部核心线程.
@@ -66,7 +80,6 @@ public final class RpcServerTaskPool {
 	 * @return void
 	 **/
 	public static void addTask(RpcRequestBody requestBody, AbstractCallBack call) {
-		//LOGGER.info("RPC请求任务入池,MessageId: " + requestBody.getMessageId());
 		ListenableFuture<RpcResponseBody> future = POOLTASKEXECUTOR
 				.submitListenable(new Callable<RpcResponseBody>() {
 					@Override

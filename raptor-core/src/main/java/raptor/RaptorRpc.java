@@ -109,6 +109,8 @@ public final class RaptorRpc<T extends Serializable> {
 			throw new RpcException("RPC 连接池获取对象失败,message: " + message);
 		}
 					
+//		LOGGER.info("激活POOL Object数量: " + pool.getNumActive()+", TcpId: " + rpc.getTcpId());
+
         DateTime reqDate = new DateTime(); //请求时间
 
 		String uuid = new UUID().toString();
