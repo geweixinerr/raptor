@@ -92,7 +92,7 @@ public final class RpcClient {
 	    	String minclients = ObjectUtils.defaultIfNull(en.get(MIN_CLIENTS),String.valueOf(DEFAULT_MIN_CLIENTS));
 	    	//对象池配置
 	    	GenericObjectPoolConfig conf = new GenericObjectPoolConfig();
-	    	conf.setLifo(false); //池中实例的操作是否按照LIFO（后进先出）的原则,默认true
+	    	conf.setLifo(false); //池中实例的操作是否按照LIFO（后进先出）的原则,默认true[先入池的TCP连接先出]
 	    	conf.setMaxTotal(Integer.parseInt(maxclients));  //池中最多可用的实例个数
 	    	conf.setMaxIdle(Integer.parseInt(maxclients)); //连接池中最大空闲的连接数,默认为8
 	    	conf.setMinIdle(Integer.parseInt(minclients)); //连接池中最少空闲的连接数,默认为0
