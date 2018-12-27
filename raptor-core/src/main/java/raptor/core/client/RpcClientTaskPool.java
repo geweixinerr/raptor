@@ -52,10 +52,8 @@ public final class RpcClientTaskPool {
 		POOLTASKEXECUTOR.setRejectedExecutionHandler(new RejectedExecutionHandler() {
 			@Override
 			public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-				LOGGER.warn("客户端线程池自动伸缩[before],maxPoolSize: " + POOLTASKEXECUTOR.getMaxPoolSize());
-				POOLTASKEXECUTOR.setMaxPoolSize(POOLTASKEXECUTOR.getMaxPoolSize() * 2); //max pool double
+				POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 12 * 3);
 				POOLTASKEXECUTOR.submit(r); //再度入池.
-				LOGGER.warn("客户端线程池自动伸缩[after],maxPoolSize: " + POOLTASKEXECUTOR.getMaxPoolSize());
 			}
 		});
 		
