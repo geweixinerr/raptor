@@ -2,6 +2,9 @@ package raptor.core.message;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import raptor.core.RpcResult;
 
@@ -9,11 +12,17 @@ import raptor.core.RpcResult;
  * @author gewx RPC消息响应主体
  * **/
 public final class RpcResponseBody implements RpcMessage {
+	
+	/**
+	 * 线程安全格式化类-Joda API
+	 * **/
+    private  static transient DateTimeFormatter dateTimeFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss:SSS");
+    
 
 	/**
 	 */
 	private static final long serialVersionUID = 495386357818590739L;
-
+    
 	/**
 	 * 消息Id
 	 * **/
@@ -34,6 +43,11 @@ public final class RpcResponseBody implements RpcMessage {
 	 * **/
 	private Boolean success;
 
+	/**
+	 * 服务器响应到达客户端时间.(仅测试使用)
+	 * **/
+	private  transient DateTime responseTime; 
+	
 	/**
 	 * RPC响应码
 	 * **/
@@ -78,6 +92,14 @@ public final class RpcResponseBody implements RpcMessage {
 	public void setRpcCode(RpcResult rpcCode) {
 		this.rpcCode = rpcCode;
 	}
+	
+	public DateTime getResponseTime() {
+		return responseTime;
+	}
+
+	public void setResponseTime(DateTime responseTime) {
+		this.responseTime = responseTime;
+	}
 
 	@Override
 	public String toString() {
@@ -89,6 +111,10 @@ public final class RpcResponseBody implements RpcMessage {
 		builder.append("body",body);
 		if (this.rpcCode != null) {
 			builder.append("rpcCode",rpcCode.getComment());	
+		}
+		
+		if (this.responseTime != null) {
+			builder.append("responseTime", this.responseTime.toString(dateTimeFormat));
 		}
 		sb.trimToSize();
 		return builder.toString();

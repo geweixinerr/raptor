@@ -66,9 +66,9 @@ public final class RpcClient {
 	private static final Integer DEFAULT_MIN_CLIENTS = 6;
 	
 	/**
-	 * 从池中获取对象,最大等待时间 MAXWAIT_MILLIS,默认1000毫秒
+	 * 时间设置常量,默认单位1000毫秒.
 	 * **/
-	private static final Integer DEFAULT_MAXWAIT_MILLIS = 1000;
+	private static final Integer DEFAULT_MILLIS = 1000;
 	
 
 	private RpcClient() {
@@ -97,10 +97,10 @@ public final class RpcClient {
 	    	conf.setMaxIdle(Integer.parseInt(maxclients)); //连接池中最大空闲的连接数,默认为8
 	    	conf.setMinIdle(Integer.parseInt(minclients)); //连接池中最少空闲的连接数,默认为0
 	    	conf.setBlockWhenExhausted(false); //是否堵塞等待连接创建. (true:等待,false:不等待)
-	    	conf.setMaxWaitMillis(DEFAULT_MAXWAIT_MILLIS); //调用borrowObject方法时，需要等待的最长时间. 单位:毫秒
+	    	conf.setMaxWaitMillis(5 * DEFAULT_MILLIS); //调用borrowObject方法时，需要等待的最长时间. 单位:毫秒
 	    	conf.setMinEvictableIdleTimeMillis(-1); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除 （-1 :不移除,使用setSoftMinEvictableIdleTimeMillis配置）
-	    	conf.setSoftMinEvictableIdleTimeMillis(1000 * 60 * 5); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除
-	    	conf.setTimeBetweenEvictionRunsMillis(8000); //闲置实例校验器启动的时间间隔,单位是毫秒
+	    	conf.setSoftMinEvictableIdleTimeMillis(5 * 60 * DEFAULT_MILLIS); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除[tcp连接空闲超时设置5分钟]
+	    	conf.setTimeBetweenEvictionRunsMillis(10 * DEFAULT_MILLIS); //闲置实例校验器启动的时间间隔,单位是毫秒 [10秒扫描一次]
 	    	ObjectPool<RpcPushDefine> pool = new GenericObjectPool<RpcPushDefine>(poolFactory,conf);
 
 	    	RPC_OBJECT_POOL.put(en.get(CLIENT_NAME), pool); //入池

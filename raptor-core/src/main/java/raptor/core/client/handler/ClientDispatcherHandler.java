@@ -5,6 +5,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -69,7 +70,16 @@ public class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResp
 
 	@Override
 	public boolean isWritable() {
-		return ctx.channel().isWritable();
+		Channel channel = ctx.channel();
+		boolean isWritable = channel.isWritable();
+		boolean isOpen = channel.isOpen();
+		boolean isActive = channel.isActive();
+		
+		if (isWritable && isOpen && isActive) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
