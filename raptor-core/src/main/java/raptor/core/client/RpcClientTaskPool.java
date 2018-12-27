@@ -49,13 +49,6 @@ public final class RpcClientTaskPool {
 		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 12); // 最大线程数
 		POOLTASKEXECUTOR.setKeepAliveSeconds(5000); //线程最/大空闲时间-可回收
 		POOLTASKEXECUTOR.setThreadNamePrefix("TASK_RPC_CLIENT_"); // 线程名前缀.
-		POOLTASKEXECUTOR.setRejectedExecutionHandler(new RejectedExecutionHandler() {
-			@Override
-			public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-				POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 12 * 3);
-				POOLTASKEXECUTOR.submit(r); //再度入池.
-			}
-		});
 		
 		POOLTASKEXECUTOR.initialize();
 

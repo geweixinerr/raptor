@@ -110,6 +110,9 @@ public final class RaptorRpc<T extends Serializable> {
 		}
 					
 //		LOGGER.info("激活POOL Object数量: " + pool.getNumActive()+", TcpId: " + rpc.getTcpId());
+		System.out.println("激活POOL Object数量: " + pool.getNumActive()+", 空闲总数:" +pool.getNumIdle()+", TcpId: " + rpc.getTcpId());
+		System.out.println("激活POOL Object数量: " + pool.getNumActive()+", 空闲总数:" +pool.getNumIdle()+", TcpId: " + rpc.getTcpId());
+		System.out.println("激活POOL Object数量: " + pool.getNumActive()+", 空闲总数:" +pool.getNumIdle()+", TcpId: " + rpc.getTcpId());
 
         DateTime reqDate = new DateTime(); //请求时间
 
