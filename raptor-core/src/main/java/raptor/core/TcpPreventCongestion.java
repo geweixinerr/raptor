@@ -15,6 +15,15 @@ public final class TcpPreventCongestion {
 	 * @author gewx 简单堵塞
 	 * **/
 	public synchronized void congestion(final int sleepTime) {
+		/*
+		TimeUnit.DAYS          //天  
+		TimeUnit.HOURS         //小时  
+		TimeUnit.MINUTES       //分钟  
+		TimeUnit.SECONDS       //秒  
+		TimeUnit.MILLISECONDS  //毫秒 
+		TimeUnit.NANOSECONDS   //毫微秒
+        */
+		
 		try {
 			TimeUnit.MILLISECONDS.sleep(sleepTime);
 		} catch (InterruptedException e) {
