@@ -15,6 +15,7 @@ import com.eaio.uuid.UUID;
 import raptor.core.AbstractCallBack;
 import raptor.core.PushMessageCallBack;
 import raptor.core.RpcPushDefine;
+import raptor.core.TcpPreventCongestion;
 import raptor.core.client.RpcClient;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
@@ -28,6 +29,8 @@ public final class RaptorRpc<T extends Serializable> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RaptorRpc.class);
 
+	private static final TcpPreventCongestion TCP_PREVENT_CONGESTION = TcpPreventCongestion.INSTANCE;
+	
 	/**
 	 * 业务超时设置,默认5秒
 	 **/
@@ -84,7 +87,7 @@ public final class RaptorRpc<T extends Serializable> {
 			LOGGER.error("RPC服务器映射不存在,请检查配置. serverName : " + serverName);
 			throw new RpcException("RPC服务器映射不存在,请检查配置. serverName : " + serverName);
 		}
-
+        		
 		Queue<RpcPushDefine> cacheRpcQueue = new ArrayDeque<RpcPushDefine>(32); //缓存暂时无法使用的池内对象.
 		RpcPushDefine rpc = null;
 		try {
@@ -109,14 +112,14 @@ public final class RaptorRpc<T extends Serializable> {
 			throw new RpcException("RPC 连接池获取对象失败,message: " + message);
 		}
 					
+		//防tcp拥塞
+		TCP_PREVENT_CONGESTION.congestion(1);
+		
 //		LOGGER.info("激活POOL Object数量: " + pool.getNumActive()+", TcpId: " + rpc.getTcpId());
-		System.out.println("激活POOL Object数量: " + pool.getNumActive()+", 空闲总数:" +pool.getNumIdle()+", TcpId: " + rpc.getTcpId());
-		System.out.println("激活POOL Object数量: " + pool.getNumActive()+", 空闲总数:" +pool.getNumIdle()+", TcpId: " + rpc.getTcpId());
-		System.out.println("激活POOL Object数量: " + pool.getNumActive()+", 空闲总数:" +pool.getNumIdle()+", TcpId: " + rpc.getTcpId());
-
+		
         DateTime reqDate = new DateTime(); //请求时间
-
 		String uuid = new UUID().toString();
+		
 		// 组装请求参数
 		RpcRequestBody requestBody = new RpcRequestBody();
 		requestBody.setMessageId(uuid);

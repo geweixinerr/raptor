@@ -163,7 +163,7 @@ public final class RpcRequestBody implements RpcMessage {
 		*/
 		
 		if (this.requestTime != null) {
-			builder.append("requestTime", this.requestTime.toString(dateTimeFormat));
+			builder.append("请求时间", this.requestTime.toString(dateTimeFormat));
 		}
 		
 		/*
@@ -172,17 +172,17 @@ public final class RpcRequestBody implements RpcMessage {
 		}
 		*/
 		if (this.clientTime != null) {
-			builder.append("clientTime", this.clientTime.toString(dateTimeFormat));
+			builder.append("响应时间", this.clientTime.toString(dateTimeFormat));
 		}
 		
 		if (this.responseTime != null) {
-			builder.append("responseTime", this.responseTime.toString(dateTimeFormat));
+			builder.append("回调时间", this.responseTime.toString(dateTimeFormat));
 		}
 		
 		if(this.requestTime != null && this.responseTime != null) {
 			Period p2 = new Period(this.requestTime, this.responseTime);
 			int seconds = p2.getSeconds(); //相差的秒
-			builder.append("consumeTime: " + (seconds * 1000 + p2.getMillis()));
+			builder.append("RPC耗时: " + (seconds * 1000 + p2.getMillis()));
 		}
 		
 		sb.trimToSize();
