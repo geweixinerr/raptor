@@ -2,8 +2,6 @@ package raptor.core.client;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -44,17 +42,11 @@ public final class RpcClientTaskPool {
 	 **/
 	public static void initPool() {
 		LOGGER.info("初始化RPC Client业务线程池对象...");
-		POOLTASKEXECUTOR.setQueueCapacity(CPU_CORE * 1024 * 20); // 队列深度
+		POOLTASKEXECUTOR.setQueueCapacity(Integer.MAX_VALUE); // 队列深度
 		POOLTASKEXECUTOR.setCorePoolSize(CPU_CORE * 4); // 核心线程数
-		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 12); // 最大线程数
+		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 4); // 最大线程数
 		POOLTASKEXECUTOR.setKeepAliveSeconds(5000); //线程最/大空闲时间-可回收
 		POOLTASKEXECUTOR.setThreadNamePrefix("TASK_RPC_CLIENT_"); // 线程名前缀.
-		POOLTASKEXECUTOR.setRejectedExecutionHandler(new RejectedExecutionHandler() {
-			@Override
-			public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-				//溢出,暂不处理.
-			}
-		});
 		
 		POOLTASKEXECUTOR.initialize();
 
