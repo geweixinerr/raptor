@@ -1,5 +1,7 @@
 package raptor.core.client.handler;
 
+import java.net.InetSocketAddress;
+
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.joda.time.DateTime;
@@ -7,6 +9,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.eaio.uuid.UUID;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -74,7 +78,11 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		try {
 			ctx.writeAndFlush(requestBody);
 		} finally {
-			call.invoke();
+			if (requestBody.getRpcMethod().equals(HEARTBEAT_METHOD)) { //心跳包的响应,无需释放tcp pool资源
+				LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcp_id: " + this.getTcpId()); //打印即可.
+			} else {
+				call.invoke();	
+			}
 		}
 	}
 	
@@ -132,11 +140,41 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		RpcClientTaskPool.addTask(msg); // 入池处理.
 	}
 
+	/**
+	 * 当一个Channel的可写的状态发生改变的时候执行，用户可以保证写的操作不要太快，这样可以防止OOM,写的太快容易发生OOM,
+	 *  如果当发现Channel变得再次可写之后重新恢复写入的操作，Channel中的isWritable方法可以监控该channel的可写状态，
+	 *  可写状态的阀门直接通过Channel.config().setWriterHighWaterMark()和Channel.config().setWriteLowWaterMark()配置
+	 * **/
+	/*
+	@Override
+	public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+		super.channelWritabilityChanged(ctx);
+	}
+	*/
+
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		String message = StringUtil.getErrorText(cause);
 		LOGGER.error("RPC客户端异常,message: " + message);
 		//待定处理,响应客户端异常.
+	}
+
+	@Override
+	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+		Channel channel = ctx.channel();
+		InetSocketAddress local = (InetSocketAddress) channel.localAddress();
+		InetSocketAddress remote = (InetSocketAddress) channel.remoteAddress();
+		
+		LOGGER.warn("[重要!!!]心跳检测...,tcp_id: " + this.getTcpId() + ",客户端: " + local.getAddress() + ":" + local.getPort()
+				+", 服务器: " + remote.getAddress() + ":" + remote.getPort());
+		
+		// 组装心跳检测包
+		RpcRequestBody requestBody = new RpcRequestBody();
+		requestBody.setMessageId(new UUID().toString());
+		requestBody.setRpcMethod(HEARTBEAT_METHOD);
+		requestBody.setRequestTime(new DateTime());
+		
+		this.pushMessage(requestBody, null); //发送心跳
 	}
 
 }
