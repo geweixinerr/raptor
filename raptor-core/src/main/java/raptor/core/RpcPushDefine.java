@@ -1,5 +1,7 @@
 package raptor.core;
 
+import org.joda.time.DateTime;
+
 import raptor.core.message.RpcRequestBody;
 
 /**
@@ -9,23 +11,29 @@ public interface RpcPushDefine {
 
 	/**
 	 * @author gewx 消息推送.
-	 * @param RpcRequestBody RPC请求对象
-	 * @return 服务请求受理结果, true : 受理成功, false: 受理失败,服务拒绝[超过raptor中间件发送的数据包上限,参考属性: ChannelOption.WRITE_BUFFER_WATER_MARK]
+	 * @param RpcRequestBody RPC请求对象, call 资源释放回调对象.
+	 * @return void 
 	 * **/
 	void pushMessage(RpcRequestBody requestBody, PushMessageCallBack call);
 	
 	/**
-	 * @author gewx 资源关闭
+	 * @author gewx 资源关闭,释放tcp pool空闲对象.
 	 * **/
 	void close();
 	
 	/**
-	 * @author gewx 池中对象,是否可写.
+	 * @author gewx 检测tcp pool当中tcp对象,是否可写.
 	 * */
 	boolean isWritable();
 	
 	/**
-	 * @author gewx tcp连接唯一Id
+	 * @author gewx tcp连接唯一Id [建议测试使用].
 	 * **/
 	String getTcpId();
+	
+	/**
+	 * @author gewx 获取tcp连接入池时间 [建议测试使用].
+	 * **/
+	DateTime getTcpIntoPoolTime();
+	
 }

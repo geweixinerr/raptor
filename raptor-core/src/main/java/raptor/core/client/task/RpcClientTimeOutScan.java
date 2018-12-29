@@ -15,6 +15,7 @@ import raptor.core.message.RpcResponseBody;
 
 /**
  * @author gewx RPC请求客户端超时扫描: 本线程执行过期消息清理.
+ * 备注: 本服务为定时扫描ConcurrentHashMap对象,由于是get只读操作,不会存在并发线程锁定问题,也不会降低 ConcurrentHashMap对象吞吐能力.
  **/
 public final class RpcClientTimeOutScan {
 
@@ -44,7 +45,7 @@ public final class RpcClientTimeOutScan {
 		/**
 		 * 以毫秒为单位设置重复执行任务之间的周期。
 		 **/
-		task.setPeriod(200); // 任务间隔200毫秒.
+		task.setPeriod(100); // 任务间隔100毫秒.
 
 		task.setRunnable(new Runnable() {
 			 	@Override

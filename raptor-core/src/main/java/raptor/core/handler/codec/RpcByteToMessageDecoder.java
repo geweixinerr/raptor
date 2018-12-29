@@ -9,8 +9,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
 /**
- * @author gewx 入站处理-解码器,转为RpcRequestBody
- * 解决TCP拆包,粘包,半包读写
+ * @author gewx 入站处理-解码器,解决TCP拆包,粘包,半包读写.
+ * 
  * **/
 public final class RpcByteToMessageDecoder extends ByteToMessageDecoder {
 
@@ -35,7 +35,7 @@ public final class RpcByteToMessageDecoder extends ByteToMessageDecoder {
 
 		byte [] rpcByteArray = new byte[rpcByteCount];
 		in.readBytes(rpcByteArray);
-//		in.discardReadBytes(); //清理无效堆外内存.时间换CPU空间[这行代码可不加.]
+//		in.discardReadBytes(); //清理无效堆外内存.时间换CPU空间[这行代码可不加].
 
 		Object rpcObject = configuration.asObject(rpcByteArray); //反序列化
 		out.add(rpcObject);	

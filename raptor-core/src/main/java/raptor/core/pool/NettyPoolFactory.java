@@ -29,7 +29,7 @@ import raptor.exception.RpcException;
 import raptor.util.StringUtil;
 
 /**
- * @author gewx Netty Client Pool
+ * @author gewx tcp连接对象池
  **/
 public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefine> {
 
@@ -44,6 +44,9 @@ public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefin
 	// 默认超时设置,5秒
 	private static final Integer DEFAULT_TIME_OUT = 5000;
 
+    //字节数值空间常量
+	private static final Integer ONE_KB = 1024; // 1KB数值常量.
+	
 	/**
 	 * 远程服务器地址
 	 **/
@@ -59,20 +62,16 @@ public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefin
 		this.port = port;
 	}
 
-	/**
-	 * TCP参数配置
-	 **/
-	private static final Integer ONE_KB = 1024; // 1KB数值常量.
-
 	@Override
 	public RpcPushDefine create() {
 		Bootstrap boot = new Bootstrap();
 		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 2);// 网络IO处理线程池
 		boot.group(eventGroup).channel(NioSocketChannel.class)
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIME_OUT) // 设置连接超时5秒,默认值30000毫秒即30秒。
-				.option(ChannelOption.SO_RCVBUF, 128 * ONE_KB) // 接受窗口(window size value),设置为512kb
-				.option(ChannelOption.SO_SNDBUF, 128 * ONE_KB) // 发送窗口(window size value),设置为256kb
+				.option(ChannelOption.SO_RCVBUF, 128 * ONE_KB) // 接受窗口(window size value),设置为128kb
+				.option(ChannelOption.SO_SNDBUF, 128 * ONE_KB) // 发送窗口(window size value),设置为128kb
 				// 默认WriteBufferWaterMark(low: 32768, high: 65536)
+				//Netty Buffer高水平线,限流使用.
 				.option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(8 * ONE_KB, 16 * ONE_KB))
 				.remoteAddress(remoteAddr, port).handler(new ChannelInitializer<SocketChannel>() {
 					@Override
@@ -86,7 +85,7 @@ public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefin
 
 		ChannelFuture future = null;
 		try {
-			future = boot.connect().sync();
+			future = boot.connect().sync(); //同步连接.
 			future.addListener(new ChannelFutureListener() {
 				@Override
 				public void operationComplete(ChannelFuture future) throws Exception {
@@ -97,14 +96,16 @@ public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefin
 								+ ", remoteAddress: " + remote.getAddress() + ":" + remote.getPort());
 						LOGGER.info("客户端服务注册成功.");
 					} else {
-						LOGGER.info("客户端连接失败,message: " + StringUtil.getErrorText(future.cause()));
+						String message = StringUtil.getErrorText(future.cause());
+						LOGGER.warn("tcp连接建立初始化异常-0,message: " + message);
+						throw new RpcException("tcp连接建立初始化异常-0,message: " + message);
 					}
 				}
 			});
 		} catch (Exception e) {
 			String message = StringUtil.getErrorText(e);
-			LOGGER.error("RPC连接初始化失败,message: " + message);
-			throw new RpcException("RPC连接初始化失败,message: " + message);
+			LOGGER.error("tcp连接建立初始化异常-1,message: " + message);
+			throw new RpcException("tcp连接建立初始化异常-1,message: " + message);
 		}
 
 		RpcPushDefine handler = (RpcPushDefine) future.channel().pipeline().get(CLIENT_DISPATCHER);

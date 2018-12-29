@@ -15,8 +15,10 @@ public final class RpcMappingInit {
 	private RpcMappingInit() {
 	}
 	
-	//RPC映射关系存储Map
-	private static final Map<String,RpcHandlerObject> RPC_MAPPING = new ConcurrentHashMap<String,RpcHandlerObject>();
+	/**
+	 * RPC映射关系存储对象
+	 * **/
+	private static final Map<String,RpcHandlerObject> RPC_MAPPING = new ConcurrentHashMap<String,RpcHandlerObject>(64);
 			
 	/**
 	 * @author gewx 建立RPC映射关系

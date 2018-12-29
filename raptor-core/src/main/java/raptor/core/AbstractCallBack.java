@@ -17,7 +17,7 @@ public abstract class AbstractCallBack {
 	public abstract void invoke(final RpcResponseBody resp);
 
 	/**
-	 * @author gewx 业务回调 (测试专用)
+	 * @author gewx 业务回调 [推荐测试专用]
 	 * @param RpcRequestBody
 	 *            req,请求数据, RpcResponseBody respo 响应回调对象.
 	 * @return void
