@@ -2,6 +2,7 @@ package raptor.core.client;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -32,6 +33,8 @@ public final class RpcClientTaskPool {
 	 * 客户端请求MessageId与回调对应关系,这里设置较大数值避免客户端高并发请求期间,map resize导致吞吐量降低[当然有点耗费内存,可根据实际情况自行调整 (#^.^#)].
 	 **/
 	private static final Map<String, RpcRequestBody> MESSAGEID_MAPPING = new ConcurrentHashMap<String, RpcRequestBody>(1024 * 100);
+	
+	private static final AtomicInteger countObject = new AtomicInteger();
 	
 	private RpcClientTaskPool() {
 	}
@@ -82,7 +85,8 @@ public final class RpcClientTaskPool {
 						if (!requestBody.isMessageSend()) { //是否已发送,并发串行化校验.
 							responseBody.setRpcCode(RpcResult.SUCCESS);
 							requestBody.getCall().invoke(responseBody);
-							LOGGER.warn("成功执行回调,requestBody: " + requestBody);
+							int count = countObject.incrementAndGet();
+							LOGGER.warn("成功执行回调,count:" + count + ",requestBody: " + requestBody);
 						} else {
 							//并发发送[与timeOut定时扫描器存在并发],不予处理.
 						}
@@ -92,11 +96,12 @@ public final class RpcClientTaskPool {
 						responseBody.setMessage("RPC 服务调用超时,message:timeOut");
 						responseBody.setRpcCode(RpcResult.TIME_OUT);
 						requestBody.getCall().invoke(responseBody);						
-						LOGGER.warn("成功执行回调-已超时,requestBody: " + requestBody);
+						int count = countObject.incrementAndGet();
+						LOGGER.warn("成功执行回调-已超时,count:" + count + ", requestBody: " + requestBody);
 					}
 				}
 			});
-		}
+		} 
 		/***
 		else {
 			//requestBody is null, 已超时[已反馈给调用客户端]

@@ -92,6 +92,7 @@ public final class RaptorRpc<T extends Serializable> {
 		requestBody.setTimeOut(reqDate.plusSeconds(timeOut));
 		requestBody.setCall(call);
 
+		RpcClientTaskPool.pushTask(requestBody); // 入客户端队列,定时扫描.
 		// 发送消息(异步发送)
 		rpc.pushMessage(requestBody, new PushMessageCallBack(rpc) {
 			@Override
@@ -110,7 +111,6 @@ public final class RaptorRpc<T extends Serializable> {
 			}
 		}); 
 		
-		RpcClientTaskPool.pushTask(requestBody); // 入客户端队列,定时扫描.
 	}
 
 	// 重载异步方法

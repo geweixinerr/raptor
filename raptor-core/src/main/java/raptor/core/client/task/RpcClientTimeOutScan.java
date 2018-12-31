@@ -50,10 +50,14 @@ public final class RpcClientTimeOutScan {
 		task.setRunnable(new Runnable() {
 			 	@Override
 				public void run() {
-					Map<String, RpcRequestBody> requestPool = RpcClientTaskPool.listMapPool(); //客户端请求-回调任务池.
+					Map<String, RpcRequestBody> requestPool = RpcClientTaskPool.listMapPool();  
+					String [] keys = requestPool.keySet().toArray(new String[]{}); //客户端请求-回调任务池.
 					
-					for (Map.Entry<String, RpcRequestBody> en : requestPool.entrySet()) {
-						RpcRequestBody requestBody = en.getValue(); 
+					for (String key : keys) {
+						RpcRequestBody requestBody = requestPool.get(key);
+						if (requestBody == null) {
+							continue;
+						}
 						// 如果当前时间已超过设置的超时时间,则为过期消息.
 						DateTime thisDate = new DateTime();
 						if (thisDate.compareTo(requestBody.getTimeOut()) >= 0) {
