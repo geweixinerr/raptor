@@ -71,22 +71,18 @@ public final class RpcClientTaskPool {
 		RpcRequestBody requestBody = MESSAGEID_MAPPING.remove(responseBody.getMessageId());
 
 		if (requestBody != null) {
-			if (LOGGER.isDebugEnabled()) {
-				requestBody.setClientTime(responseBody.getResponseTime()); //客户端接收到服务器响应时间[仅推荐测试使用].
-			}
+			requestBody.setClientTime(responseBody.getResponseTime()); //客户端接收到服务器响应时间[仅推荐测试使用].
 			
 			POOLTASKEXECUTOR.submit(new Runnable() {
 				@Override
 				public void run() {
-					if (LOGGER.isDebugEnabled()) {
-						requestBody.setResponseTime(new DateTime()); // 客户端回调时间	
-					}
+					requestBody.setResponseTime(new DateTime()); // 客户端回调时间	
 					
 					if (new DateTime().compareTo(requestBody.getTimeOut()) <= 0) { //是否超时
 						if (!requestBody.isMessageSend()) { //是否已发送,并发串行化校验.
 							responseBody.setRpcCode(RpcResult.SUCCESS);
 							requestBody.getCall().invoke(responseBody);
-							LOGGER.info("成功执行回调,requestBody: " + requestBody);
+							LOGGER.warn("成功执行回调,requestBody: " + requestBody);
 						} else {
 							//并发发送[与timeOut定时扫描器存在并发],不予处理.
 						}

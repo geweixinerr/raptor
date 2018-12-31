@@ -15,7 +15,6 @@ import com.eaio.uuid.UUID;
 import raptor.core.AbstractCallBack;
 import raptor.core.PushMessageCallBack;
 import raptor.core.RpcPushDefine;
-import raptor.core.TcpPreventCongestion;
 import raptor.core.client.RpcClient;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
@@ -28,8 +27,6 @@ import raptor.util.StringUtil;
 public final class RaptorRpc<T extends Serializable> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RaptorRpc.class);
-
-	private static final TcpPreventCongestion TCP_PREVENT_CONGESTION = TcpPreventCongestion.INSTANCE;
 	
 	/**
 	 * 业务超时设置,默认5秒
@@ -81,9 +78,7 @@ public final class RaptorRpc<T extends Serializable> {
 			throw new RpcException("RPC 连接池获取对象失败,message: " + message);
 		}
 					
-		TCP_PREVENT_CONGESTION.congestion(1); //防tcp拥塞
-
-		//LOGGER.info("激活POOL Object数量: " + pool.getNumActive()+", TcpId: " + rpc.getTcpId());	
+		rpc.getTPCObject().congestion(1);
 		
         DateTime reqDate = new DateTime(); //请求时间
 		String uuid = new UUID().toString();

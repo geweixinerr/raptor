@@ -24,6 +24,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import raptor.core.RpcPushDefine;
+import raptor.core.TcpPreventCongestion;
 import raptor.core.client.handler.ClientDispatcherHandler;
 import raptor.core.handler.codec.RpcByteToMessageDecoder;
 import raptor.core.handler.codec.RpcMessageToByteEncoder;
@@ -79,10 +80,10 @@ public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefin
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
 						ChannelPipeline pipline = ch.pipeline();
-						pipline.addLast(new IdleStateHandler(0,5,0, TimeUnit.SECONDS)); //心跳检测5秒[单个tcp连接5秒内没有出站动作]
+						pipline.addLast(new IdleStateHandler(0,60 * 2,0, TimeUnit.SECONDS)); //心跳检测2分钟[单个tcp连接2分钟内没有出站动作]
 						pipline.addLast(new RpcByteToMessageDecoder());
 						pipline.addLast(new RpcMessageToByteEncoder());
-						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString()));
+						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString(), new TcpPreventCongestion()));
 					}
 				});
 

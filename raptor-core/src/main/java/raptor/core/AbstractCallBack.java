@@ -4,7 +4,7 @@ import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
 
 /**
- * @author gewx RPC服务端业务分发回调抽象类
+ * @author gewx RPC业务分发回调抽象类
  **/
 public abstract class AbstractCallBack {
 

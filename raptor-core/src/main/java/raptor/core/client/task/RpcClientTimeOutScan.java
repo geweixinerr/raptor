@@ -67,7 +67,10 @@ public final class RpcClientTimeOutScan {
 								responseBody.setMessage("RPC 服务调用超时[扫描],message:timeOut");
 								responseBody.setRpcCode(RpcResult.TIME_OUT);
 								
-								requestBody.setResponseTime(thisDate);
+								if (requestBody.getResponseTime() == null) {
+									requestBody.setResponseTime(thisDate);	
+								}
+								
 								requestBody.getCall().invoke(responseBody); // 回调通知
 								LOGGER.warn("清理超时消息...,messageId: " + requestBody);
 							}

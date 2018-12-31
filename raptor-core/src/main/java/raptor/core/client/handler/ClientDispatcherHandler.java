@@ -20,6 +20,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import raptor.core.PushMessageCallBack;
 import raptor.core.RpcPushDefine;
+import raptor.core.TcpPreventCongestion;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
@@ -45,6 +46,11 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	private ChannelHandlerContext ctx;
 	
 	/**
+	 * tcp防拥塞对象.
+	 * **/
+	private final TcpPreventCongestion tpcObject;
+	
+	/**
 	 * tcp_id,唯一标识单条tcp连接[tcp pool测试使用]
 	 * **/
 	private final String tcp_id; 
@@ -54,9 +60,15 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	 * **/
 	private final DateTime into_pool_time;
 	
-	public ClientDispatcherHandler(String tcp_id) {
+	public ClientDispatcherHandler(String tcp_id, TcpPreventCongestion tpcObject) {
 		this.tcp_id = tcp_id;
 		this.into_pool_time = new DateTime();
+		this.tpcObject = tpcObject;
+	}
+
+	@Override
+	public TcpPreventCongestion getTPCObject() {
+		return this.tpcObject;
 	}
 
 	@Override
@@ -131,12 +143,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody msg) throws Exception {
-		/**
-		 * 客户端接收到服务器响应时间[仅推荐测试使用].
-		 * **/
-		if (LOGGER.isDebugEnabled()) {
-			msg.setResponseTime(new DateTime());	
-		}
+		msg.setResponseTime(new DateTime());	
 		RpcClientTaskPool.addTask(msg); // 入池处理.
 	}
 
