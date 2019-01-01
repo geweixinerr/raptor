@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:c="http://www.springframework.org/schema/c" xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:lang="http://www.springframework.org/schema/lang" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.3.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-4.3.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+
+	<!-- 开启注解扫描 -->
+	<context:component-scan base-package="raptor.*"/>
+	
+    <!-- 引入支持LogBack -->
+	<bean id="logInitialization"
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetClass" value="ch.qos.logback.ext.spring.LogbackConfigurer" />
+		<property name="targetMethod" value="initLogging" />
+		<property name="arguments">
+			<value>classpath:logback.xml</value>
+		</property>
+	</bean>
+	
+	<!-- Netty Pool客户端配置 -->
+	<bean id="NettyPoolConfig"
+		class="org.springframework.beans.factory.config.ListFactoryBean">
+		<property name="targetListClass" value="java.util.concurrent.CopyOnWriteArrayList" />
+		<property name="singleton" value="false" />
+		<!-- 客户端配置集合List,可配置多客户端属性. -->
+		<property name="sourceList">
+			<list>
+			    <!-- RPC客户端配置,NIO线程池大小根据服务器所在物理主机CPU核心数动态拓展,数值设定为: core * 2 -->
+			    <bean class="org.springframework.beans.factory.config.MapFactoryBean">
+					<property name="targetMapClass">
+						<value>java.util.HashMap</value>
+					</property>
+					<property name="sourceMap">
+						<map>
+						    <entry key="clientName" value="remote"/> <!-- 客户端标识 -->
+						    <!-- 连接的远程服务器IP地址/端口号 --> 
+							<entry key="remote" value="localhost"/> 
+							<entry key="port" value="8090"/>
+							<entry key="maxclients" value="32"/> <!-- 最大tcp连接数据 -->
+							<entry key="minclients" value="6"/> <!-- 最小tcp连接数据,初始化时建立此配置的数值连接数. -->
+						</map>
+					</property>    
+				</bean>  
+			</list>
+		</property>
+	</bean>
+	
+</beans>
