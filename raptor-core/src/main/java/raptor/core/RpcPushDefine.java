@@ -27,11 +27,6 @@ public interface RpcPushDefine {
 	boolean isWritable();
 	
 	/**
-	 * @author gewx 获取防拥塞对象.
-	 * **/
-	TcpPreventCongestion getTPCObject();
-	
-	/**
 	 * @author gewx tcp连接唯一Id [建议测试使用].
 	 * **/
 	String getTcpId();

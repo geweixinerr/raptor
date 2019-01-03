@@ -84,7 +84,7 @@ public final class RpcClient {
 	public static void start() throws Exception {
 		List<Map<String, String>> clientConfig = RpcParameter.INSTANCE.getClientConfig(); // 客户端配置参数
 		for (Map<String,String> en : clientConfig) {
-	    	PooledObjectFactory poolFactory = new NettyPoolFactory(en.get(REMOTE_ADDR),Integer.parseInt(en.get(PORT)));
+	    	PooledObjectFactory poolFactory = new NettyPoolFactory(en.get(REMOTE_ADDR),Integer.parseInt(en.get(PORT)),en.get(CLIENT_NAME));
 	    	
 	    	//最大连接数
 	    	String maxclients = ObjectUtils.defaultIfNull(en.get(MAX_CLIENTS),String.valueOf(DEFAULT_MAX_CLIENTS));

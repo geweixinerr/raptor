@@ -24,7 +24,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import raptor.core.RpcPushDefine;
-import raptor.core.TcpPreventCongestion;
 import raptor.core.client.handler.ClientDispatcherHandler;
 import raptor.core.handler.codec.RpcByteToMessageDecoder;
 import raptor.core.handler.codec.RpcMessageToByteEncoder;
@@ -59,14 +58,22 @@ public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefin
 	 * 远程服务器端口
 	 **/
 	private final int port;
-
-	public NettyPoolFactory(String remoteAddr, int port) {
+	
+	/**
+	 * 当前poolFactory 隶属于哪个server节点
+	 * **/
+    private final String serverNode;
+	
+	public NettyPoolFactory(String remoteAddr, int port, String serverNode) {
 		this.remoteAddr = remoteAddr;
 		this.port = port;
+		this.serverNode = serverNode;
 	}
 
 	@Override
 	public RpcPushDefine create() {
+		final String serverNode = this.serverNode; //服务器节点
+		
 		Bootstrap boot = new Bootstrap();
 		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 2);// 网络IO处理线程池
 		boot.group(eventGroup).channel(NioSocketChannel.class)
@@ -83,7 +90,7 @@ public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefin
 						pipline.addLast(new IdleStateHandler(0,60 * 2,0, TimeUnit.SECONDS)); //心跳检测2分钟[单个tcp连接2分钟内没有出站动作]
 						pipline.addLast(new RpcByteToMessageDecoder());
 						pipline.addLast(new RpcMessageToByteEncoder());
-						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString(), new TcpPreventCongestion()));
+						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString(), serverNode));
 					}
 				});
 

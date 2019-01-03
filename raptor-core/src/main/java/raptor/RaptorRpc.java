@@ -77,8 +77,6 @@ public final class RaptorRpc<T extends Serializable> {
 			LOGGER.error("RPC 连接池获取对象失败,message: " + message);
 			throw new RpcException("RPC 连接池获取对象失败,message: " + message);
 		}
-					
-		rpc.getTPCObject().congestion(1);
 		
         DateTime reqDate = new DateTime(); //请求时间
 		String uuid = new UUID().toString();

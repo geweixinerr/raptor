@@ -1,6 +1,7 @@
 package raptor.core.client.handler;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -20,7 +21,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import raptor.core.PushMessageCallBack;
 import raptor.core.RpcPushDefine;
-import raptor.core.TcpPreventCongestion;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
@@ -46,9 +46,9 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	private ChannelHandlerContext ctx;
 	
 	/**
-	 * tcp防拥塞对象.
+	 * tcp隶属pool服务节点
 	 * **/
-	private final TcpPreventCongestion tpcObject;
+	private final String serverNode;
 	
 	/**
 	 * tcp_id,唯一标识单条tcp连接[tcp pool测试使用]
@@ -60,15 +60,15 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	 * **/
 	private final DateTime into_pool_time;
 	
-	public ClientDispatcherHandler(String tcp_id, TcpPreventCongestion tpcObject) {
+	/**
+	 * tcp速率控制对象.
+	 * **/
+	private final AtomicInteger speedObject = new AtomicInteger(); 
+	
+	public ClientDispatcherHandler(String tcp_id, String serverNode) {
 		this.tcp_id = tcp_id;
+		this.serverNode = serverNode;
 		this.into_pool_time = new DateTime();
-		this.tpcObject = tpcObject;
-	}
-
-	@Override
-	public TcpPreventCongestion getTPCObject() {
-		return this.tpcObject;
 	}
 
 	@Override
@@ -88,6 +88,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	public void pushMessage(RpcRequestBody requestBody, PushMessageCallBack call) {
 		try {
+			speedObject.incrementAndGet(); 
 			ctx.writeAndFlush(requestBody);
 		} finally {
 			if (requestBody.getRpcMethod().equals(HEARTBEAT_METHOD)) { //心跳包的响应,无需释放tcp pool资源
@@ -143,6 +144,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody msg) throws Exception {
+		speedObject.decrementAndGet();
 		msg.setResponseTime(new DateTime());	
 		RpcClientTaskPool.addTask(msg); // 入池处理.
 	}
