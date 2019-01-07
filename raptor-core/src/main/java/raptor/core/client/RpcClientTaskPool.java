@@ -71,7 +71,7 @@ public final class RpcClientTaskPool {
 		 * 3.清理队列中已发送的消息对象。
 		 * 
 		 **/
-		RpcRequestBody requestBody = MESSAGEID_MAPPING.remove(responseBody.getMessageId());
+		RpcRequestBody requestBody = MESSAGEID_MAPPING.get(responseBody.getMessageId());
 
 		if (requestBody != null) {
 			requestBody.setClientTime(responseBody.getResponseTime()); //客户端接收到服务器响应时间[仅推荐测试使用].
@@ -79,11 +79,13 @@ public final class RpcClientTaskPool {
 			POOLTASKEXECUTOR.submit(new Runnable() {
 				@Override
 				public void run() {
+					MESSAGEID_MAPPING.remove(requestBody.getMessageId()); 
+
 					requestBody.setResponseTime(new DateTime()); // 客户端回调时间	
 					
 					if (new DateTime().compareTo(requestBody.getTimeOut()) <= 0) { //是否超时
 						if (!requestBody.isMessageSend()) { //是否已发送,并发串行化校验.
-							responseBody.setRpcCode(RpcResult.SUCCESS);
+							responseBody.setRpcCode(RpcResult.SUCCESS);							
 							requestBody.getCall().invoke(responseBody);
 							int count = countObject.incrementAndGet();
 							LOGGER.warn("成功执行回调,count:" + count + ",requestBody: " + requestBody);

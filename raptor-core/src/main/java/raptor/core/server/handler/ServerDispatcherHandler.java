@@ -27,7 +27,6 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 		RpcServerTaskPool.addTask(msg, new AbstractCallBack() {
 			@Override
 			public void invoke(RpcResponseBody responseBody) {
-				//MDC.put("invokeId", "invokeId-"+java.util.UUID.randomUUID().toString().replaceAll("-", "").toUpperCase());
 				ctx.writeAndFlush(responseBody);
 			}
 		});
@@ -37,7 +36,6 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		String message = StringUtil.getErrorText(cause);
 		LOGGER.warn("RPC服务端异常,message: " + message);
-		//待定,输出异常响应对象.
 	}
 	
 }

@@ -67,6 +67,7 @@ public final class RpcServerTaskPool {
 	 * @return void
 	 **/
 	public static void addTask(RpcRequestBody requestBody, AbstractCallBack call) {
+		final String rpcMethod = requestBody.getRpcMethod();
 		ListenableFuture<RpcResponseBody> future = POOLTASKEXECUTOR
 				.submitListenable(new Callable<RpcResponseBody>() {
 					@Override
@@ -74,7 +75,7 @@ public final class RpcServerTaskPool {
 						/**
 						 * 实际业务调用
 						 * **/
-						RpcHandlerObject handler = RPC_MAPPING.get(requestBody.getRpcMethod());
+						RpcHandlerObject handler = RPC_MAPPING.get(rpcMethod);
 						if (handler == null) {
 							throw new RpcException("RPC参数缺失,RpcMethod is null !");
 						}
@@ -87,6 +88,7 @@ public final class RpcServerTaskPool {
 							result = MethodUtils.invokeMethod(handler.getObject(), handler.getRpcKey());
 						}
 						RpcResponseBody body = new RpcResponseBody();
+						body.setRpcMethod(rpcMethod);						
 						body.setBody(result);
 						body.setMessageId(requestBody.getMessageId());
 						body.setSuccess(true);
@@ -107,9 +109,10 @@ public final class RpcServerTaskPool {
 				/**
 				 * 定义回调异常,默认响应体
 				 * **/
-				RpcResponseBody body = new RpcResponseBody(); 
-				body.setSuccess(false);
+				RpcResponseBody body = new RpcResponseBody();
+				body.setRpcMethod(rpcMethod);
 				body.setMessageId(requestBody.getMessageId());
+				body.setSuccess(false);
 				body.setMessage("RPC 服务调用失败,message:[" + throwable.getMessage() + "]");
 				
 				call.invoke(body);

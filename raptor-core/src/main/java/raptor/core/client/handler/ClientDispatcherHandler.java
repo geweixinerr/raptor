@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.concurrent.ThreadSafe;
 
+import org.apache.commons.pool2.ObjectPool;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -19,11 +20,12 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import raptor.core.PushMessageCallBack;
 import raptor.core.RpcPushDefine;
+import raptor.core.client.RpcClient;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
+import raptor.exception.RpcException;
 import raptor.util.StringUtil;
 
 /**
@@ -46,11 +48,6 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	private ChannelHandlerContext ctx;
 	
 	/**
-	 * tcp隶属pool服务节点
-	 * **/
-	private final String serverNode;
-	
-	/**
 	 * tcp_id,唯一标识单条tcp连接[tcp pool测试使用]
 	 * **/
 	private final String tcp_id; 
@@ -61,14 +58,30 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	private final DateTime into_pool_time;
 	
 	/**
+	 * 速率值
+	 * **/
+	private final Integer speedNum;
+	
+	/**
+	 * 当前tcp连接隶属的tcp pool池
+	 * **/
+	private final ObjectPool<RpcPushDefine> pool;
+	
+	/**
 	 * tcp速率控制对象.
 	 * **/
-	private final AtomicInteger speedObject = new AtomicInteger(); 
+	private final AtomicInteger speedObject = new AtomicInteger();
 	
-	public ClientDispatcherHandler(String tcp_id, String serverNode) {
+	/**
+	 * tcp事务结束累计值-用于资源释放计数
+	 * **/
+	private final AtomicInteger releaseObject = new AtomicInteger();
+	
+	public ClientDispatcherHandler(String tcp_id, String serverNode, Integer speedNum) {
 		this.tcp_id = tcp_id;
-		this.serverNode = serverNode;
+	    this.speedNum = speedNum;
 		this.into_pool_time = new DateTime();
+		this.pool = RpcClient.getRpcPoolMapping().get(serverNode);
 	}
 
 	@Override
@@ -82,20 +95,26 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	}
 
 	/**
-	 * @author gewx RPC实际调用--->信息推送. 信息成功推送入Netty队列后,释放TCP连接入池.
-	 * 后续未完事项:这里可以做tcp连接活动监控,譬如耗时总长,譬如单条tcp连接服务器保活等...
+	 * @author gewx RPC实际调用--->信息推送.
 	 **/
 	@Override
-	public void pushMessage(RpcRequestBody requestBody, PushMessageCallBack call) {
-		try {
-			speedObject.incrementAndGet(); 
+	public void pushMessage(RpcRequestBody requestBody) {
+		if (requestBody.getRpcMethod().equals(HEARTBEAT_METHOD)) {
 			ctx.writeAndFlush(requestBody);
-		} finally {
-			if (requestBody.getRpcMethod().equals(HEARTBEAT_METHOD)) { //心跳包的响应,无需释放tcp pool资源
-				LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcp_id: " + this.getTcpId()); //打印即可.
-			} else {
-				call.invoke();	
-			}
+		} else {
+			try {
+				speedObject.incrementAndGet(); 
+				ctx.writeAndFlush(requestBody);
+			} finally {
+				if (speedObject.intValue() < speedNum) {
+					try {
+						pool.returnObject(this);
+					} catch (Exception e) {
+						LOGGER.error("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
+						throw new RpcException("资源释放异常,tcpId: "+this.getTcpId()+",message: " + e.getMessage());
+					}
+				}
+			}	
 		}
 	}
 	
@@ -117,8 +136,6 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 					}
 				} else {
 					LOGGER.error("tcp连接关闭失败,message: " + StringUtil.getErrorText(future.cause()));
-					//客户端单方面强制断开连接
-					ctx.disconnect();
 				}
 			}
 		});
@@ -144,28 +161,27 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody msg) throws Exception {
-		speedObject.decrementAndGet();
+		if (msg.getRpcMethod().equals(HEARTBEAT_METHOD)) {
+			LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcp_id: " + this.getTcpId());
+			return;
+		}
+		
+		releaseObject.incrementAndGet();
+		synchronized (this) {
+			if (releaseObject.intValue() >= speedNum) {
+				releaseObject.set(0);
+				speedObject.set(0);
+				pool.returnObject(this);
+			}
+		}
 		msg.setResponseTime(new DateTime());	
-		RpcClientTaskPool.addTask(msg); // 入池处理.
+		RpcClientTaskPool.addTask(msg); 
 	}
-
-	/**
-	 * 当一个Channel的可写的状态发生改变的时候执行，用户可以保证写的操作不要太快，这样可以防止OOM,写的太快容易发生OOM,
-	 *  如果当发现Channel变得再次可写之后重新恢复写入的操作，Channel中的isWritable方法可以监控该channel的可写状态，
-	 *  可写状态的阀门直接通过Channel.config().setWriterHighWaterMark()和Channel.config().setWriteLowWaterMark()配置
-	 * **/
-	/*
-	@Override
-	public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-		super.channelWritabilityChanged(ctx);
-	}
-	*/
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		String message = StringUtil.getErrorText(cause);
 		LOGGER.error("RPC客户端异常,message: " + message);
-		//待定处理,响应客户端异常.
 	}
 
 	@Override
@@ -177,13 +193,12 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		LOGGER.warn("[重要!!!]心跳检测...,tcp_id: " + this.getTcpId() + ",客户端: " + local.getAddress() + ":" + local.getPort()
 				+", 服务器: " + remote.getAddress() + ":" + remote.getPort());
 		
-		// 组装心跳检测包
 		RpcRequestBody requestBody = new RpcRequestBody();
 		requestBody.setMessageId(new UUID().toString());
 		requestBody.setRpcMethod(HEARTBEAT_METHOD);
 		requestBody.setRequestTime(new DateTime());
 		
-		this.pushMessage(requestBody, null); //发送心跳
+		this.pushMessage(requestBody);
 	}
 
 }

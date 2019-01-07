@@ -64,15 +64,22 @@ public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefin
 	 * **/
     private final String serverNode;
 	
-	public NettyPoolFactory(String remoteAddr, int port, String serverNode) {
+    /**
+     * 速率
+     * **/
+    private final Integer speedNum;
+    
+	public NettyPoolFactory(String remoteAddr, int port, String serverNode, Integer speedNum) {
 		this.remoteAddr = remoteAddr;
 		this.port = port;
 		this.serverNode = serverNode;
+		this.speedNum = speedNum;
 	}
 
 	@Override
 	public RpcPushDefine create() {
-		final String serverNode = this.serverNode; //服务器节点
+		String serverNode = this.serverNode; //服务器节点
+		Integer speedNum = this.speedNum; //速率 
 		
 		Bootstrap boot = new Bootstrap();
 		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 2);// 网络IO处理线程池
@@ -90,7 +97,7 @@ public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefin
 						pipline.addLast(new IdleStateHandler(0,60 * 2,0, TimeUnit.SECONDS)); //心跳检测2分钟[单个tcp连接2分钟内没有出站动作]
 						pipline.addLast(new RpcByteToMessageDecoder());
 						pipline.addLast(new RpcMessageToByteEncoder());
-						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString(), serverNode));
+						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString(), serverNode, speedNum));
 					}
 				});
 
@@ -137,6 +144,7 @@ public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefin
 	@Override
 	public void passivateObject(PooledObject<RpcPushDefine> pooledObject) {
 		// 钝化,不处理. 对象返回池中时的动作.
+//		LOGGER.info("资源入池...,tcpId: " + pooledObject.getObject().getTcpId());
 	}
 
 	/**

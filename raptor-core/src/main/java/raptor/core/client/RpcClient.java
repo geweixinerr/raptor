@@ -40,9 +40,19 @@ public final class RpcClient {
 	private static final String PORT = "port";
 	
 	/**
-	 * 客户端标识
+	 * 服务器节点标识
 	 * **/
-	private static final String CLIENT_NAME = "clientName";
+	private static final String SERVER_NODE = "serverNode";
+	
+	/**
+	 * 单台服务器TCP连接速率
+	 * **/
+	private static final String SPEED_NUM = "speedNum";
+	
+	/**
+	 * 单台服务器TCP连接速率-默认值:100
+	 * **/
+	private static final Integer DEFAULT_SPEED_NUM = 100;
 	
 	/**
 	 * 最大连接数
@@ -84,8 +94,8 @@ public final class RpcClient {
 	public static void start() throws Exception {
 		List<Map<String, String>> clientConfig = RpcParameter.INSTANCE.getClientConfig(); // 客户端配置参数
 		for (Map<String,String> en : clientConfig) {
-	    	PooledObjectFactory poolFactory = new NettyPoolFactory(en.get(REMOTE_ADDR),Integer.parseInt(en.get(PORT)),en.get(CLIENT_NAME));
-	    	
+	    	//最大连接数
+	    	String speedNum = ObjectUtils.defaultIfNull(en.get(SPEED_NUM),String.valueOf(DEFAULT_SPEED_NUM));
 	    	//最大连接数
 	    	String maxclients = ObjectUtils.defaultIfNull(en.get(MAX_CLIENTS),String.valueOf(DEFAULT_MAX_CLIENTS));
 	    	//最小连接数
@@ -101,14 +111,16 @@ public final class RpcClient {
 	    	conf.setMinEvictableIdleTimeMillis(-1); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除 （-1 :不移除,使用setSoftMinEvictableIdleTimeMillis配置）
 	    	conf.setSoftMinEvictableIdleTimeMillis(5 * 60 * DEFAULT_MILLIS); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除[tcp连接空闲超时设置5分钟]
 	    	conf.setTimeBetweenEvictionRunsMillis(10 * DEFAULT_MILLIS); //闲置实例校验器启动的时间间隔,单位是毫秒 [10秒扫描一次]
+	    	
+	    	PooledObjectFactory poolFactory = new NettyPoolFactory(en.get(REMOTE_ADDR),Integer.parseInt(en.get(PORT)),en.get(SERVER_NODE),Integer.parseInt(speedNum));
 	    	ObjectPool<RpcPushDefine> pool = new GenericObjectPool<RpcPushDefine>(poolFactory,conf);
 
-	    	RPC_OBJECT_POOL.put(en.get(CLIENT_NAME), pool); //入池
+	    	RPC_OBJECT_POOL.put(en.get(SERVER_NODE), pool); //入池
 	    		    	
 	    	/**
 	    	 * init 初始化
 	    	 * **/
-	        LOGGER.info("初始化客户端:" + en.get(CLIENT_NAME) +", tcp连接池最小连接数: " + minclients);
+	        LOGGER.info("初始化客户端:" + en.get(SERVER_NODE) +", tcp连接池最小连接数: " + minclients);
 	    	int num = Integer.parseInt(minclients);	    	
 	    	for (int i = 0; i < num; i++) {
 				pool.addObject();

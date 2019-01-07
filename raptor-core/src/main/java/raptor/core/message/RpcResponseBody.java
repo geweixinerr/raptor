@@ -42,16 +42,22 @@ public final class RpcResponseBody implements RpcMessage {
 	 * 执行标记
 	 * **/
 	private Boolean success;
-
-	/**
-	 * 服务器响应到达客户端时间.(仅测试使用)
-	 * **/
-	private  transient DateTime responseTime; 
 	
+	/**
+	 * 服务器执行方法名
+	 * **/
+	private String rpcMethod;
+
 	/**
 	 * RPC响应码
 	 * **/
 	private transient RpcResult rpcCode;
+	
+	
+	/**
+	 * 服务器响应到达客户端时间.(仅测试使用)
+	 * **/
+	private  transient DateTime responseTime; 
 	
 	public String getMessage() {
 		return message;
@@ -101,6 +107,14 @@ public final class RpcResponseBody implements RpcMessage {
 		this.responseTime = responseTime;
 	}
 
+	public String getRpcMethod() {
+		return rpcMethod;
+	}
+
+	public void setRpcMethod(String rpcMethod) {
+		this.rpcMethod = rpcMethod;
+	}
+
 	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer(256);
@@ -108,7 +122,7 @@ public final class RpcResponseBody implements RpcMessage {
 		builder.append("message",message);
 		builder.append("messageId",messageId);
 		builder.append("success",success);
-		builder.append("body",body);
+		//builder.append("body",body);
 		if (this.rpcCode != null) {
 			builder.append("rpcCode",rpcCode.getComment());	
 		}
