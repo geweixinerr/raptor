@@ -167,13 +167,16 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		}
 		
 		releaseObject.incrementAndGet();
-		synchronized (this) {
-			if (releaseObject.intValue() >= speedNum) {
-				releaseObject.set(0);
-				speedObject.set(0);
-				pool.returnObject(this);
-			}
+		if (releaseObject.intValue() >= speedNum) {
+			synchronized (this) {
+				if (releaseObject.intValue() >= speedNum) {
+					releaseObject.set(0);
+					speedObject.set(0);
+					pool.returnObject(this);
+				}
+			}			
 		}
+
 		msg.setResponseTime(new DateTime());	
 		RpcClientTaskPool.addTask(msg); 
 	}
