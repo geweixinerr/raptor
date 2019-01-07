@@ -111,7 +111,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 						pool.returnObject(this);
 					} catch (Exception e) {
 						LOGGER.error("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
-						throw new RpcException("资源释放异常,tcpId: "+this.getTcpId()+",message: " + e.getMessage());
+						throw new RpcException("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
 					}
 				}
 			}	
