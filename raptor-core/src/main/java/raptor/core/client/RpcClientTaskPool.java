@@ -76,7 +76,7 @@ public final class RpcClientTaskPool {
 		if (requestBody != null) {
 			requestBody.setClientTime(responseBody.getResponseTime()); //客户端接收到服务器响应时间[仅推荐测试使用].
 			
-			POOLTASKEXECUTOR.submit(new Runnable() {
+			POOLTASKEXECUTOR.execute(new Runnable() {
 				@Override
 				public void run() {
 					MESSAGEID_MAPPING.remove(requestBody.getMessageId()); 

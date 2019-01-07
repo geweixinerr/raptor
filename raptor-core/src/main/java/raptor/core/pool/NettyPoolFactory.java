@@ -62,23 +62,16 @@ public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefin
 	 * 当前poolFactory 隶属于哪个server节点
 	 * **/
     private final String serverNode;
-	
-    /**
-     * 速率
-     * **/
-    private final Integer speedNum;
     
-	public NettyPoolFactory(String remoteAddr, int port, String serverNode, Integer speedNum) {
+	public NettyPoolFactory(String remoteAddr, int port, String serverNode) {
 		this.remoteAddr = remoteAddr;
 		this.port = port;
 		this.serverNode = serverNode;
-		this.speedNum = speedNum;
 	}
 
 	@Override
 	public RpcPushDefine create() {
 		String serverNode = this.serverNode; //服务器节点
-		Integer speedNum = this.speedNum; //速率 
 		
 		Bootstrap boot = new Bootstrap();
 		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 2);// 网络IO处理线程池
@@ -93,7 +86,7 @@ public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefin
 						pipline.addLast(new IdleStateHandler(0,60 * 2,0, TimeUnit.SECONDS)); //心跳检测2分钟[单个tcp连接2分钟内没有出站动作]
 						pipline.addLast(new RpcByteToMessageDecoder());
 						pipline.addLast(new RpcMessageToByteEncoder());
-						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString(), serverNode, speedNum));
+						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString(), serverNode));
 					}
 				});
 
