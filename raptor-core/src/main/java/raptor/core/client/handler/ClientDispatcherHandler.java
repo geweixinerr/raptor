@@ -100,7 +100,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	public void pushMessage(RpcRequestBody requestBody) {
 		try {
-			ctx.writeAndFlush(requestBody);	
+			ctx.writeAndFlush(requestBody);
 		} finally {
 			if (requestBody.getRpcMethod().equals(HEARTBEAT_METHOD)) {
 				return;
@@ -159,14 +159,14 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	}
 	
 	@Override
-	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody msg) throws Exception {
-		if (msg.getRpcMethod().equals(HEARTBEAT_METHOD)) {
+	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody responseBody) throws Exception {
+		if (responseBody.getRpcMethod().equals(HEARTBEAT_METHOD)) {
 			LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcp_id: " + this.getTcpId());
 			return;
 		}
 		
-		msg.setResponseTime(new DateTime());	
-		RpcClientTaskPool.addTask(msg); 
+		responseBody.setResponseTime(new DateTime());	
+		RpcClientTaskPool.addTask(responseBody); 
 		
 		releaseObject.incrementAndGet();
 		if (releaseObject.intValue() > (speedNum/2) && speedObject.intValue() == speedNum) {
