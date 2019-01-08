@@ -70,27 +70,26 @@ public final class RpcClientTaskPool {
 			@Override
 			public void run() {
 				RpcRequestBody requestBody = MESSAGEID_MAPPING.remove(responseBody.getMessageId());
-				if (requestBody != null) {
-					//客户端接收到服务器响应时间[仅推荐测试使用].
-					requestBody.setClientTime(responseBody.getResponseTime()); 
+				if (requestBody == null) {
+					return;
 				}
 				
-				requestBody.setResponseTime(new DateTime()); // 客户端回调时间	
+				DateTime thisDate = new DateTime();
+				requestBody.setClientTime(responseBody.getResponseTime()); 
+				requestBody.setResponseTime(thisDate);
 				
-				if (new DateTime().compareTo(requestBody.getTimeOut()) <= 0) { //是否超时
+				if (thisDate.compareTo(requestBody.getTimeOut()) <= 0) {
 					if (!requestBody.isMessageSend()) { //是否已发送,并发串行化校验.
 						responseBody.setRpcCode(RpcResult.SUCCESS);							
-						requestBody.getCall().invoke(requestBody,responseBody);
-					} else {
-						//并发发送[与timeOut定时扫描器存在并发],不予处理.
 					}
 				} else {
 					//重写响应response对象[此刻无论响应处理是否成功,但凡客户端调用超时,则认为业务端调用失败!].
 					responseBody.setSuccess(false);
 					responseBody.setMessage("RPC 服务调用超时,message:timeOut");
 					responseBody.setRpcCode(RpcResult.TIME_OUT);
-					requestBody.getCall().invoke(requestBody,responseBody);						
 				}
+				
+				requestBody.getCall().invoke(requestBody,responseBody);
 			}
 		});
 	}
