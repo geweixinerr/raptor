@@ -1,6 +1,7 @@
 package raptor.core.client.handler;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -61,6 +62,18 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	 * **/
 	private final ObjectPool<RpcPushDefine> pool;
 	
+	private final Integer speedNum = 100;
+	
+	/**
+	 * 速率控制对象计数
+	 * **/
+	private final AtomicInteger speedObject = new AtomicInteger();
+	
+	/**
+	 * 速率释放对象计数
+	 * **/
+	private final AtomicInteger releaseObject = new AtomicInteger();
+	
 	public ClientDispatcherHandler(String tcp_id, String serverNode) {
 		this.tcp_id = tcp_id;
 		this.into_pool_time = new DateTime();
@@ -82,7 +95,22 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	 **/
 	@Override
 	public void pushMessage(RpcRequestBody requestBody) {
-		ctx.writeAndFlush(requestBody);
+		try {
+			ctx.writeAndFlush(requestBody);	
+		} finally {
+			if (requestBody.getRpcMethod().equals(HEARTBEAT_METHOD)) {
+				return;
+			}
+			speedObject.incrementAndGet();
+			if (speedObject.intValue() < speedNum) {
+				try {
+					pool.returnObject(this);
+				} catch (Exception e) {
+					LOGGER.error("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
+					throw new RpcException("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
+				}
+			}
+		}
 	}
 	
 	/**
@@ -136,12 +164,22 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		msg.setResponseTime(new DateTime());	
 		RpcClientTaskPool.addTask(msg); 
 		
-		try {
-			pool.returnObject(this);
-		} catch (Exception e) {
-			LOGGER.error("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
-			throw new RpcException("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
+		releaseObject.incrementAndGet();
+		if (releaseObject.intValue() > (speedNum/2) && speedObject.intValue() == speedNum) {
+			synchronized (this) {
+				if (speedObject.intValue() == speedNum) {
+					speedObject.set(speedObject.intValue() - releaseObject.intValue());
+					releaseObject.set(0);
+					try {
+						pool.returnObject(this);
+					} catch (Exception e) {
+						LOGGER.error("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
+						throw new RpcException("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
+					}
+				}
+			}
 		}
+		
 	}
 
 	@Override
