@@ -65,40 +65,34 @@ public final class RpcClientTaskPool {
 		 * 1.客户端任务池存在未超时的回调任务,判断当前任务时间是否超时。
 		 * 2.未超时则判断当前消息是否已发送(消息对象(RpcRequestBody)存在并发调用,串行化控制消息的发送)。 
 		 * 3.清理队列中已发送的消息对象。
-		 * 
 		 **/
-		RpcRequestBody requestBody = MESSAGEID_MAPPING.remove(responseBody.getMessageId());
-
-		if (requestBody != null) {
-			requestBody.setClientTime(responseBody.getResponseTime()); //客户端接收到服务器响应时间[仅推荐测试使用].
-			
-			POOLTASKEXECUTOR.execute(new Runnable() {
-				@Override
-				public void run() {
-					requestBody.setResponseTime(new DateTime()); // 客户端回调时间	
-					
-					if (new DateTime().compareTo(requestBody.getTimeOut()) <= 0) { //是否超时
-						if (!requestBody.isMessageSend()) { //是否已发送,并发串行化校验.
-							responseBody.setRpcCode(RpcResult.SUCCESS);							
-							requestBody.getCall().invoke(requestBody,responseBody);
-						} else {
-							//并发发送[与timeOut定时扫描器存在并发],不予处理.
-						}
-					} else {
-						//重写响应response对象[此刻无论响应处理是否成功,但凡客户端调用超时,则认为业务端调用失败!].
-						responseBody.setSuccess(false);
-						responseBody.setMessage("RPC 服务调用超时,message:timeOut");
-						responseBody.setRpcCode(RpcResult.TIME_OUT);
-						requestBody.getCall().invoke(requestBody,responseBody);						
-					}
+		POOLTASKEXECUTOR.execute(new Runnable() {
+			@Override
+			public void run() {
+				RpcRequestBody requestBody = MESSAGEID_MAPPING.remove(responseBody.getMessageId());
+				if (requestBody != null) {
+					//客户端接收到服务器响应时间[仅推荐测试使用].
+					requestBody.setClientTime(responseBody.getResponseTime()); 
 				}
-			});
-		} 
-		/***
-		else {
-			//requestBody is null, 已超时[已反馈给调用客户端]
-		}
-		***/
+				
+				requestBody.setResponseTime(new DateTime()); // 客户端回调时间	
+				
+				if (new DateTime().compareTo(requestBody.getTimeOut()) <= 0) { //是否超时
+					if (!requestBody.isMessageSend()) { //是否已发送,并发串行化校验.
+						responseBody.setRpcCode(RpcResult.SUCCESS);							
+						requestBody.getCall().invoke(requestBody,responseBody);
+					} else {
+						//并发发送[与timeOut定时扫描器存在并发],不予处理.
+					}
+				} else {
+					//重写响应response对象[此刻无论响应处理是否成功,但凡客户端调用超时,则认为业务端调用失败!].
+					responseBody.setSuccess(false);
+					responseBody.setMessage("RPC 服务调用超时,message:timeOut");
+					responseBody.setRpcCode(RpcResult.TIME_OUT);
+					requestBody.getCall().invoke(requestBody,responseBody);						
+				}
+			}
+		});
 	}
 
 	/**
