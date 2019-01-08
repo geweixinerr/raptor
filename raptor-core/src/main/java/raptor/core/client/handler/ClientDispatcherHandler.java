@@ -133,15 +133,15 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			return;
 		}
 		
+		msg.setResponseTime(new DateTime());	
+		RpcClientTaskPool.addTask(msg); 
+		
 		try {
 			pool.returnObject(this);
 		} catch (Exception e) {
 			LOGGER.error("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
 			throw new RpcException("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
 		}
-
-		msg.setResponseTime(new DateTime());	
-		RpcClientTaskPool.addTask(msg); 
 	}
 
 	@Override

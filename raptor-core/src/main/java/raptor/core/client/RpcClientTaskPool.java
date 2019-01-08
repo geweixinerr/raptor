@@ -2,7 +2,6 @@ package raptor.core.client;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -33,9 +32,7 @@ public final class RpcClientTaskPool {
 	 * 客户端请求MessageId与回调对应关系,这里设置较大数值避免客户端高并发请求期间,map resize导致吞吐量降低[当然有点耗费内存,可根据实际情况自行调整 (#^.^#)].
 	 **/
 	private static final Map<String, RpcRequestBody> MESSAGEID_MAPPING = new ConcurrentHashMap<String, RpcRequestBody>(1024 * 100);
-	
-	private static final AtomicInteger countObject = new AtomicInteger();
-	
+		
 	private RpcClientTaskPool() {
 	}
 
@@ -71,7 +68,7 @@ public final class RpcClientTaskPool {
 		 * 3.清理队列中已发送的消息对象。
 		 * 
 		 **/
-		RpcRequestBody requestBody = MESSAGEID_MAPPING.get(responseBody.getMessageId());
+		RpcRequestBody requestBody = MESSAGEID_MAPPING.remove(responseBody.getMessageId());
 
 		if (requestBody != null) {
 			requestBody.setClientTime(responseBody.getResponseTime()); //客户端接收到服务器响应时间[仅推荐测试使用].
@@ -79,16 +76,12 @@ public final class RpcClientTaskPool {
 			POOLTASKEXECUTOR.execute(new Runnable() {
 				@Override
 				public void run() {
-					MESSAGEID_MAPPING.remove(requestBody.getMessageId()); 
-
 					requestBody.setResponseTime(new DateTime()); // 客户端回调时间	
 					
 					if (new DateTime().compareTo(requestBody.getTimeOut()) <= 0) { //是否超时
 						if (!requestBody.isMessageSend()) { //是否已发送,并发串行化校验.
 							responseBody.setRpcCode(RpcResult.SUCCESS);							
-							requestBody.getCall().invoke(responseBody);
-							int count = countObject.incrementAndGet();
-							LOGGER.warn("成功执行回调,count:" + count + ",requestBody: " + requestBody);
+							requestBody.getCall().invoke(requestBody,responseBody);
 						} else {
 							//并发发送[与timeOut定时扫描器存在并发],不予处理.
 						}
@@ -97,9 +90,7 @@ public final class RpcClientTaskPool {
 						responseBody.setSuccess(false);
 						responseBody.setMessage("RPC 服务调用超时,message:timeOut");
 						responseBody.setRpcCode(RpcResult.TIME_OUT);
-						requestBody.getCall().invoke(responseBody);						
-						int count = countObject.incrementAndGet();
-						LOGGER.warn("成功执行回调-已超时,count:" + count + ", requestBody: " + requestBody);
+						requestBody.getCall().invoke(requestBody,responseBody);						
 					}
 				}
 			});
