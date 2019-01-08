@@ -62,7 +62,10 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	 * **/
 	private final ObjectPool<RpcPushDefine> pool;
 	
-	private final Integer speedNum = 100;
+	/**
+	 * 速率
+	 * **/
+	private final Integer speedNum;
 	
 	/**
 	 * 速率控制对象计数
@@ -74,9 +77,10 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	 * **/
 	private final AtomicInteger releaseObject = new AtomicInteger();
 	
-	public ClientDispatcherHandler(String tcp_id, String serverNode) {
+	public ClientDispatcherHandler(String tcp_id, String serverNode, Integer speedNum) {
 		this.tcp_id = tcp_id;
 		this.into_pool_time = new DateTime();
+		this.speedNum = speedNum;
 		this.pool = RpcClient.getRpcPoolMapping().get(serverNode);
 	}
 

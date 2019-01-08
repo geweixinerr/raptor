@@ -70,6 +70,15 @@ public final class RpcClient {
 	 * **/
 	private static final Integer DEFAULT_MILLIS = 1000;
 	
+	/**
+	 * 速率控制阈值
+	 * **/
+	private static final String TCP_SPEED = "speedNum";
+	
+	/**
+	 * 速率控制默认值
+	 * **/
+	private static final Integer DEFAULT_TCP_SPEED_NUM = 64;
 
 	private RpcClient() {
 
@@ -84,6 +93,8 @@ public final class RpcClient {
 	public static void start() throws Exception {
 		List<Map<String, String>> clientConfig = RpcParameter.INSTANCE.getClientConfig(); // 客户端配置参数
 		for (Map<String,String> en : clientConfig) {
+			//速率
+			String speedNum = ObjectUtils.defaultIfNull(en.get(TCP_SPEED),String.valueOf(DEFAULT_TCP_SPEED_NUM));
 	    	//最大连接数
 	    	String maxclients = ObjectUtils.defaultIfNull(en.get(MAX_CLIENTS),String.valueOf(DEFAULT_MAX_CLIENTS));
 	    	//最小连接数
@@ -100,7 +111,7 @@ public final class RpcClient {
 	    	conf.setSoftMinEvictableIdleTimeMillis(5 * 60 * DEFAULT_MILLIS); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除[tcp连接空闲超时设置5分钟]
 	    	conf.setTimeBetweenEvictionRunsMillis(10 * DEFAULT_MILLIS); //闲置实例校验器启动的时间间隔,单位是毫秒 [10秒扫描一次]
 	    	
-	    	PooledObjectFactory poolFactory = new NettyPoolFactory(en.get(REMOTE_ADDR),Integer.parseInt(en.get(PORT)),en.get(SERVER_NODE));
+	    	PooledObjectFactory poolFactory = new NettyPoolFactory(en.get(REMOTE_ADDR),Integer.parseInt(en.get(PORT)),en.get(SERVER_NODE),Integer.parseInt(speedNum));
 	    	ObjectPool<RpcPushDefine> pool = new GenericObjectPool<RpcPushDefine>(poolFactory,conf);
 
 	    	RPC_OBJECT_POOL.put(en.get(SERVER_NODE), pool); //入池
