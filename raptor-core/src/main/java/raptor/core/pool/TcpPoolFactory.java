@@ -43,26 +43,14 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 
 	private static final Integer DEFAULT_TIME_OUT = 5000;
 
-	private static final Integer ONE_KB = 1024; // 1KB数值常量.
+	private static final Integer ONE_KB = 1024; 
 	
-	/**
-	 * 远程服务器地址
-	 **/
 	private final String remoteAddr;
 
-	/**
-	 * 远程服务器端口
-	 **/
 	private final int port;
 	
-	/**
-	 * 当前poolFactory 隶属于哪个server节点
-	 * **/
     private final String serverNode;
     
-    /**
-     * 速率
-     * **/
     private final Integer speedNum;
     
 	public TcpPoolFactory(String remoteAddr, int port, String serverNode, Integer speedNum) {
@@ -123,30 +111,20 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 		return handler;
 	}
 
-	/**
-	 * Use the default PooledObject implementation.
-	 */
 	@Override
 	public PooledObject<RpcPushDefine> wrap(RpcPushDefine channelHandler) {
 		return new DefaultPooledObject<RpcPushDefine>(channelHandler);
 	}
 
-	/**
-	 * When an object is returned to the pool, clear the buffer.
-	 */
 	@Override
 	public void passivateObject(PooledObject<RpcPushDefine> pooledObject) {
-		// 钝化,对象返回池中时的动作.
 		pooledObject.getObject().setState(true);
 	}
 
-	/**
-	 * 销毁对象,关闭tcp连接
-	 * **/
 	@Override
 	public void destroyObject(PooledObject<RpcPushDefine> pooledObject) throws Exception {
 		ObjectPool<RpcPushDefine> pool = pooledObject.getObject().getRpcPoolObject();
-		LOGGER.error("资源入池,剩余激活对象: " + pool.getNumActive() +", 剩余空闲总数: " + pool.getNumIdle());
+		LOGGER.info("资源入池,tcpId: " + pooledObject.getObject().getTcpId() + ", 剩余激活对象: " + pool.getNumActive() +", 剩余空闲总数: " + pool.getNumIdle());
 		pooledObject.getObject().close();
 	}
 	
