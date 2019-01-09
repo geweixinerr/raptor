@@ -124,7 +124,7 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 	@Override
 	public void destroyObject(PooledObject<RpcPushDefine> pooledObject) throws Exception {
 		ObjectPool<RpcPushDefine> pool = pooledObject.getObject().getRpcPoolObject();
-		LOGGER.info("资源入池,tcpId: " + pooledObject.getObject().getTcpId() + ", 剩余激活对象: " + pool.getNumActive() +", 剩余空闲总数: " + pool.getNumIdle());
+		LOGGER.info("资源入池,tcpId: " + pooledObject.getObject().getTcpId() +", active: " + pool.getNumActive() +", Idle: " + pool.getNumIdle());
 		pooledObject.getObject().close();
 	}
 	
