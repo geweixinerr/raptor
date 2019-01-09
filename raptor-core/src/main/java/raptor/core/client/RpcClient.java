@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import raptor.core.RpcPushDefine;
 import raptor.core.init.RpcParameter;
-import raptor.core.pool.NettyPoolFactory;
+import raptor.core.pool.TcpPoolFactory;
 
 /**
  * @author gewx Netty客户端类
@@ -111,7 +111,7 @@ public final class RpcClient {
 	    	conf.setSoftMinEvictableIdleTimeMillis(5 * 60 * DEFAULT_MILLIS); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除[tcp连接空闲超时设置5分钟]
 	    	conf.setTimeBetweenEvictionRunsMillis(10 * DEFAULT_MILLIS); //闲置实例校验器启动的时间间隔,单位是毫秒 [10秒扫描一次]
 	    	
-	    	PooledObjectFactory poolFactory = new NettyPoolFactory(en.get(REMOTE_ADDR),Integer.parseInt(en.get(PORT)),en.get(SERVER_NODE),Integer.parseInt(speedNum));
+	    	PooledObjectFactory poolFactory = new TcpPoolFactory(en.get(REMOTE_ADDR),Integer.parseInt(en.get(PORT)),en.get(SERVER_NODE),Integer.parseInt(speedNum));
 	    	ObjectPool<RpcPushDefine> pool = new GenericObjectPool<RpcPushDefine>(poolFactory,conf);
 
 	    	RPC_OBJECT_POOL.put(en.get(SERVER_NODE), pool); //入池

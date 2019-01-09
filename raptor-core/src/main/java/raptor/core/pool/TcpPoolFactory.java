@@ -32,9 +32,9 @@ import raptor.util.StringUtil;
 /**
  * @author gewx tcp连接对象池
  **/
-public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefine> {
+public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(NettyPoolFactory.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TcpPoolFactory.class);
 
 	// CPU核心数
 	private static final Integer CPU_CORE = Runtime.getRuntime().availableProcessors();
@@ -68,7 +68,7 @@ public final class NettyPoolFactory extends BasePooledObjectFactory<RpcPushDefin
      * **/
     private final Integer speedNum;
     
-	public NettyPoolFactory(String remoteAddr, int port, String serverNode, Integer speedNum) {
+	public TcpPoolFactory(String remoteAddr, int port, String serverNode, Integer speedNum) {
 		this.remoteAddr = remoteAddr;
 		this.port = port;
 		this.serverNode = serverNode;

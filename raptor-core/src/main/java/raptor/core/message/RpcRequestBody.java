@@ -1,5 +1,8 @@
 package raptor.core.message;
 
+import java.util.concurrent.Delayed;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -13,7 +16,7 @@ import raptor.core.AbstractCallBack;
 /**
  * @author gewx RPC消息发送主体
  * **/
-public final class RpcRequestBody implements RpcMessage {
+public final class RpcRequestBody implements RpcMessage, Delayed {
 
 	
 	/**
@@ -70,6 +73,19 @@ public final class RpcRequestBody implements RpcMessage {
 	 **/
 	private transient boolean send;
 	
+	/**
+	 * 延迟时间
+	 * **/
+	private transient Long delayTime;
+	
+	public Long getDelayTime() {
+		return delayTime;
+	}
+
+	public void setDelayTime(Long delayTime) {
+		this.delayTime = delayTime;
+	}
+
 	public String getMessageId() {
 		return messageId;
 	}
@@ -145,6 +161,26 @@ public final class RpcRequestBody implements RpcMessage {
 			this.send = true;
 			return false;
 		}
+	}
+	
+	@Override
+	public int compareTo(Delayed o) {
+		if (this == o) {
+			return 0;
+		}
+		RpcRequestBody other = (RpcRequestBody)o;
+		if (this.getDelayTime() > other.getDelayTime()) {
+			return 1;
+		} else if (this.getDelayTime() < other.getDelayTime()) {
+			return -1;
+		} else {
+			return 0;	
+		}
+	}
+	
+	@Override
+	public long getDelay(TimeUnit unit) {
+		return unit.convert(this.getDelayTime() - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
 	}
 
 	@Override
