@@ -1,6 +1,7 @@
 package raptor.core.client.handler;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.DelayQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.concurrent.ThreadSafe;
@@ -77,6 +78,16 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	 * **/
 	private final AtomicInteger releaseObject = new AtomicInteger();
 	
+	/**
+	 * 延迟执行tcp包发送
+	 * **/
+	private final DelayQueue<RpcRequestBody> queue = new DelayQueue<RpcRequestBody>();
+	
+	/**
+	 * tcp包推送标记.
+	 * **/
+	private volatile boolean isPush = false;
+	
 	public ClientDispatcherHandler(String tcp_id, String serverNode, Integer speedNum) {
 		this.tcp_id = tcp_id;
 		this.into_pool_time = new DateTime();
@@ -100,7 +111,9 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	public void pushMessage(RpcRequestBody requestBody) {
 		try {
-			ctx.writeAndFlush(requestBody);
+			requestBody.setDelayTime(System.currentTimeMillis() + 1);
+			queue.add(requestBody);			
+			loopPush();
 		} finally {
 			if (requestBody.getRpcMethod().equals(HEARTBEAT_METHOD)) {
 				return;
@@ -209,4 +222,19 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		this.pushMessage(requestBody);
 	}
 
+	/**
+	 * 循环延迟推送,减少包的传输速率.
+	 * **/
+	private void loopPush() {
+		if (!this.isPush) {
+			this.isPush = true;
+			while (queue.size() > 0) {
+				RpcRequestBody requestBody = queue.poll();
+				if (requestBody != null) {
+					ctx.writeAndFlush(requestBody);
+				}
+			}
+			this.isPush = false;  
+		}
+	}
 }

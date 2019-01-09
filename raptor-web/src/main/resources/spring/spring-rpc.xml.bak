@@ -46,12 +46,13 @@
 					</property>
 					<property name="sourceMap">
 						<map>
-						    <entry key="clientName" value="remote"/> <!-- 客户端标识 -->
+						    <entry key="serverNode" value="remote"/> <!-- 客户端标识 -->
 						    <!-- 连接的远程服务器IP地址/端口号 --> 
-							<entry key="remote" value="localhost"/> 
+							<entry key="remote" value="10.19.181.22"/> 
 							<entry key="port" value="8090"/>
-							<entry key="maxclients" value="32"/> <!-- 最大tcp连接数据 -->
-							<entry key="minclients" value="6"/> <!-- 最小tcp连接数据,初始化时建立此配置的数值连接数. -->
+							<entry key="maxclients" value="64"/> <!-- 最大tcp连接数据 -->
+							<entry key="minclients" value="16"/> <!-- 最小tcp连接数据,初始化时建立此配置的数值连接数. -->
+							<entry key="speedNum" value="256"/> <!-- TCP连接单条连接在途事务数 -->
 						</map>
 					</property>    
 				</bean>  
