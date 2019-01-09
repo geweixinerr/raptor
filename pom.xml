@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.raptor</groupId>
 	<artifactId>raptor</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>pom</packaging>
 	<name>raptor project[猛禽项目]</name>
 	<description>基于Netty4开发的RPC服务框架raptor</description>
