@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.pool2.BasePooledObjectFactory;
+import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.slf4j.Logger;
@@ -136,15 +137,16 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 	@Override
 	public void passivateObject(PooledObject<RpcPushDefine> pooledObject) {
 		// 钝化,不处理. 对象返回池中时的动作.
-//		LOGGER.info("资源入池...,tcpId: " + pooledObject.getObject().getTcpId());
 	}
 
 	/**
 	 * 销毁对象,关闭tcp连接
 	 * **/
 	@Override
-	public void destroyObject(PooledObject<RpcPushDefine> p) throws Exception {
-		p.getObject().close();
+	public void destroyObject(PooledObject<RpcPushDefine> pooledObject) throws Exception {
+		ObjectPool<RpcPushDefine> pool = pooledObject.getObject().getRpcPoolObject();
+		LOGGER.info("资源入池,剩余激活对象: " + pool.getNumActive() +", 剩余空闲总数: " + pool.getNumIdle());
+		pooledObject.getObject().close();
 	}
 	
 }

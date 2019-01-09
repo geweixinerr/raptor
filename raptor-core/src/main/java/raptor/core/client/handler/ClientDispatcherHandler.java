@@ -42,7 +42,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	 * 时间格式化
 	 * **/
     private  static final DateTimeFormatter dateTimeFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss:SSS");
-
+	
 	/**
 	 * 线程安全的ChannelHandlerContext实例对象.
 	 * **/
@@ -105,6 +105,11 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		return this.into_pool_time;
 	}
 
+	@Override
+	public ObjectPool<RpcPushDefine> getRpcPoolObject(){
+		return this.pool;
+	}
+	
 	/**
 	 * @author gewx RPC实际调用--->信息推送.
 	 **/
@@ -195,7 +200,6 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 				}
 			}
 		}
-		
 	}
 
 	@Override
@@ -210,15 +214,14 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		InetSocketAddress local = (InetSocketAddress) channel.localAddress();
 		InetSocketAddress remote = (InetSocketAddress) channel.remoteAddress();
 		
-		LOGGER.warn("[重要!!!]心跳检测...,tcp_id: " + this.getTcpId() + ",客户端: " + local.getAddress() + ":" + local.getPort()
-				+", 服务器: " + remote.getAddress() + ":" + remote.getPort());
+		LOGGER.warn("[重要!!!]心跳检测...,tcp_id: " + this.getTcpId() + ", 客户端: " + local.getAddress() + ":" + local.getPort()
+				+", 服务器: " + remote.getAddress() + ":" + remote.getPort() 
+				+", active: " + this.pool.getNumActive() +", Idle: " + this.pool.getNumIdle());
 		
 		RpcRequestBody requestBody = new RpcRequestBody();
 		requestBody.setMessageId(new UUID().toString());
 		requestBody.setRpcMethod(HEARTBEAT_METHOD);
-		requestBody.setRequestTime(new DateTime());
-		
-		this.pushMessage(requestBody);
+		ctx.writeAndFlush(requestBody);
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package raptor.core;
 
+import org.apache.commons.pool2.ObjectPool;
 import org.joda.time.DateTime;
 
 import raptor.core.message.RpcRequestBody;
@@ -38,6 +39,11 @@ public interface RpcPushDefine {
 	 * @author gewx 获取tcp连接入池时间 [建议测试使用].
 	 * **/
 	DateTime getTcpIntoPoolTime();
+	
+	/**
+	 * @author gewx 获取池对象
+	 * **/
+	ObjectPool<RpcPushDefine> getRpcPoolObject();
 	
 	/**
 	 * @author gewx 心跳检测包方法名
