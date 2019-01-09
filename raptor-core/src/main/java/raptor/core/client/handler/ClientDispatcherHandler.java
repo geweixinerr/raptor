@@ -74,11 +74,6 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	private final AtomicInteger speedObject = new AtomicInteger();
 	
 	/**
-	 * 速率释放对象计数
-	 * **/
-	private final AtomicInteger releaseObject = new AtomicInteger();
-	
-	/**
 	 * 延迟发包Queue
 	 * **/
 	private final DelayQueue<RpcRequestBody> queue = new DelayQueue<RpcRequestBody>();
@@ -86,7 +81,12 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	/**
 	 * tcp包是否延迟发送中标记.
 	 * **/
-	private volatile boolean isPush = false;
+	private boolean isPush = false;
+	
+	/**
+	 * tcp 连接状态
+	 * **/
+	private boolean state = true;
 	
 	public ClientDispatcherHandler(String tcpId, String serverNode, Integer speedNum) {
 		this.tcpId = tcpId;
@@ -110,6 +110,16 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		return this.pool;
 	}
 	
+	@Override
+	public void setState(boolean bool) {
+		this.state = bool;
+	}
+
+	@Override
+	public boolean getState() {
+		return this.state;
+	}
+
 	/**
 	 * @author gewx RPC实际调用--->信息推送.
 	 **/
@@ -119,9 +129,6 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			queue.add(requestBody);			
 			loopPushMessage();
 		} finally {
-			if (requestBody.getRpcMethod().equals(HEARTBEAT_METHOD)) {
-				return;
-			}
 			speedObject.incrementAndGet();
 			if (speedObject.intValue() < speedNum) {
 				try {
@@ -184,13 +191,11 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		
 		responseBody.setResponseTime(new DateTime());	
 		RpcClientTaskPool.addTask(responseBody); 
-		
-		releaseObject.incrementAndGet();
-		if (releaseObject.intValue() > (speedNum/2) && speedObject.intValue() == speedNum) {
+		int thisSpeed = speedObject.intValue();
+		speedObject.decrementAndGet();
+		if (thisSpeed == speedNum) {
 			synchronized (this) {
-				if (speedObject.intValue() == speedNum) {
-					speedObject.set(speedObject.intValue() - releaseObject.intValue());
-					releaseObject.set(0);
+				if (!this.getState()) {
 					try {
 						pool.returnObject(this);
 					} catch (Exception e) {
@@ -198,7 +203,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 						throw new RpcException("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
 					}
 				}
-			}
+			}	
 		}
 	}
 

@@ -65,7 +65,7 @@ public final class RaptorRpc<T extends Serializable> {
 					break;
 				}
 			}
-			
+			rpc.setState(false);
 		} catch (Exception e) {
 			String message = StringUtil.getErrorText(e);
 			LOGGER.error("RPC 连接池获取对象失败,message: " + message);

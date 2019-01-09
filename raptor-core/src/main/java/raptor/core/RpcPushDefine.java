@@ -46,6 +46,16 @@ public interface RpcPushDefine {
 	ObjectPool<RpcPushDefine> getRpcPoolObject();
 	
 	/**
+	 *@author gewx tcp状态,是否入池[true-已入,false-未入]
+	 * **/
+	void setState(boolean bool);
+	
+	/**
+	 * @author gewx 获取tcp状态.
+	 * **/
+	boolean getState();
+	
+	/**
 	 * @author gewx 心跳检测包方法名
 	 * **/
 	String HEARTBEAT_METHOD = "heartbeat";

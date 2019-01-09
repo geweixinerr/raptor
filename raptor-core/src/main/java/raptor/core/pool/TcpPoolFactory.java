@@ -136,7 +136,8 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 	 */
 	@Override
 	public void passivateObject(PooledObject<RpcPushDefine> pooledObject) {
-		// 钝化,不处理. 对象返回池中时的动作.
+		// 钝化,对象返回池中时的动作.
+		pooledObject.getObject().setState(true);
 	}
 
 	/**
@@ -145,7 +146,7 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 	@Override
 	public void destroyObject(PooledObject<RpcPushDefine> pooledObject) throws Exception {
 		ObjectPool<RpcPushDefine> pool = pooledObject.getObject().getRpcPoolObject();
-		LOGGER.info("资源入池,剩余激活对象: " + pool.getNumActive() +", 剩余空闲总数: " + pool.getNumIdle());
+		LOGGER.error("资源入池,剩余激活对象: " + pool.getNumActive() +", 剩余空闲总数: " + pool.getNumIdle());
 		pooledObject.getObject().close();
 	}
 	
