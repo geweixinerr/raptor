@@ -52,6 +52,8 @@ public final class RaptorRpc<T extends Serializable> {
 			throw new RpcException("RPC服务器映射不存在,请检查配置. serverNode : " + serverNode);
 		}
         		
+		DateTime reqDate = new DateTime(); 
+		
 		RpcPushDefine rpc = null;
 		try {
 			while (true) {
@@ -67,7 +69,6 @@ public final class RaptorRpc<T extends Serializable> {
 			throw new RpcException("RPC 连接池获取对象失败,message: " + message);
 		}
 		
-        DateTime reqDate = new DateTime(); 
 		String uuid = new UUID().toString();
 		
 		RpcRequestBody requestBody = new RpcRequestBody();
