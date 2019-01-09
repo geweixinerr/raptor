@@ -15,7 +15,7 @@ import raptor.core.message.RpcResponseBody;
 
 /**
  * @author gewx RPC请求客户端超时扫描: 本线程执行过期消息清理.
- * 备注: 本服务为定时扫描ConcurrentHashMap对象,由于是get只读操作,不会存在并发线程锁定问题,也不会降低 ConcurrentHashMap对象吞吐能力.
+ * 
  **/
 public final class RpcClientTimeOutScan {
 
@@ -62,9 +62,9 @@ public final class RpcClientTimeOutScan {
 						DateTime thisDate = new DateTime();
 						if (thisDate.compareTo(requestBody.getTimeOut()) >= 0) {
 							String messageId = requestBody.getMessageId();
-							requestPool.remove(messageId); // delete,mark:此处删除已回调超时信息,避免客户端回调重复执行此信息.
+							requestPool.remove(messageId);
 							
-							if (!requestBody.isMessageSend()) { // 消息未发送
+							if (!requestBody.isMessageSend()) {
 								RpcResponseBody responseBody = new RpcResponseBody();
 								responseBody.setSuccess(false);
 								responseBody.setMessageId(requestBody.getMessageId());
@@ -76,7 +76,6 @@ public final class RpcClientTimeOutScan {
 								}
 								
 								requestBody.getCall().invoke(requestBody,responseBody); // 回调通知
-								LOGGER.warn("清理超时消息...,messageId: " + requestBody);
 							}
 						}				
 					}
@@ -86,6 +85,6 @@ public final class RpcClientTimeOutScan {
 		factory.setScheduledExecutorTasks(task);
 		factory.setContinueScheduledExecutionAfterException(true); // 调度遇到异常后,调度计划继续执行.
 		factory.setThreadNamePrefix("TASK_RPC_CLIENT_SCAN_");
-		factory.initialize(); // 初始化
+		factory.initialize(); 
 	}
 }

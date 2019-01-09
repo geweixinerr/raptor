@@ -26,12 +26,8 @@ public final class RpcServerTaskPool {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RpcServerTaskPool.class);
 
-	// CPU核心数
 	private static final Integer CPU_CORE = Runtime.getRuntime().availableProcessors();
 
-	/**
-	 * 线程池对象
-	 **/
 	private static final ThreadPoolTaskExecutor POOLTASKEXECUTOR = new ThreadPoolTaskExecutor();
 
 	/**

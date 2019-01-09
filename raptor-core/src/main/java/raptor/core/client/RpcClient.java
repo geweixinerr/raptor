@@ -85,13 +85,12 @@ public final class RpcClient {
 	}
 
 	/**
-	 * 启动客户端连接
-	 * 
-	 * @throws InterruptedException
+	 * @author gewx 启动客户端连接
+	 * @throws Exception
 	 **/
 	@SuppressWarnings({ "rawtypes", "unchecked"})
 	public static void start() throws Exception {
-		List<Map<String, String>> clientConfig = RpcParameter.INSTANCE.getClientConfig(); // 客户端配置参数
+		List<Map<String, String>> clientConfig = RpcParameter.INSTANCE.getClientConfig();
 		for (Map<String,String> en : clientConfig) {
 			//速率
 			String speedNum = ObjectUtils.defaultIfNull(en.get(TCP_SPEED),String.valueOf(DEFAULT_TCP_SPEED_NUM));
@@ -99,13 +98,14 @@ public final class RpcClient {
 	    	String maxclients = ObjectUtils.defaultIfNull(en.get(MAX_CLIENTS),String.valueOf(DEFAULT_MAX_CLIENTS));
 	    	//最小连接数
 	    	String minclients = ObjectUtils.defaultIfNull(en.get(MIN_CLIENTS),String.valueOf(DEFAULT_MIN_CLIENTS));
+	    	
 	    	//对象池配置
 	    	GenericObjectPoolConfig conf = new GenericObjectPoolConfig();
 	    	conf.setLifo(false); //池中实例的操作是否按照LIFO（后进先出）的原则,默认true[先入池的TCP连接先出]
 	    	conf.setMaxTotal(Integer.parseInt(maxclients));  //池中最多可用的实例个数
 	    	conf.setMaxIdle(Integer.parseInt(maxclients)); //连接池中最大空闲的连接数,默认为8
 	    	conf.setMinIdle(Integer.parseInt(minclients)); //连接池中最少空闲的连接数,默认为0
-	    	conf.setBlockWhenExhausted(true); //是否堵塞等待连接创建. (true:等待,false:不等待)
+	    	conf.setBlockWhenExhausted(true); //池无可用对象,是否堵塞等待对象创建. (true:等待,false:不等待)
 	    	conf.setMaxWaitMillis(5 * DEFAULT_MILLIS); //调用borrowObject方法时，需要等待的最长时间. 单位:毫秒
 	    	conf.setMinEvictableIdleTimeMillis(-1); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除 （-1 :不移除,使用setSoftMinEvictableIdleTimeMillis配置）
 	    	conf.setSoftMinEvictableIdleTimeMillis(5 * 60 * DEFAULT_MILLIS); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除[tcp连接空闲超时设置5分钟]
@@ -114,11 +114,8 @@ public final class RpcClient {
 	    	PooledObjectFactory poolFactory = new TcpPoolFactory(en.get(REMOTE_ADDR),Integer.parseInt(en.get(PORT)),en.get(SERVER_NODE),Integer.parseInt(speedNum));
 	    	ObjectPool<RpcPushDefine> pool = new GenericObjectPool<RpcPushDefine>(poolFactory,conf);
 
-	    	RPC_OBJECT_POOL.put(en.get(SERVER_NODE), pool); //入池
+	    	RPC_OBJECT_POOL.put(en.get(SERVER_NODE), pool);
 	    		    	
-	    	/**
-	    	 * init 初始化
-	    	 * **/
 	        LOGGER.info("初始化客户端:" + en.get(SERVER_NODE) +", tcp连接池最小连接数: " + minclients);
 	    	int num = Integer.parseInt(minclients);	    	
 	    	for (int i = 0; i < num; i++) {

@@ -49,14 +49,9 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	private ChannelHandlerContext ctx;
 	
 	/**
-	 * tcp_id,唯一标识单条tcp连接[tcp pool测试使用]
+	 * tcpId,唯一标识单条tcp连接
 	 * **/
-	private final String tcp_id; 
-	
-	/**
-	 * tcp连接入池时间 [仅推荐测试使用]
-	 * **/
-	private final DateTime into_pool_time;
+	private final String tcpId; 
 	
 	/**
 	 * 当前tcp连接隶属的tcp pool池
@@ -69,6 +64,11 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	private final Integer speedNum;
 	
 	/**
+	 * tcp连接入池时间 [仅推荐测试使用]
+	 * **/
+	private final DateTime into_pool_time;
+	
+	/**
 	 * 速率控制对象计数
 	 * **/
 	private final AtomicInteger speedObject = new AtomicInteger();
@@ -79,17 +79,17 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	private final AtomicInteger releaseObject = new AtomicInteger();
 	
 	/**
-	 * 延迟执行tcp包发送
+	 * 延迟发包Queue
 	 * **/
 	private final DelayQueue<RpcRequestBody> queue = new DelayQueue<RpcRequestBody>();
 	
 	/**
-	 * tcp包推送标记.
+	 * tcp包是否延迟发送中标记.
 	 * **/
 	private volatile boolean isPush = false;
 	
-	public ClientDispatcherHandler(String tcp_id, String serverNode, Integer speedNum) {
-		this.tcp_id = tcp_id;
+	public ClientDispatcherHandler(String tcpId, String serverNode, Integer speedNum) {
+		this.tcpId = tcpId;
 		this.into_pool_time = new DateTime();
 		this.speedNum = speedNum;
 		this.pool = RpcClient.getRpcPoolMapping().get(serverNode);
@@ -97,7 +97,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 
 	@Override
 	public String getTcpId() {
-		return this.tcp_id;
+		return this.tcpId;
 	}
 
 	@Override
@@ -111,9 +111,8 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	public void pushMessage(RpcRequestBody requestBody) {
 		try {
-			requestBody.setDelayTime(System.currentTimeMillis() + 1);
 			queue.add(requestBody);			
-			loopPush();
+			loopPushMessage();
 		} finally {
 			if (requestBody.getRpcMethod().equals(HEARTBEAT_METHOD)) {
 				return;
@@ -225,7 +224,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	/**
 	 * 循环延迟推送,减少包的传输速率.
 	 * **/
-	private void loopPush() {
+	private void loopPushMessage() {
 		if (!this.isPush) {
 			this.isPush = true;
 			while (queue.size() > 0) {

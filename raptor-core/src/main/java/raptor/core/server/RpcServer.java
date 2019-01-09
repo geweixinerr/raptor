@@ -37,7 +37,6 @@ public final class RpcServer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RpcServer.class);
 
-	// CPU核心数
 	private static final Integer CPU_CORE = Runtime.getRuntime().availableProcessors();
 
 	private static final ServerBootstrap server = new ServerBootstrap();
@@ -46,9 +45,6 @@ public final class RpcServer {
 
 	private static final String PORT = "port";
 
-	/**
-	 * TCP参数配置
-	 * **/
 	private static final Integer ONE_KB = 1024; //1KB数值常量.
 	
 	private RpcServer() {
@@ -67,17 +63,16 @@ public final class RpcServer {
 		if (SystemUtils.IS_OS_LINUX) {
 			LOGGER.info("Linux系统下,RPC Server启动...");
 			// Linux Epoll
-			EventLoopGroup acceptGroup = new EpollEventLoopGroup(1); // accept connection thread ,1个足矣.
-			EventLoopGroup ioGroup = new EpollEventLoopGroup(CPU_CORE * 2); //网络IO处理线程池
+			EventLoopGroup acceptGroup = new EpollEventLoopGroup(1); 
+			EventLoopGroup ioGroup = new EpollEventLoopGroup(CPU_CORE * 2); 
 			server.group(acceptGroup, ioGroup).channel(EpollServerSocketChannel.class);
 		} else {
 			LOGGER.info("非Linux系统下,RPC Server启动...");
-			EventLoopGroup acceptGroup = new NioEventLoopGroup(1); // accept connection thread ,1个足矣.
-			EventLoopGroup ioGroup = new NioEventLoopGroup(CPU_CORE * 2); //网络IO处理线程池
+			EventLoopGroup acceptGroup = new NioEventLoopGroup(1); 
+			EventLoopGroup ioGroup = new NioEventLoopGroup(CPU_CORE * 2); 
 			server.group(acceptGroup, ioGroup).channel(NioServerSocketChannel.class);
 		}
 		
-		//根据配置信息绑定本地IP地址/端口.
 		InetSocketAddress localAddress = null;
 		if (StringUtils.isNotBlank(serverConfig.get(ADDRESS_KEY))) {
 			localAddress = new InetSocketAddress(serverConfig.get(ADDRESS_KEY),Integer.parseInt(serverConfig.get(PORT)));
@@ -85,9 +80,9 @@ public final class RpcServer {
 			localAddress = new InetSocketAddress(Integer.parseInt(serverConfig.get(PORT)));
 		}
 		
-		server.option(ChannelOption.SO_BACKLOG, 1024) // 服务端接受连接的队列长度，如果队列已满，客户端连接将被拒绝。默认值，Windows为200，其他为128。
-				.childOption(ChannelOption.SO_RCVBUF, 256 * ONE_KB) // 接受窗口(window size value),设置为512kb
-				.childOption(ChannelOption.SO_SNDBUF, 256 * ONE_KB) // 发送窗口(window size value),设置为512kb
+		server.option(ChannelOption.SO_BACKLOG, 8192) // 服务端接受连接的队列长度，如果队列已满，客户端连接将被拒绝。默认值，Windows为200，其他为128。
+				.childOption(ChannelOption.SO_RCVBUF, 256 * ONE_KB)
+				.childOption(ChannelOption.SO_SNDBUF, 256 * ONE_KB)
 				.localAddress(localAddress)
 				.childHandler(new ChannelInitializer<SocketChannel>() {
 					@Override
@@ -95,7 +90,7 @@ public final class RpcServer {
 						String logOnOff = serverConfig.get(RpcParameterEnum.LOGONOFF.getCode());
 						ChannelPipeline pipline = ch.pipeline();
 						if (Constants.LogOn.equals(logOnOff)) {
-							pipline.addLast(new LoggingHandler(LogLevel.INFO)); // 开启日志监控
+							pipline.addLast(new LoggingHandler(LogLevel.INFO));
 						}
 						pipline.addLast(new RpcByteToMessageDecoder());
 						pipline.addLast(new RpcMessageToByteEncoder());
@@ -103,7 +98,6 @@ public final class RpcServer {
 					}
 				});
 
-		// 同步绑定
 		server.bind().sync().addListener(new ChannelFutureListener() {
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {

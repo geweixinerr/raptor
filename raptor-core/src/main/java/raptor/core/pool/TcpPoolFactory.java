@@ -36,16 +36,12 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TcpPoolFactory.class);
 
-	// CPU核心数
 	private static final Integer CPU_CORE = Runtime.getRuntime().availableProcessors();
 
-	// 客户端分发器注册pipline Key
 	private static final String CLIENT_DISPATCHER = "clientDispatcher";
 
-	// 默认超时设置,5秒
 	private static final Integer DEFAULT_TIME_OUT = 5000;
 
-    //字节数值空间常量
 	private static final Integer ONE_KB = 1024; // 1KB数值常量.
 	
 	/**
@@ -81,11 +77,11 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 		Integer speedNum = this.speedNum; //速率
 		
 		Bootstrap boot = new Bootstrap();
-		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 2);// 网络IO处理线程池
+		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 2);
 		boot.group(eventGroup).channel(NioSocketChannel.class)
-				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIME_OUT) // 设置连接超时5秒,默认值30000毫秒即30秒。
-				.option(ChannelOption.SO_RCVBUF, 256 * ONE_KB) // 接受窗口(window size value)
-				.option(ChannelOption.SO_SNDBUF, 256 * ONE_KB) // 发送窗口(window size value)
+				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIME_OUT) 
+				.option(ChannelOption.SO_RCVBUF, 256 * ONE_KB) 
+				.option(ChannelOption.SO_SNDBUF, 256 * ONE_KB)
 				.remoteAddress(remoteAddr, port).handler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
@@ -99,7 +95,7 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 
 		ChannelFuture future = null;
 		try {
-			future = boot.connect().sync(); //同步连接.
+			future = boot.connect().sync(); 
 			future.addListener(new ChannelFutureListener() {
 				@Override
 				public void operationComplete(ChannelFuture future) throws Exception {

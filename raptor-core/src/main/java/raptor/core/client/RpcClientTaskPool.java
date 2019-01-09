@@ -19,13 +19,9 @@ import raptor.core.message.RpcResponseBody;
 public final class RpcClientTaskPool {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RpcClientTaskPool.class);
-
-	// CPU核心数
+	 
 	private static final Integer CPU_CORE = Runtime.getRuntime().availableProcessors();
 
-	/**
-	 * 线程池对象
-	 **/
 	private static final ThreadPoolTaskExecutor POOLTASKEXECUTOR = new ThreadPoolTaskExecutor();
 
 	/**

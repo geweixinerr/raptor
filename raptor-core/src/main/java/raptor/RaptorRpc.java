@@ -19,7 +19,7 @@ import raptor.exception.RpcException;
 import raptor.util.StringUtil;
 
 /**
- * @author gewx Raptor消息发送入口类,消息的包装发送.
+ * @author gewx Raptor RPC消息的包装发送.
  **/
 public final class RaptorRpc<T extends Serializable> {
 
@@ -29,6 +29,11 @@ public final class RaptorRpc<T extends Serializable> {
 	 * 业务超时设置,默认5秒
 	 **/
 	private static final Integer TIME_OUT = 5;
+	
+	/**
+	 * 延迟时间,单位:毫秒
+	 * **/
+	private static final Integer DELAY_TIME = 1;
 	
 	/**
 	 * @author gewx 异步发送消息
@@ -51,8 +56,6 @@ public final class RaptorRpc<T extends Serializable> {
 			LOGGER.error("RPC服务器映射不存在,请检查配置. serverNode : " + serverNode);
 			throw new RpcException("RPC服务器映射不存在,请检查配置. serverNode : " + serverNode);
 		}
-        		
-		DateTime reqDate = new DateTime(); 
 		
 		RpcPushDefine rpc = null;
 		try {
@@ -70,6 +73,7 @@ public final class RaptorRpc<T extends Serializable> {
 		}
 		
 		String uuid = new UUID().toString();
+		DateTime reqDate = new DateTime();
 		
 		RpcRequestBody requestBody = new RpcRequestBody();
 		requestBody.setMessageId(uuid);
@@ -77,6 +81,7 @@ public final class RaptorRpc<T extends Serializable> {
 		requestBody.setRpcMethod(rpcMethodName);
 		requestBody.setRequestTime(reqDate);
 		requestBody.setTimeOut(reqDate.plusSeconds(timeOut));
+		requestBody.setDelayTime(System.currentTimeMillis() + DELAY_TIME); //delay
 		requestBody.setCall(call);
 
 		RpcClientTaskPool.pushTask(requestBody); 

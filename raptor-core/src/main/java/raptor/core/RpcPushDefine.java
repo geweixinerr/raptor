@@ -12,7 +12,7 @@ public interface RpcPushDefine {
 
 	/**
 	 * @author gewx 消息推送.
-	 * @param RpcRequestBody RPC请求对象, call 资源释放回调对象.
+	 * @param RpcRequestBody RPC请求对象
 	 * @throws RpcException RPC异常
 	 * @return void 
 	 * **/
@@ -30,7 +30,7 @@ public interface RpcPushDefine {
 	boolean isWritable();
 	
 	/**
-	 * @author gewx tcp连接唯一Id [建议测试使用].
+	 * @author gewx tcp连接唯一Id
 	 * **/
 	String getTcpId();
 	
