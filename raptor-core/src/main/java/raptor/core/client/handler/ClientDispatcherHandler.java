@@ -140,8 +140,9 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 				try {
 					pool.returnObject(this);
 				} catch (Exception e) {
-					LOGGER.error("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
-					throw new RpcException("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
+					String message = StringUtil.getErrorText(e);
+					LOGGER.error("资源释放异常-[0],tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode +", message: " + message);
+					throw new RpcException("资源释放异常-[0],tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode +", message: " + message);
 				}
 			}
 		}
@@ -205,8 +206,9 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 					try {
 						pool.returnObject(this);
 					} catch (Exception e) {
-						LOGGER.error("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
-						throw new RpcException("资源释放异常,tcpId: "+this.getTcpId()+",message: " + StringUtil.getErrorText(e));
+						String message = StringUtil.getErrorText(e);
+						LOGGER.error("资源释放异常-[1],tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode +", message: " + message);
+						throw new RpcException("资源释放异常-[1],tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode +", message: " + message);
 					}
 				}
 			}	
@@ -216,7 +218,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		String message = StringUtil.getErrorText(cause);
-		LOGGER.error("RPC客户端异常,message: " + message);
+		LOGGER.error("RPC IO异常,tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode + ", message: " + message);
 	}
 
 	@Override
