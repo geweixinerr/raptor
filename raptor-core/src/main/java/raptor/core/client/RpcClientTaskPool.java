@@ -39,9 +39,9 @@ public final class RpcClientTaskPool {
 	public static void initPool() {
 		LOGGER.info("初始化RPC Client业务线程池对象...");
 		POOLTASKEXECUTOR.setQueueCapacity(Integer.MAX_VALUE); // 队列深度. [建议设置Integer.MAX_VALUE,当然也可以根据项目情况自行调整配置]
-		POOLTASKEXECUTOR.setCorePoolSize(CPU_CORE * 4); // 核心线程数. [推荐,可根据项目情况自行配置] 
-		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 4); // 最大线程数 [推荐,可根据项目情况自行配置] 
-		//POOLTASKEXECUTOR.setKeepAliveSeconds(5000); //线程最/大空闲时间-可回收
+		POOLTASKEXECUTOR.setCorePoolSize(CPU_CORE); // 核心线程数.
+		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 4); // 最大线程数.
+		POOLTASKEXECUTOR.setKeepAliveSeconds(60 * 5); //线程最大空闲时间5分钟可回收,默认60秒.
 		POOLTASKEXECUTOR.setThreadNamePrefix("TASK_RPC_CLIENT_"); // 线程名前缀.
 		POOLTASKEXECUTOR.initialize();
 

@@ -39,7 +39,7 @@
 		
 		<property name="sourceMap">
 			<map>
-			    <entry key="localAddress" value="10.19.181.22"/> <!-- 绑定的服务器IP地址 -->
+			    <entry key="localAddress" value="localhost"/> <!-- 绑定的服务器IP地址 -->
 				<entry key="port" value="8090"/> <!-- 服务端口号 -->
 				<entry key="logOnOff" value="Off"/> <!-- Netty内置日志打印开关.On(开),Off(关),默认关闭. -->
 			</map>

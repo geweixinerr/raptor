@@ -49,17 +49,17 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 	private transient DateTime timeOut; 
 	
 	/**
-	 * 业务-->请求时间 [仅测试使用]
+	 * 业务-->请求时间
 	 * **/
 	private  transient DateTime requestTime; 
 	
 	/**
-	 * 业务-->客户端回调时间. [仅测试使用]
+	 * 业务-->客户端回调时间
 	 * **/
 	private  transient DateTime responseTime; 
 	
 	/**
-	 * 业务-->服务器响应达到客户端时间. [仅测试使用]
+	 * 业务-->服务器响应达到客户端时间
 	 * **/
 	private  transient DateTime clientTime; 
 	
@@ -168,6 +168,7 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 		if (this == o) {
 			return 0;
 		}
+		
 		RpcRequestBody other = (RpcRequestBody)o;
 		if (this.getDelayTime() > other.getDelayTime()) {
 			return 1;
@@ -202,11 +203,10 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 			builder.append("请求时间", this.requestTime.toString(dateTimeFormat));
 		}
 		
-		/*
 		if (this.timeOut != null) {
 			builder.append("timeOut",this.timeOut.toString(dateTimeFormat));
 		}
-		*/
+		
 		if (this.clientTime != null) {
 			builder.append("响应时间", this.clientTime.toString(dateTimeFormat));
 		}
@@ -218,7 +218,7 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 		if(this.requestTime != null && this.responseTime != null) {
 			Period p2 = new Period(this.requestTime, this.responseTime);
 			int seconds = p2.getSeconds(); //相差的秒
-			builder.append("RPC耗时: " + (seconds * 1000 + p2.getMillis()));
+			builder.append("RPC耗时: " + (seconds * 1000 + p2.getMillis() - 1));
 		}
 		
 		sb.trimToSize();
