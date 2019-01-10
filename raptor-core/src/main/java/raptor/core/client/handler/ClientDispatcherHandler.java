@@ -69,6 +69,11 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	private final DateTime into_pool_time;
 	
 	/**
+	 * 服务节点
+	 * **/
+	private final String serverNode;
+	
+	/**
 	 * 速率控制对象计数
 	 * **/
 	private final AtomicInteger speedObject = new AtomicInteger();
@@ -92,6 +97,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		this.tcpId = tcpId;
 		this.into_pool_time = new DateTime();
 		this.speedNum = speedNum;
+		this.serverNode = serverNode;
 		this.pool = RpcClient.getRpcPoolMapping().get(serverNode);
 	}
 
@@ -220,8 +226,8 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		InetSocketAddress remote = (InetSocketAddress) channel.remoteAddress();
 		
 		LOGGER.warn("[重要!!!]心跳检测...,tcp_id: " + this.getTcpId() + ", 客户端: " + local.getAddress() + ":" + local.getPort()
-				+", 服务器: " + remote.getAddress() + ":" + remote.getPort() 
-				+", active: " + this.pool.getNumActive() +", Idle: " + this.pool.getNumIdle());
+				+", 服务器: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + this.serverNode 
+				+ ", active: " + this.pool.getNumActive() +", Idle: " + this.pool.getNumIdle());
 		
 		RpcRequestBody requestBody = new RpcRequestBody();
 		requestBody.setMessageId(new UUID().toString());
