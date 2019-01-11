@@ -122,7 +122,7 @@ public final class RpcResponseBody implements RpcMessage {
 		builder.append("message",message);
 		builder.append("messageId",messageId);
 		builder.append("success",success);
-		//builder.append("body",body);
+		builder.append("body",body);
 		if (this.rpcCode != null) {
 			builder.append("rpcCode",rpcCode.getComment());	
 		}
