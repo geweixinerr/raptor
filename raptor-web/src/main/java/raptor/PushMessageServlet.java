@@ -1,10 +1,6 @@
 package raptor;
 
 import java.io.IOException;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -23,8 +19,6 @@ import raptor.core.message.RpcResponseBody;
 public class PushMessageServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-
-	private static final Integer CPU_CORE = Runtime.getRuntime().availableProcessors();
 
 	/**
 	 * Default constructor.
@@ -55,37 +49,20 @@ public class PushMessageServlet extends HttpServlet {
 		// 组装发送消息
 		String message = "Netty RPC Send, Netty is VeryGood!";
 		NettyTestData data = new NettyTestData();
-
-		Executor execute = Executors.newFixedThreadPool(CPU_CORE * 2);
-		CyclicBarrier latch = new CyclicBarrier(CPU_CORE * 2);
-
+		
 		@SuppressWarnings("rawtypes")
 		RaptorRpc rpc = new RaptorRpc();
 
-		for (int i = 0; i < CPU_CORE * 2; i++) {
-			execute.execute(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						latch.await();
-						// 发送异步消息.
-						for (int j = 0; j < 10000; j++) {
-							rpc.sendAsyncMessage("remote", "LoginAuth", new AbstractCallBack() {
-								@Override
-								public void invoke(RpcResponseBody responseBody) {
-								//	System.out.println("请求结果: " + responseBody);
-								}
-							}, 5, data, message);
-						}
-					} catch (InterruptedException | BrokenBarrierException e) {
-
-					}
-				}
-			});
-		}
+		rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
+			@Override
+			public void invoke(RpcResponseBody responseBody) {
+			//	System.out.println("请求结果: " + responseBody);
+			}
+		}, 5, data, message);
 		
 		response.getWriter().write("RPC execute ok!");
 
+		//http://localhost:9090/raptor/pushMessageServlet
 	}
 
 }
