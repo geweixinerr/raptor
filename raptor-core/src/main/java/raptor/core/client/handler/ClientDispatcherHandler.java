@@ -44,6 +44,16 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
     private  static final DateTimeFormatter dateTimeFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss:SSS");
 	
 	/**
+	 * 速率控制对象计数
+	 * **/
+	private final AtomicInteger speedObject = new AtomicInteger();
+	
+	/**
+	 * 延迟发包Queue
+	 * **/
+	private final DelayQueue<RpcRequestBody> queue = new DelayQueue<RpcRequestBody>();
+	
+	/**
 	 * 线程安全的ChannelHandlerContext实例对象.
 	 * **/
 	private ChannelHandlerContext ctx;
@@ -74,19 +84,9 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	private final String serverNode;
 	
 	/**
-	 * 速率控制对象计数
-	 * **/
-	private final AtomicInteger speedObject = new AtomicInteger();
-	
-	/**
-	 * 延迟发包Queue
-	 * **/
-	private final DelayQueue<RpcRequestBody> queue = new DelayQueue<RpcRequestBody>();
-	
-	/**
 	 * tcp包是否延迟发送中标记.
 	 * **/
-	private boolean isPush = false;
+	private volatile boolean isPush = false;
 	
 	/**
 	 * tcp 连接状态
