@@ -36,11 +36,6 @@ public interface RpcPushDefine {
 	String getTcpId();
 	
 	/**
-	 * @author gewx 获取tcp连接入池时间 [建议测试使用].
-	 * **/
-	DateTime getTcpIntoPoolTime();
-	
-	/**
 	 * @author gewx 获取池对象
 	 * **/
 	ObjectPool<RpcPushDefine> getRpcPoolObject();

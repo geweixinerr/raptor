@@ -8,8 +8,6 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import org.apache.commons.pool2.ObjectPool;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,16 +35,6 @@ import raptor.util.StringUtil;
 public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResponseBody> implements RpcPushDefine {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClientDispatcherHandler.class);
-
-	/**
-	 * 时间格式化
-	 * **/
-    private  static final DateTimeFormatter dateTimeFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss:SSS");
-	
-	/**
-	 * 速率控制对象计数
-	 * **/
-	private final AtomicInteger speedObject = new AtomicInteger();
 	
 	/**
 	 * 延迟发包Queue
@@ -54,14 +42,9 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	private final DelayQueue<RpcRequestBody> queue = new DelayQueue<RpcRequestBody>();
 	
 	/**
-	 * 线程安全的ChannelHandlerContext实例对象.
+	 * 速率控制对象计数
 	 * **/
-	private ChannelHandlerContext ctx;
-	
-	/**
-	 * tcpId,唯一标识单条tcp连接
-	 * **/
-	private final String tcpId; 
+	private final AtomicInteger speedObject = new AtomicInteger();
 	
 	/**
 	 * 当前tcp连接隶属的tcp pool池
@@ -69,24 +52,29 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	private final ObjectPool<RpcPushDefine> pool;
 	
 	/**
+	 * 线程安全的ChannelHandlerContext实例对象.
+	 * **/
+	private ChannelHandlerContext ctx;
+	
+	/**
+	 * tcp包是否延迟发送中标记.
+	 * **/
+	private boolean isPush = false;
+	
+	/**
+	 * tcpId,唯一标识单条tcp连接
+	 * **/
+	private final String tcpId; 
+	
+	/**
 	 * 速率
 	 * **/
 	private final Integer speedNum;
 	
 	/**
-	 * tcp连接入池时间 [仅推荐测试使用]
-	 * **/
-	private final DateTime into_pool_time;
-	
-	/**
 	 * 服务节点
 	 * **/
 	private final String serverNode;
-	
-	/**
-	 * tcp包是否延迟发送中标记.
-	 * **/
-	private volatile boolean isPush = false;
 	
 	/**
 	 * tcp 连接状态
@@ -95,7 +83,6 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	
 	public ClientDispatcherHandler(String tcpId, String serverNode, Integer speedNum) {
 		this.tcpId = tcpId;
-		this.into_pool_time = new DateTime();
 		this.speedNum = speedNum;
 		this.serverNode = serverNode;
 		this.pool = RpcClient.getRpcPoolMapping().get(serverNode);
@@ -104,11 +91,6 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	public String getTcpId() {
 		return this.tcpId;
-	}
-
-	@Override
-	public DateTime getTcpIntoPoolTime() {
-		return this.into_pool_time;
 	}
 
 	@Override
@@ -160,10 +142,6 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			public void operationComplete(ChannelFuture future) throws Exception {
 				if (future.isSuccess()) {
 					LOGGER.info("tcp连接关闭成功,tcp_id: " + rpc.getTcpId());
-					if (LOGGER.isDebugEnabled()) {
-						LOGGER.debug("tcp_id: " + rpc.getTcpId() + ", tcp连接服务周期账单,明细[入池时间: " + rpc.getTcpIntoPoolTime().toString(dateTimeFormat) 
-								+ ", 出池时间: " + new DateTime().toString(dateTimeFormat) + "]");
-					}
 				} else {
 					LOGGER.error("tcp连接关闭失败,message: " + StringUtil.getErrorText(future.cause()));
 				}
