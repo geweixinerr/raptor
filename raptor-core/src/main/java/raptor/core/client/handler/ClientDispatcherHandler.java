@@ -81,11 +81,6 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	 * **/
 	private boolean state = true;
 	
-	/**
-	 * 延迟时间,单位:毫秒
-	 * **/
-	private static final Integer DELAY_TIME = 1;
-	
 	public ClientDispatcherHandler(String tcpId, String serverNode, Integer speedNum) {
 		this.tcpId = tcpId;
 		this.speedNum = speedNum;
@@ -119,7 +114,6 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	public void pushMessage(RpcRequestBody requestBody) {
 		try {
-			requestBody.setDelayTime(System.currentTimeMillis() + DELAY_TIME); //delay
 			queue.add(requestBody);			
 			loopPushMessage();
 		} finally {
