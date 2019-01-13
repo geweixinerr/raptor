@@ -59,7 +59,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	/**
 	 * tcp包是否延迟发送中标记.
 	 * **/
-	private boolean isPush = false;
+	private volatile boolean isPush = false;
 	
 	/**
 	 * tcpId,唯一标识单条tcp连接
