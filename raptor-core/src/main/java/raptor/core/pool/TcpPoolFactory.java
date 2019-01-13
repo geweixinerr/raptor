@@ -1,7 +1,6 @@
 package raptor.core.pool;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.ObjectPool;
@@ -10,23 +9,11 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.eaio.uuid.UUID;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.timeout.IdleStateHandler;
+import raptor.core.Constants;
 import raptor.core.RpcPushDefine;
-import raptor.core.client.handler.ClientDispatcherHandler;
-import raptor.core.handler.codec.RpcByteToMessageDecoder;
-import raptor.core.handler.codec.RpcMessageToByteEncoder;
 import raptor.exception.RpcException;
 import raptor.util.StringUtil;
 
@@ -36,55 +23,24 @@ import raptor.util.StringUtil;
 public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TcpPoolFactory.class);
-
-	private static final Integer CPU_CORE = Runtime.getRuntime().availableProcessors();
-
-	private static final String CLIENT_DISPATCHER = "clientDispatcher";
-
-	private static final Integer DEFAULT_TIME_OUT = 5000;
-
-	private static final Integer ONE_KB = 1024; 
 	
 	private final String remoteAddr;
 
 	private final int port;
 	
-    private final String serverNode;
+	private final Bootstrap bootStrap;
     
-    private final Integer speedNum;
-    
-	public TcpPoolFactory(String remoteAddr, int port, String serverNode, Integer speedNum) {
+	public TcpPoolFactory(String remoteAddr, int port, Bootstrap bootStrap) {
 		this.remoteAddr = remoteAddr;
 		this.port = port;
-		this.serverNode = serverNode;
-		this.speedNum = speedNum;
+		this.bootStrap = bootStrap;
 	}
 
 	@Override
 	public RpcPushDefine create() {
-		String serverNode = this.serverNode; //服务器节点
-		Integer speedNum = this.speedNum; //速率
-		
-		Bootstrap boot = new Bootstrap();
-		EventLoopGroup eventGroup = new NioEventLoopGroup(CPU_CORE * 2);
-		boot.group(eventGroup).channel(NioSocketChannel.class)
-				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIME_OUT) 
-				.option(ChannelOption.SO_RCVBUF, 256 * ONE_KB) 
-				.option(ChannelOption.SO_SNDBUF, 256 * ONE_KB)
-				.remoteAddress(remoteAddr, port).handler(new ChannelInitializer<SocketChannel>() {
-					@Override
-					protected void initChannel(SocketChannel ch) throws Exception {
-						ChannelPipeline pipline = ch.pipeline();
-						pipline.addLast(new IdleStateHandler(0,60 * 2,0, TimeUnit.SECONDS)); //心跳检测2分钟[单个tcp连接2分钟内没有出站动作]
-						pipline.addLast(new RpcByteToMessageDecoder());
-						pipline.addLast(new RpcMessageToByteEncoder());
-						pipline.addLast(CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString(), serverNode, speedNum));
-					}
-				});
-
 		ChannelFuture future = null;
 		try {
-			future = boot.connect().sync(); 
+			future = bootStrap.connect(this.remoteAddr,this.port).sync(); 
 			future.addListener(new ChannelFutureListener() {
 				@Override
 				public void operationComplete(ChannelFuture future) throws Exception {
@@ -107,7 +63,7 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 			throw new RpcException("tcp连接建立初始化异常-1,message: " + message);
 		}
 
-		RpcPushDefine handler = (RpcPushDefine) future.channel().pipeline().get(CLIENT_DISPATCHER);
+		RpcPushDefine handler = (RpcPushDefine) future.channel().pipeline().get(Constants.CLIENT_DISPATCHER);
 		return handler;
 	}
 

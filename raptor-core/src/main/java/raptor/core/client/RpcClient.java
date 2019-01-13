@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.pool2.ObjectPool;
@@ -13,7 +14,22 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eaio.uuid.UUID;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
+import raptor.core.Constants;
 import raptor.core.RpcPushDefine;
+import raptor.core.client.handler.ClientDispatcherHandler;
+import raptor.core.handler.codec.RpcByteToMessageDecoder;
+import raptor.core.handler.codec.RpcMessageToByteEncoder;
 import raptor.core.init.RpcParameter;
 import raptor.core.pool.TcpPoolFactory;
 
@@ -28,6 +44,11 @@ public final class RpcClient {
 	 * @author gewx 多客户端配置与连接池映射关系.
 	 * **/
 	private static final Map<String,ObjectPool<RpcPushDefine>> RPC_OBJECT_POOL = new ConcurrentHashMap<String,ObjectPool<RpcPushDefine>>();
+	
+	/**
+	 * 默认连接超时时间
+	 * **/
+	private static final Integer DEFAULT_TIME_OUT = 5000;
 	
 	/**
 	 * 远程服务器地址配置key
@@ -48,12 +69,11 @@ public final class RpcClient {
 	 * 最大连接数
 	 * **/
 	private static final String MAX_CLIENTS = "maxclients";
-	
 
 	/**
 	 * 最大连接数-默认值
 	 * **/
-	private static final Integer DEFAULT_MAX_CLIENTS = 12040;
+	private static final Integer DEFAULT_MAX_CLIENTS = 1024;
 	
 	/**
 	 * 最小连接数
@@ -98,6 +118,8 @@ public final class RpcClient {
 	    	String maxclients = ObjectUtils.defaultIfNull(en.get(MAX_CLIENTS),String.valueOf(DEFAULT_MAX_CLIENTS));
 	    	//最小连接数
 	    	String minclients = ObjectUtils.defaultIfNull(en.get(MIN_CLIENTS),String.valueOf(DEFAULT_MIN_CLIENTS));
+	    	//serverNode节点
+	    	String serverNode = en.get(SERVER_NODE);
 	    	
 	    	//对象池配置
 	    	GenericObjectPoolConfig conf = new GenericObjectPoolConfig();
@@ -111,7 +133,24 @@ public final class RpcClient {
 	    	conf.setSoftMinEvictableIdleTimeMillis(5 * 60 * DEFAULT_MILLIS); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除[tcp连接空闲超时设置5分钟]
 	    	conf.setTimeBetweenEvictionRunsMillis(10 * DEFAULT_MILLIS); //闲置实例校验器启动的时间间隔,单位是毫秒 [10秒扫描一次]
 	    	
-	    	PooledObjectFactory poolFactory = new TcpPoolFactory(en.get(REMOTE_ADDR),Integer.parseInt(en.get(PORT)),en.get(SERVER_NODE),Integer.parseInt(speedNum));
+			Bootstrap boot = new Bootstrap();
+			EventLoopGroup eventGroup = new NioEventLoopGroup(Constants.CPU_CORE * 2);
+			boot.group(eventGroup).channel(NioSocketChannel.class)
+					.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIME_OUT) 
+					.option(ChannelOption.SO_RCVBUF, 256 * Constants.ONE_KB) 
+					.option(ChannelOption.SO_SNDBUF, 256 * Constants.ONE_KB)
+					.handler(new ChannelInitializer<SocketChannel>() {
+						@Override
+						protected void initChannel(SocketChannel ch) throws Exception {
+							ChannelPipeline pipline = ch.pipeline();
+							pipline.addLast(new IdleStateHandler(0,60 * 2,0, TimeUnit.SECONDS)); //心跳检测2分钟[单个tcp连接2分钟内没有出站动作]
+							pipline.addLast(new RpcByteToMessageDecoder());
+							pipline.addLast(new RpcMessageToByteEncoder());
+							pipline.addLast(Constants.CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString(), serverNode, Integer.parseInt(speedNum)));
+						}
+					});
+			
+	    	PooledObjectFactory poolFactory = new TcpPoolFactory(en.get(REMOTE_ADDR),Integer.parseInt(en.get(PORT)),boot);
 	    	ObjectPool<RpcPushDefine> pool = new GenericObjectPool<RpcPushDefine>(poolFactory,conf);
 
 	    	RPC_OBJECT_POOL.put(en.get(SERVER_NODE), pool);
