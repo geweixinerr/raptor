@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import raptor.core.Constants;
 import raptor.core.RpcResult;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
@@ -20,8 +21,6 @@ public final class RpcClientTaskPool {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RpcClientTaskPool.class);
 	 
-	private static final Integer CPU_CORE = Runtime.getRuntime().availableProcessors();
-
 	private static final ThreadPoolTaskExecutor POOLTASKEXECUTOR = new ThreadPoolTaskExecutor();
 
 	/**
@@ -38,9 +37,9 @@ public final class RpcClientTaskPool {
 	 **/
 	public static void initPool() {
 		LOGGER.info("初始化RPC Client业务线程池对象...");
-		POOLTASKEXECUTOR.setQueueCapacity(CPU_CORE * 10240); // 队列深度. [建议设置Integer.MAX_VALUE,当然也可以根据项目情况自行调整配置]
-		POOLTASKEXECUTOR.setCorePoolSize(CPU_CORE); // 核心线程数.
-		POOLTASKEXECUTOR.setMaxPoolSize(CPU_CORE * 4); // 最大线程数.
+		POOLTASKEXECUTOR.setQueueCapacity(Constants.CPU_CORE * 10240); // 队列深度. [建议设置Integer.MAX_VALUE,当然也可以根据项目情况自行调整配置]
+		POOLTASKEXECUTOR.setCorePoolSize(Constants.CPU_CORE); // 核心线程数.
+		POOLTASKEXECUTOR.setMaxPoolSize(Constants.CPU_CORE * 4); // 最大线程数.
 		POOLTASKEXECUTOR.setKeepAliveSeconds(60 * 5); //线程最大空闲时间5分钟可回收,默认60秒.
 		POOLTASKEXECUTOR.setThreadNamePrefix("TASK_RPC_CLIENT_"); // 线程名前缀.
 		POOLTASKEXECUTOR.initialize();
