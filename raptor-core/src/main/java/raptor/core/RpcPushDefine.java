@@ -1,7 +1,6 @@
 package raptor.core;
 
 import org.apache.commons.pool2.ObjectPool;
-import org.joda.time.DateTime;
 
 import raptor.core.message.RpcRequestBody;
 import raptor.exception.RpcException;
