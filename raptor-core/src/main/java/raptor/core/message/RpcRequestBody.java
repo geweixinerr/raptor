@@ -218,7 +218,7 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 		if(this.requestTime != null && this.responseTime != null) {
 			Period p2 = new Period(this.requestTime, this.responseTime);
 			int seconds = p2.getSeconds(); //相差的秒
-			builder.append("RPC耗时: " + (seconds * 1000 + p2.getMillis() - 1));
+			builder.append("RPC耗时: " + (seconds * 1000 + p2.getMillis()));
 		}
 		
 		sb.trimToSize();

@@ -89,16 +89,6 @@ public final class RpcClient {
 	 * 时间设置常量,默认单位1000毫秒.
 	 * **/
 	private static final Integer DEFAULT_MILLIS = 1000;
-	
-	/**
-	 * 速率控制阈值
-	 * **/
-	private static final String TCP_SPEED = "speedNum";
-	
-	/**
-	 * 速率控制默认值
-	 * **/
-	private static final Integer DEFAULT_TCP_SPEED_NUM = 64;
 
 	private RpcClient() {
 
@@ -112,8 +102,6 @@ public final class RpcClient {
 	public static void start() throws Exception {
 		List<Map<String, String>> clientConfig = RpcParameter.INSTANCE.getClientConfig();
 		for (Map<String,String> en : clientConfig) {
-			//速率
-			String speedNum = ObjectUtils.defaultIfNull(en.get(TCP_SPEED),String.valueOf(DEFAULT_TCP_SPEED_NUM));
 	    	//最大连接数
 	    	String maxclients = ObjectUtils.defaultIfNull(en.get(MAX_CLIENTS),String.valueOf(DEFAULT_MAX_CLIENTS));
 	    	//最小连接数
@@ -127,8 +115,8 @@ public final class RpcClient {
 	    	conf.setMaxTotal(Integer.parseInt(maxclients));  //池中最多可用的实例个数
 	    	conf.setMaxIdle(Integer.parseInt(maxclients)); //连接池中最大空闲的连接数,默认为8
 	    	conf.setMinIdle(Integer.parseInt(minclients)); //连接池中最少空闲的连接数,默认为0
-	    	conf.setBlockWhenExhausted(false); //池无可用对象,是否堵塞等待对象创建. (true:等待,false:不等待)
-	    	conf.setMaxWaitMillis(5 * DEFAULT_MILLIS); //调用borrowObject方法时，需要等待的最长时间. 单位:毫秒
+	    	conf.setBlockWhenExhausted(true); //池无可用对象,是否堵塞等待对象创建. (true:等待,false:不等待)
+	    	conf.setMaxWaitMillis(-1); //调用borrowObject方法时，需要等待的最长时间. 单位:毫秒
 	    	conf.setMinEvictableIdleTimeMillis(-1); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除 （-1 :不移除,使用setSoftMinEvictableIdleTimeMillis配置）
 	    	conf.setSoftMinEvictableIdleTimeMillis(5 * 60 * DEFAULT_MILLIS); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除[tcp连接空闲超时设置5分钟]
 	    	conf.setTimeBetweenEvictionRunsMillis(10 * DEFAULT_MILLIS); //闲置实例校验器启动的时间间隔,单位是毫秒 [10秒扫描一次]
@@ -146,7 +134,7 @@ public final class RpcClient {
 							pipline.addLast(new IdleStateHandler(0,60 * 2,0, TimeUnit.SECONDS)); //心跳检测2分钟[单个tcp连接2分钟内没有出站动作]
 							pipline.addLast(new RpcByteToMessageDecoder());
 							pipline.addLast(new RpcMessageToByteEncoder());
-							pipline.addLast(Constants.CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString(), serverNode, Integer.parseInt(speedNum)));
+							pipline.addLast(Constants.CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString(), serverNode));
 						}
 					});
 			

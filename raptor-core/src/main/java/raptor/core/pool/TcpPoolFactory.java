@@ -74,7 +74,7 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 
 	@Override
 	public void passivateObject(PooledObject<RpcPushDefine> pooledObject) {
-		pooledObject.getObject().setState(true);
+		//对象入池操作
 	}
 
 	@Override

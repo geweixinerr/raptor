@@ -31,11 +31,6 @@ public final class RaptorRpc<T extends Serializable> {
 	private static final Integer TIME_OUT = 5;
 	
 	/**
-	 * 延迟时间,单位:毫秒
-	 * **/
-	private static final Integer DELAY_TIME = 1;
-	
-	/**
 	 * @author gewx 异步发送消息
 	 * @param serverNode
 	 *            服务名(配置在客户端配置当中), rpcMethodName 调用服务方法名, call 回调对象,
@@ -65,7 +60,6 @@ public final class RaptorRpc<T extends Serializable> {
 					break;
 				}
 			}
-			rpc.setState(false);
 		} catch (Exception e) {
 			String message = StringUtil.getErrorText(e);
 			LOGGER.error("RPC 连接池获取对象失败,message: " + message);
@@ -81,7 +75,6 @@ public final class RaptorRpc<T extends Serializable> {
 		requestBody.setRpcMethod(rpcMethodName);
 		requestBody.setRequestTime(reqDate);
 		requestBody.setTimeOut(reqDate.plusSeconds(timeOut));
-		requestBody.setDelayTime(System.currentTimeMillis() + DELAY_TIME); //delay
 		requestBody.setCall(call);
 
 		RpcClientTaskPool.pushTask(requestBody); 

@@ -1,8 +1,6 @@
 package raptor.core.client.handler;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.DelayQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -39,12 +37,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	/**
 	 * 延迟发包Queue
 	 * **/
-	private final DelayQueue<RpcRequestBody> queue = new DelayQueue<RpcRequestBody>();
-	
-	/**
-	 * 速率控制对象计数
-	 * **/
-	private final AtomicInteger speedObject = new AtomicInteger();
+//	private final DelayQueue<RpcRequestBody> queue = new DelayQueue<RpcRequestBody>();
 	
 	/**
 	 * 当前tcp连接隶属的tcp pool池
@@ -57,33 +50,17 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	private ChannelHandlerContext ctx;
 	
 	/**
-	 * tcp包是否延迟发送中标记.
-	 * **/
-	private volatile boolean isPush = false;
-	
-	/**
 	 * tcpId,唯一标识单条tcp连接
 	 * **/
 	private final String tcpId; 
-	
-	/**
-	 * 速率
-	 * **/
-	private final Integer speedNum;
 	
 	/**
 	 * 服务节点
 	 * **/
 	private final String serverNode;
 	
-	/**
-	 * tcp 连接状态
-	 * **/
-	private boolean state = true;
-	
-	public ClientDispatcherHandler(String tcpId, String serverNode, Integer speedNum) {
+	public ClientDispatcherHandler(String tcpId, String serverNode) {
 		this.tcpId = tcpId;
-		this.speedNum = speedNum;
 		this.serverNode = serverNode;
 		this.pool = RpcClient.getRpcPoolMapping().get(serverNode);
 	}
@@ -94,18 +71,8 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	}
 
 	@Override
-	public ObjectPool<RpcPushDefine> getRpcPoolObject(){
+	public ObjectPool<RpcPushDefine> getRpcPoolObject() {
 		return this.pool;
-	}
-	
-	@Override
-	public void setState(boolean bool) {
-		this.state = bool;
-	}
-
-	@Override
-	public boolean getState() {
-		return this.state;
 	}
 
 	/**
@@ -113,21 +80,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	 **/
 	@Override
 	public void pushMessage(RpcRequestBody requestBody) {
-		try {
-			queue.add(requestBody);			
-			loopPushMessage();
-		} finally {
-			speedObject.incrementAndGet();
-			if (speedObject.intValue() < speedNum) {
-				try {
-					pool.returnObject(this);
-				} catch (Exception e) {
-					String message = StringUtil.getErrorText(e);
-					LOGGER.error("资源释放异常-[0],tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode +", message: " + message);
-					throw new RpcException("资源释放异常-[0],tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode +", message: " + message);
-				}
-			}
-		}
+		ctx.writeAndFlush(requestBody);
 	}
 	
 	/**
@@ -176,27 +129,22 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		
 		responseBody.setResponseTime(new DateTime());	
 		RpcClientTaskPool.addTask(responseBody); 
-		int thisSpeed = speedObject.intValue();
-		speedObject.decrementAndGet();
-		if (thisSpeed == speedNum) {
-			synchronized (this) {
-				if (!this.getState()) {
-					try {
-						pool.returnObject(this);
-					} catch (Exception e) {
-						String message = StringUtil.getErrorText(e);
-						LOGGER.error("资源释放异常-[1],tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode +", message: " + message);
-						throw new RpcException("资源释放异常-[1],tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode +", message: " + message);
-					}
-				}
-			}	
+		
+		try {
+			pool.returnObject(this);
+		} catch (Exception e) {
+			String message = StringUtil.getErrorText(e);
+			LOGGER.error("资源释放异常,tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode +", message: " + message);
+			throw new RpcException("资源释放异常,tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode +", message: " + message);
 		}
+		
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		String message = StringUtil.getErrorText(cause);
 		LOGGER.error("RPC IO异常,tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode + ", message: " + message);
+		close();
 	}
 
 	@Override
@@ -213,21 +161,5 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		requestBody.setMessageId(new UUID().toString());
 		requestBody.setRpcMethod(HEARTBEAT_METHOD);
 		ctx.writeAndFlush(requestBody);
-	}
-
-	/**
-	 * 循环延迟推送,减少包的传输速率.
-	 * **/
-	private void loopPushMessage() {
-		if (!this.isPush) {
-			this.isPush = true;
-			while (queue.size() > 0) {
-				RpcRequestBody requestBody = queue.poll();
-				if (requestBody != null) {
-					ctx.writeAndFlush(requestBody);
-				}
-			}
-			this.isPush = false;  
-		}
 	}
 }
