@@ -28,11 +28,14 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 
 	private final int port;
 	
+	private final String serverNode;
+	
 	private final Bootstrap bootStrap;
     
-	public TcpPoolFactory(String remoteAddr, int port, Bootstrap bootStrap) {
+	public TcpPoolFactory(String remoteAddr, int port, String serverNode, Bootstrap bootStrap) {
 		this.remoteAddr = remoteAddr;
 		this.port = port;
+		this.serverNode = serverNode;
 		this.bootStrap = bootStrap;
 	}
 
@@ -48,19 +51,18 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 						InetSocketAddress local = (InetSocketAddress) future.channel().localAddress();
 						InetSocketAddress remote = (InetSocketAddress) future.channel().remoteAddress();
 						LOGGER.info("客户端连接成功,localAddress: " + local.getAddress() + ":" + local.getPort()
-								+ ", remoteAddress: " + remote.getAddress() + ":" + remote.getPort());
-						LOGGER.info("客户端服务注册成功.");
+								+ ", remoteAddress: " + remote.getAddress() + ":" + remote.getPort() +", serverNode: " + serverNode);
 					} else {
 						String message = StringUtil.getErrorText(future.cause());
-						LOGGER.warn("tcp连接建立初始化异常-0,message: " + message);
-						throw new RpcException("tcp连接建立初始化异常-0,message: " + message);
+						LOGGER.warn("tcp连接建立初始化异常-0,serverNode: " + serverNode +", message: " + message);
+						throw new RpcException("tcp连接建立初始化异常-0,serverNode: " + serverNode +", message: " + message);
 					}
 				}
 			});
 		} catch (Exception e) {
 			String message = StringUtil.getErrorText(e);
-			LOGGER.error("tcp连接建立初始化异常-1,message: " + message);
-			throw new RpcException("tcp连接建立初始化异常-1,message: " + message);
+			LOGGER.error("tcp连接建立初始化异常-1,serverNode: " + serverNode +", message: " + message);
+			throw new RpcException("tcp连接建立初始化异常-1,serverNode: " + serverNode +", message: " + message);
 		}
 
 		RpcPushDefine handler = (RpcPushDefine) future.channel().pipeline().get(Constants.CLIENT_DISPATCHER);

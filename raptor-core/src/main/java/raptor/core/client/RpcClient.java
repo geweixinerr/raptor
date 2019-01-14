@@ -100,6 +100,13 @@ public final class RpcClient {
 	 **/
 	@SuppressWarnings({ "rawtypes", "unchecked"})
 	public static void start() throws Exception {
+		Bootstrap boot = new Bootstrap();
+		EventLoopGroup eventGroup = new NioEventLoopGroup(Constants.CPU_CORE * 2);
+		boot.group(eventGroup).channel(NioSocketChannel.class)
+				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIME_OUT) 
+				.option(ChannelOption.SO_RCVBUF, 256 * Constants.ONE_KB) 
+				.option(ChannelOption.SO_SNDBUF, 256 * Constants.ONE_KB);
+		
 		List<Map<String, String>> clientConfig = RpcParameter.INSTANCE.getClientConfig();
 		for (Map<String,String> en : clientConfig) {
 	    	//最大连接数
@@ -120,25 +127,19 @@ public final class RpcClient {
 	    	conf.setMinEvictableIdleTimeMillis(-1); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除 （-1 :不移除,使用setSoftMinEvictableIdleTimeMillis配置）
 	    	conf.setSoftMinEvictableIdleTimeMillis(5 * 60 * DEFAULT_MILLIS); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除[tcp连接空闲超时设置5分钟]
 	    	conf.setTimeBetweenEvictionRunsMillis(10 * DEFAULT_MILLIS); //闲置实例校验器启动的时间间隔,单位是毫秒 [10秒扫描一次]
-	    	
-			Bootstrap boot = new Bootstrap();
-			EventLoopGroup eventGroup = new NioEventLoopGroup(Constants.CPU_CORE * 2);
-			boot.group(eventGroup).channel(NioSocketChannel.class)
-					.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIME_OUT) 
-					.option(ChannelOption.SO_RCVBUF, 256 * Constants.ONE_KB) 
-					.option(ChannelOption.SO_SNDBUF, 256 * Constants.ONE_KB)
-					.handler(new ChannelInitializer<SocketChannel>() {
-						@Override
-						protected void initChannel(SocketChannel ch) throws Exception {
-							ChannelPipeline pipline = ch.pipeline();
-							pipline.addLast(new IdleStateHandler(0,60 * 2,0, TimeUnit.SECONDS)); //心跳检测2分钟[单个tcp连接2分钟内没有出站动作]
-							pipline.addLast(new RpcByteToMessageDecoder());
-							pipline.addLast(new RpcMessageToByteEncoder());
-							pipline.addLast(Constants.CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString(), serverNode));
-						}
-					});
+
+	    	boot.handler(new ChannelInitializer<SocketChannel>() {
+				@Override
+				protected void initChannel(SocketChannel ch) throws Exception {
+					ChannelPipeline pipline = ch.pipeline();
+					pipline.addLast(new IdleStateHandler(0,60 * 2,0, TimeUnit.SECONDS)); //心跳检测2分钟[单个tcp连接2分钟内没有出站动作]
+					pipline.addLast(new RpcByteToMessageDecoder());
+					pipline.addLast(new RpcMessageToByteEncoder());
+					pipline.addLast(Constants.CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString(), serverNode));
+				}
+			});
 			
-	    	PooledObjectFactory poolFactory = new TcpPoolFactory(en.get(REMOTE_ADDR),Integer.parseInt(en.get(PORT)),boot);
+	    	PooledObjectFactory poolFactory = new TcpPoolFactory(en.get(REMOTE_ADDR),Integer.parseInt(en.get(PORT)),serverNode,boot);
 	    	ObjectPool<RpcPushDefine> pool = new GenericObjectPool<RpcPushDefine>(poolFactory,conf);
 
 	    	RPC_OBJECT_POOL.put(en.get(SERVER_NODE), pool);
