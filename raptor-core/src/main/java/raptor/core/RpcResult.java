@@ -11,7 +11,7 @@ public enum RpcResult {
 		this.comment = comment;
 	}
 
-	private String comment; // 描述文本
+	private String comment;
 
 	public String getComment() {
 		return comment;

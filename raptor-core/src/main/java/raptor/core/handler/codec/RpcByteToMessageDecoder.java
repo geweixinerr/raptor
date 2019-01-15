@@ -14,9 +14,6 @@ import io.netty.handler.codec.ByteToMessageDecoder;
  * **/
 public final class RpcByteToMessageDecoder extends ByteToMessageDecoder {
 
-	/**
-	 * 得益于Netty的IO线程设计[线程封闭技术],下面的代码不会存在线程安全问题.
-	 * **/
 	private final FSTConfiguration configuration = FSTConfiguration.createDefaultConfiguration();
 	
 	@Override

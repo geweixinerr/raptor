@@ -205,29 +205,29 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 		builder.append("rpcMethod",rpcMethod);
 		builder.append("isSync",isSync);
 		
-		/*
 		if (body != null) {
 			builder.append("body",ArrayUtils.toStringArray(body));
 		} else {
 			builder.append("body","");
 		}
-		*/
 		
 		if (this.requestTime != null) {
-			builder.append("请求时间", this.requestTime.toString(dateTimeFormat));
+			builder.append("reqDate", this.requestTime.toString(dateTimeFormat));
 		}
 		
+		/*
 		if (this.timeOut != null) {
 			builder.append("timeOut",this.timeOut.toString(dateTimeFormat));
 		}
 		
 		if (this.clientTime != null) {
-			builder.append("响应时间", this.clientTime.toString(dateTimeFormat));
+			builder.append("respDate", this.clientTime.toString(dateTimeFormat));
 		}
 		
 		if (this.responseTime != null) {
-			builder.append("回调时间", this.responseTime.toString(dateTimeFormat));
+			builder.append("callDate", this.responseTime.toString(dateTimeFormat));
 		}
+		*/
 		
 		if(this.requestTime != null && this.responseTime != null) {
 			Period p2 = new Period(this.requestTime, this.responseTime);

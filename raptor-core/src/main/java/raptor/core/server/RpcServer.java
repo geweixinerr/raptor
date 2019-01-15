@@ -28,6 +28,7 @@ import raptor.core.handler.codec.RpcMessageToByteEncoder;
 import raptor.core.init.RpcParameter;
 import raptor.core.init.RpcParameterEnum;
 import raptor.core.server.handler.ServerDispatcherHandler;
+import raptor.exception.RpcException;
 import raptor.util.StringUtil;
 
 /**
@@ -47,8 +48,7 @@ public final class RpcServer {
 	}
 
 	/**
-	 * 启动RPC服务
-	 * 
+	 * @author gewx 启动RPC服务
 	 * @throws InterruptedException
 	 **/
 	public static void start() throws InterruptedException {
@@ -101,7 +101,8 @@ public final class RpcServer {
 					LOGGER.info("RPC 服务启动成功!");
 				} else {
 					String message = StringUtil.getErrorText(future.cause());
-					LOGGER.info("RPC 服务启动失败,message: " + message);
+					LOGGER.warn("RPC 服务启动失败,message: " + message);
+					throw new RpcException("RPC Server启动失败,message: " + message);
 				}
 			}
 		});

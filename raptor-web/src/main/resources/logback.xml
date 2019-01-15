@@ -16,44 +16,31 @@
 
 
 	<!-- 按照每天生成日志文件 -->
-	<appender name="FILE"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!--日志文件输出的文件名 -->
-			<FileNamePattern>${log_Home}/log.%d{yyyy-MM-dd}.log</FileNamePattern>
-			<!--日志文件保留天数 -->
-			<MaxHistory>30</MaxHistory>
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${log_Home}/raptor.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<!-- kb/mb/gb -->
+			<maxFileSize>128MB</maxFileSize>
+			<!-- 日志文件保留天数 -->
+			<maxHistory>30</maxHistory>
+			<totalSizeCap>10GB</totalSizeCap>
 		</rollingPolicy>
-		<!-- 日志输出的文件的格式 -->
 		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}|%contextName|%X{invokeId}|[%thread] %-5level %logger{36} - %msg%n</pattern>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
 			<charset>UTF-8</charset>
 		</encoder>
-		<!--日志文件最大的大小 -->
-		<triggeringPolicy
-			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<MaxFileSize>10MB</MaxFileSize>
-		</triggeringPolicy>
 	</appender>
 
 	<!-- 异步输出 -->
 	<appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
 		<!-- 不丢失日志.默认的. 如果discardingThreshold大于0,队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
 		<discardingThreshold>0</discardingThreshold>
-		<!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
-		<queueSize>102400</queueSize>
-		<!-- neverBlock默认值false, 设置为true防止日志写入Queue队列堵塞,存在丢日志的可能 -->
-		<!--
-		<neverBlock>true</neverBlock> 
-		 -->
-		<!-- immediateFlush参数默认是true，代表是否立即刷新OutputStream中的信息。如果设置为false，会在OutputStream放满或隔断时间进行flush，具体由OutputStream类决定,
-		         据说设置为false之后输出日志的效率能提高为原来的4倍。 -->
+		<queueSize>1024</queueSize>
 		<immediateFlush>false</immediateFlush>
-		<!-- 添加附加的appender,最多只能添加一个 -->
 		<appender-ref ref="FILE" />
 	</appender>
 
-	<root level="WARN">
+	<root level="INFO">
 		<appender-ref ref="ASYNC" />
 	</root>
 

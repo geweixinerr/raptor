@@ -109,11 +109,8 @@ public final class RpcClient {
 		
 		List<Map<String, String>> clientConfig = RpcParameter.INSTANCE.getClientConfig();
 		for (Map<String,String> en : clientConfig) {
-	    	//最大连接数
 	    	String maxclients = ObjectUtils.defaultIfNull(en.get(MAX_CLIENTS),String.valueOf(DEFAULT_MAX_CLIENTS));
-	    	//最小连接数
 	    	String minclients = ObjectUtils.defaultIfNull(en.get(MIN_CLIENTS),String.valueOf(DEFAULT_MIN_CLIENTS));
-	    	//serverNode节点
 	    	String serverNode = en.get(SERVER_NODE);
 	    	
 	    	//对象池配置

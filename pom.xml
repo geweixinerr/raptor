@@ -156,23 +156,25 @@
 		</dependency>
 
 		<!-- logback start -->
+		<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
 		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.1.3</version>
+		    <groupId>ch.qos.logback</groupId>
+		    <artifactId>logback-classic</artifactId>
+		    <version>1.2.3</version>
 		</dependency>
 
-		<!-- logback-ext-spring是由官方提供的对Spring的支持，它的作用就相当于log4j中的Log4jConfigListener -->
+		<!-- https://mvnrepository.com/artifact/org.logback-extensions/logback-ext-spring -->
 		<dependency>
-			<groupId>org.logback-extensions</groupId>
-			<artifactId>logback-ext-spring</artifactId>
-			<version>0.1.2</version>
+		    <groupId>org.logback-extensions</groupId>
+		    <artifactId>logback-ext-spring</artifactId>
+		    <version>0.1.5</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.slf4j/jcl-over-slf4j -->
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<version>1.7.12</version>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>jcl-over-slf4j</artifactId>
+		    <version>1.7.25</version>
 		</dependency>
 		<!-- logback end -->
 

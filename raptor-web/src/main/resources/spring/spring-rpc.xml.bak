@@ -36,23 +36,33 @@
 		class="org.springframework.beans.factory.config.ListFactoryBean">
 		<property name="targetListClass" value="java.util.concurrent.CopyOnWriteArrayList" />
 		<property name="singleton" value="false" />
-		<!-- 客户端配置集合List,可配置多客户端属性. -->
 		<property name="sourceList">
 			<list>
-			    <!-- RPC客户端配置,NIO线程池大小根据服务器所在物理主机CPU核心数动态拓展,数值设定为: core * 2 -->
 			    <bean class="org.springframework.beans.factory.config.MapFactoryBean">
 					<property name="targetMapClass">
 						<value>java.util.HashMap</value>
 					</property>
 					<property name="sourceMap">
 						<map>
-						    <entry key="serverNode" value="mc"/> <!-- 客户端标识 -->
-						    <!-- 连接的远程服务器IP地址/端口号 --> 
+						    <entry key="serverNode" value="mc"/>
 							<entry key="remote" value="localhost"/> 
 							<entry key="port" value="8090"/>
-							<entry key="maxclients" value="32"/> <!-- 最大tcp连接数据 -->
-							<entry key="minclients" value="6"/> <!-- 最小tcp连接数据,初始化时建立此配置的数值连接数. -->
-							<entry key="speedNum" value="1024"/> <!-- TCP连接单条连接在途事务数 -->
+							<entry key="maxclients" value="32"/> 
+							<entry key="minclients" value="6"/> 
+						</map>
+					</property>    
+				</bean>  
+			    <bean class="org.springframework.beans.factory.config.MapFactoryBean">
+					<property name="targetMapClass">
+						<value>java.util.HashMap</value>
+					</property>
+					<property name="sourceMap">
+						<map>
+						    <entry key="serverNode" value="tcs"/>
+							<entry key="remote" value="localhost"/> 
+							<entry key="port" value="8090"/>
+							<entry key="maxclients" value="32"/> 
+							<entry key="minclients" value="6"/> 
 						</map>
 					</property>    
 				</bean>  

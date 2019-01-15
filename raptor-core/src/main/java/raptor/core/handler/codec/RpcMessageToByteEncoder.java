@@ -12,9 +12,6 @@ import raptor.core.message.RpcMessage;
  * **/
 public final class RpcMessageToByteEncoder extends MessageToByteEncoder<RpcMessage> {
 
-	/**
-	 * 得益于Netty的IO线程设计[线程封闭技术],下面的代码不会存在线程安全问题.
-	 * **/
 	private final FSTConfiguration configuration = FSTConfiguration.createDefaultConfiguration();
 	
 	@Override

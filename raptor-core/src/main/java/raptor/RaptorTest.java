@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
 
-import io.netty.handler.codec.http.HttpContentEncoder.Result;
 import raptor.RaptorRpc;
 import raptor.core.AbstractCallBack;
 import raptor.core.client.NettyTestData;
@@ -59,6 +55,7 @@ public final class RaptorTest {
 		RaptorRpc rpc = new RaptorRpc();
 		
 		//异步
+		/*
 		rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
 			@Override
 			public void invoke(RpcResponseBody resp) {
@@ -72,7 +69,7 @@ public final class RaptorTest {
 			}
 			
 		}, 5, data, message);
-		
+		*/
 		
 		//同步
 	    RpcResponseBody response = rpc.sendSyncMessage("mc", "LoginAuth", data,message);

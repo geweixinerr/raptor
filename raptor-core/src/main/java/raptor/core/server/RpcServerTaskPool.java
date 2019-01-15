@@ -29,9 +29,6 @@ public final class RpcServerTaskPool {
 
 	private static final ThreadPoolTaskExecutor POOLTASKEXECUTOR = new ThreadPoolTaskExecutor();
 
-	/**
-	 * RPC映射关系
-	 * **/
 	private static final Map<String,RpcHandlerObject> RPC_MAPPING = RpcMappingInit.listRpcMapping();
 	
 	private RpcServerTaskPool() {
@@ -43,7 +40,7 @@ public final class RpcServerTaskPool {
 	 **/
 	public static void initPool() {
 		LOGGER.info("初始化RPC Server业务线程池对象...");
-		POOLTASKEXECUTOR.setQueueCapacity(Constants.CPU_CORE * 10240); //队列深度. [建议设置Integer.MAX_VALUE,当然也可以根据项目情况自行调整配置]
+		POOLTASKEXECUTOR.setQueueCapacity(Constants.CPU_CORE * 10240); //队列深度. 
 		POOLTASKEXECUTOR.setCorePoolSize(Constants.CPU_CORE); // 核心线程数. 
 		POOLTASKEXECUTOR.setMaxPoolSize(Constants.CPU_CORE * 4); // 最大线程数. 
 		POOLTASKEXECUTOR.setKeepAliveSeconds(60 * 5); //线程最大空闲时间5分钟可回收,默认60秒.
@@ -66,9 +63,6 @@ public final class RpcServerTaskPool {
 				.submitListenable(new Callable<RpcResponseBody>() {
 					@Override
 					public RpcResponseBody call() throws Exception {
-						/**
-						 * 实际业务调用
-						 * **/
 						RpcHandlerObject handler = RPC_MAPPING.get(rpcMethod);
 						if (handler == null) {
 							throw new RpcException("RPC参数缺失,RpcMethod is null !");

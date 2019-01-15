@@ -34,29 +34,12 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClientDispatcherHandler.class);
 	
-	/**
-	 * 延迟发包Queue
-	 * **/
-//	private final DelayQueue<RpcRequestBody> queue = new DelayQueue<RpcRequestBody>();
-	
-	/**
-	 * 当前tcp连接隶属的tcp pool池
-	 * **/
 	private final ObjectPool<RpcPushDefine> pool;
 	
-	/**
-	 * 线程安全的ChannelHandlerContext实例对象.
-	 * **/
 	private ChannelHandlerContext ctx;
 	
-	/**
-	 * tcpId,唯一标识单条tcp连接
-	 * **/
 	private final String tcpId; 
 	
-	/**
-	 * 服务节点
-	 * **/
 	private final String serverNode;
 	
 	public ClientDispatcherHandler(String tcpId, String serverNode) {
@@ -75,17 +58,11 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		return this.pool;
 	}
 
-	/**
-	 * @author gewx RPC实际调用--->信息推送.
-	 **/
 	@Override
 	public void pushMessage(RpcRequestBody requestBody) {
 		ctx.writeAndFlush(requestBody);
 	}
 	
-	/**
-	 * @author gewx 关闭闲时的tcp连接.
-	 * **/
 	@Override
 	public void close() {
 		RpcPushDefine rpc = this;
@@ -126,7 +103,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcp_id: " + this.getTcpId());
 			return;
 		}
-		
+		LOGGER.info("客户端收到响应: " + responseBody);
 		responseBody.setResponseTime(new DateTime());	
 		RpcClientTaskPool.addTask(responseBody); 
 		

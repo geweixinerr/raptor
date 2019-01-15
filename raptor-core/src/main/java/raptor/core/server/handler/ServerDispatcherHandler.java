@@ -21,10 +21,10 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcRequestBody msg) throws Exception {
 		LOGGER.info("服务端收到信息: " + msg);		
-
 		RpcServerTaskPool.addTask(msg, new AbstractCallBack() {
 			@Override
 			public void invoke(RpcResponseBody responseBody) {
+				LOGGER.info("响应输出: " + responseBody);				
 				ctx.writeAndFlush(responseBody);
 			}
 		});

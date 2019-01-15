@@ -12,9 +12,9 @@ public enum RpcParameterEnum {
 		this.comment = comment;
 	}
 	
-	private String code; //RPC参数数值
+	private String code; 
 	
-	private String comment; //RPC参数描述
+	private String comment; 
 
 	public String getCode() {
 		return code;

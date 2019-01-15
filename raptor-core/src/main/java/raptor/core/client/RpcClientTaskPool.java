@@ -23,9 +23,6 @@ public final class RpcClientTaskPool {
 	 
 	private static final ThreadPoolTaskExecutor POOLTASKEXECUTOR = new ThreadPoolTaskExecutor();
 
-	/**
-	 * 客户端请求MessageId与回调对应关系,这里设置较大数值避免客户端高并发请求期间,map resize导致吞吐量降低[当然有点耗费内存,可根据实际情况自行调整 (#^.^#)].
-	 **/
 	private static final Map<String, RpcRequestBody> MESSAGEID_MAPPING = new ConcurrentHashMap<String, RpcRequestBody>(1024 * 100);
 		
 	private RpcClientTaskPool() {
@@ -37,7 +34,7 @@ public final class RpcClientTaskPool {
 	 **/
 	public static void initPool() {
 		LOGGER.info("初始化RPC Client业务线程池对象...");
-		POOLTASKEXECUTOR.setQueueCapacity(Constants.CPU_CORE * 10240); // 队列深度. [建议设置Integer.MAX_VALUE,当然也可以根据项目情况自行调整配置]
+		POOLTASKEXECUTOR.setQueueCapacity(Constants.CPU_CORE * 10240); // 队列深度.
 		POOLTASKEXECUTOR.setCorePoolSize(Constants.CPU_CORE); // 核心线程数.
 		POOLTASKEXECUTOR.setMaxPoolSize(Constants.CPU_CORE * 4); // 最大线程数.
 		POOLTASKEXECUTOR.setKeepAliveSeconds(60 * 5); //线程最大空闲时间5分钟可回收,默认60秒.
@@ -55,12 +52,6 @@ public final class RpcClientTaskPool {
 	 * @return void
 	 **/
 	public static void addTask(RpcResponseBody responseBody) {
-		/**
-		 * 实际客户端回调处理,此处逻辑描述: 
-		 * 1.客户端任务池存在未超时的回调任务,判断当前任务时间是否超时。
-		 * 2.未超时则判断当前消息是否已发送(消息对象(RpcRequestBody)存在并发调用,串行化控制消息的发送)。 
-		 * 3.清理队列中已发送的消息对象。
-		 **/
 		POOLTASKEXECUTOR.execute(new Runnable() {
 			@Override
 			public void run() {
