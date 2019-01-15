@@ -82,10 +82,10 @@ public final class RpcServerTaskPool {
 							result = MethodUtils.invokeMethod(handler.getObject(), handler.getRpcKey());
 						}
 						RpcResponseBody body = new RpcResponseBody();
-						body.setRpcMethod(rpcMethod);						
-						body.setBody(result);
-						body.setMessageId(requestBody.getMessageId());
 						body.setSuccess(true);
+						body.setMessageId(requestBody.getMessageId());
+						body.setRpcMethod(rpcMethod);
+						body.setBody(result);
 						body.setMessage("RPC调用成功!");
 						return body;
 					}
@@ -104,9 +104,9 @@ public final class RpcServerTaskPool {
 				 * 定义回调异常,默认响应体
 				 * **/
 				RpcResponseBody body = new RpcResponseBody();
-				body.setRpcMethod(rpcMethod);
-				body.setMessageId(requestBody.getMessageId());
 				body.setSuccess(false);
+				body.setMessageId(requestBody.getMessageId());
+				body.setRpcMethod(rpcMethod);
 				body.setMessage("RPC 服务调用失败,message:[" + throwable.getMessage() + "]");
 				
 				call.invoke(body);

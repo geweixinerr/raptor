@@ -44,6 +44,11 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 	private Object[] body;
 	
 	/**
+	 * 是否同步[true-同步,false-异步]
+	 * **/
+	private boolean isSync;
+	
+	/**
 	 * 业务超时时间,默认5秒(单位:秒)
 	 * **/
 	private transient DateTime timeOut; 
@@ -150,6 +155,14 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 		this.clientTime = clientTime;
 	}
 
+	public boolean isSync() {
+		return isSync;
+	}
+
+	public void setSync(boolean isSync) {
+		this.isSync = isSync;
+	}
+
 	/**
 	 * @author gewx 本方法作用在于串行化回调消息执行逻辑. 问题描述:
 	 *         假设调度线程与正常客户端回调线程同时处理某个回调对象,会产生客户端响应接收到两次的情况.
@@ -190,6 +203,7 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE,sb);
 		builder.append("messageId",messageId);
 		builder.append("rpcMethod",rpcMethod);
+		builder.append("isSync",isSync);
 		
 		/*
 		if (body != null) {

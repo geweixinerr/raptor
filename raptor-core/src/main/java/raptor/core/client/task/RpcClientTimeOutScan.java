@@ -55,7 +55,7 @@ public final class RpcClientTimeOutScan {
 					
 					for (String key : keys) {
 						RpcRequestBody requestBody = requestPool.get(key);
-						if (requestBody == null) {
+						if (requestBody == null || requestBody.isSync()) {
 							continue;
 						}
 						// 如果当前时间已超过设置的超时时间,则为过期消息.

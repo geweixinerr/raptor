@@ -73,6 +73,14 @@ public final class RpcClientTaskPool {
 				requestBody.setClientTime(responseBody.getResponseTime()); 
 				requestBody.setResponseTime(thisDate);
 				
+				//sync
+				if (requestBody.isSync()) {
+					responseBody.setRpcCode(RpcResult.SUCCESS);			
+					requestBody.getCall().invoke(requestBody,responseBody);
+					return;
+				}
+				
+				//async				
 				if (thisDate.compareTo(requestBody.getTimeOut()) <= 0) {
 					if (!requestBody.isMessageSend()) { //是否已发送,并发串行化校验.
 						responseBody.setRpcCode(RpcResult.SUCCESS);			

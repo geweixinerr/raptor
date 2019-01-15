@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 
+import io.netty.handler.codec.http.HttpContentEncoder.Result;
 import raptor.RaptorRpc;
 import raptor.core.AbstractCallBack;
 import raptor.core.client.NettyTestData;
@@ -53,21 +57,26 @@ public final class RaptorTest {
 		
 		@SuppressWarnings("rawtypes")
 		RaptorRpc rpc = new RaptorRpc();
-		for (int i = 0; i < 1000; i++) {
-			rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
-				@Override
-				public void invoke(RpcResponseBody resp) {
-					System.out.println("RPC结果[0]: " + resp);
-				}
-				
-				@Override
-				public void invoke(RpcRequestBody req, RpcResponseBody resp) {
-					System.out.println("请求对象: " + req);
-					System.out.println("RPC结果[1]: " + resp);
-				}
-				
-			}, 5, data, message);
-		}
+		
+		//异步
+		rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
+			@Override
+			public void invoke(RpcResponseBody resp) {
+				System.out.println("RPC结果[0]: " + resp);
+			}
+			
+			@Override
+			public void invoke(RpcRequestBody req, RpcResponseBody resp) {
+				System.out.println("请求对象: " + req);
+				System.out.println("RPC结果[1]: " + resp);
+			}
+			
+		}, 5, data, message);
+		
+		
+		//同步
+	    RpcResponseBody response = rpc.sendSyncMessage("mc", "LoginAuth", data,message);
+		System.out.println("result : " + response);
 	}
 
 }
