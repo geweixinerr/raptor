@@ -121,7 +121,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		String message = StringUtil.getErrorText(cause);
 		LOGGER.error("RPC IO异常,tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode + ", message: " + message);
-		close();
+		pool.invalidateObject(this);
 	}
 
 	@Override
