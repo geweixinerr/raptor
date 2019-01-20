@@ -61,8 +61,6 @@ public class PushMessageServlet extends HttpServlet {
 		}, 5, data, message);
 		
 		response.getWriter().write("RPC execute ok!");
-
-		//http://localhost:9090/raptor/pushMessageServlet
 	}
 
 }
