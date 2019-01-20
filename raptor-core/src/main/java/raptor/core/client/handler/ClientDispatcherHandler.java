@@ -60,7 +60,26 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 
 	@Override
 	public void pushMessage(RpcRequestBody requestBody) {
-		ctx.writeAndFlush(requestBody);
+		RpcPushDefine rpcObject = this;
+		ChannelFuture future = ctx.writeAndFlush(requestBody);
+		future.addListener(new ChannelFutureListener() {
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				if (future.isSuccess()) {
+					try {
+						pool.returnObject(rpcObject);
+					} catch (Exception e) {
+						String message = StringUtil.getErrorText(e);
+						LOGGER.error("资源释放异常,tcpId: "+rpcObject.getTcpId()+ ", serverNode: " + serverNode +", message: " + message);
+						throw new RpcException("资源释放异常,tcpId: "+rpcObject.getTcpId()+ ", serverNode: " + serverNode +", message: " + message);
+					}
+ 				} else {
+					String message = StringUtil.getErrorText(future.cause());
+					LOGGER.error("RPC请求推送异常,tcpId: "+rpcObject.getTcpId()+ ", serverNode: " + serverNode +", message: " + message);
+ 					pool.invalidateObject(rpcObject);
+				}
+			}
+		});
 	}
 	
 	@Override
@@ -106,15 +125,6 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		LOGGER.info("客户端收到响应: " + responseBody);
 		responseBody.setResponseTime(new DateTime());	
 		RpcClientTaskPool.addTask(responseBody); 
-		
-		try {
-			pool.returnObject(this);
-		} catch (Exception e) {
-			String message = StringUtil.getErrorText(e);
-			LOGGER.error("资源释放异常,tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode +", message: " + message);
-			throw new RpcException("资源释放异常,tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode +", message: " + message);
-		}
-		
 	}
 
 	@Override
