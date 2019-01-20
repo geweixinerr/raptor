@@ -94,6 +94,8 @@ public final class RpcServerTaskPool {
 
 			@Override
 			public void onFailure(Throwable throwable) {
+				Throwable ex = throwable.getCause();
+				String message = (ex != null) ? ex.getMessage() : throwable.getMessage();
 				/**
 				 * 定义回调异常,默认响应体
 				 * **/
@@ -101,7 +103,7 @@ public final class RpcServerTaskPool {
 				body.setSuccess(false);
 				body.setMessageId(requestBody.getMessageId());
 				body.setRpcMethod(rpcMethod);
-				body.setMessage("RPC 服务调用失败,message:[" + throwable.getMessage() + "]");
+				body.setMessage("RPC 服务调用失败,message:[" + message + "]");
 				
 				call.invoke(body);
 			}

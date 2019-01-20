@@ -2,9 +2,12 @@ package raptor.service;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import raptor.core.annotation.RpcHandler;
 import raptor.core.annotation.RpcMethod;
 import raptor.core.client.NettyTestData;
+import raptor.dao.member.MemberInfoDao;
 
 /**
  * @author gewx 业务服务类 Test类
@@ -13,24 +16,26 @@ import raptor.core.client.NettyTestData;
 @RpcHandler
 public final class AlibabaService {
 
+	@Autowired
+	private MemberInfoDao memberInfoDao;
+	
 	/**登录认证**/
 	@RpcMethod
 	public void LoginAuth(Map<String,String> params) {
-	//	System.out.println("AlibabaService.............ONE");
+		
 	}
 	
 	/**登录认证**/
 	@RpcMethod
 	public String LoginAuth(Map<String,String> params,String message) {
-	//	System.out.println("AlibabaService.............TWO");
 		return message;
 	}
 	
 	/**登录认证**/
 	@RpcMethod
 	public String LoginAuth(NettyTestData params,String message) {
-		//System.out.println("AlibabaService.............THREE");
-		return message;
+		String dbMessage = memberInfoDao.selectOne();
+		return message +", dbMessage: " + dbMessage;
 	}
 	
 }

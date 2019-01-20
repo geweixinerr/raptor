@@ -39,9 +39,9 @@
 		<immediateFlush>false</immediateFlush>
 		<appender-ref ref="FILE" />
 	</appender>
-
+	
 	<root level="INFO">
-		<appender-ref ref="ASYNC" />
+		<appender-ref ref="STDOUT" />
 	</root>
 
 </configuration>

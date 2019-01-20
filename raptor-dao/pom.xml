@@ -9,19 +9,8 @@
 		<version>1.0</version>
 	</parent>
 
-	<artifactId>raptor-service</artifactId>
-	<name>raptor-service[RPC服务实现层]</name>
+	<artifactId>raptor-dao</artifactId>
+	<name>raptor-dao[数据库DAO层]</name>
 	<url>http://maven.apache.org</url>
-	
-	<dependencies>
-		<dependency>
-			<groupId>cn.raptor</groupId>
-			<artifactId>raptor-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cn.raptor</groupId>
-			<artifactId>raptor-dao</artifactId>
-		</dependency>
-	</dependencies>
-	
+
 </project>
