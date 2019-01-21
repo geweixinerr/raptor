@@ -3,6 +3,8 @@ package raptor.core.server.handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import raptor.core.AbstractCallBack;
@@ -20,12 +22,22 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcRequestBody msg) throws Exception {
-		LOGGER.info("服务端收到信息: " + msg);		
+		LOGGER.info("RPC服务端收到请求信息: " + msg);		
 		RpcServerTaskPool.addTask(msg, new AbstractCallBack() {
 			@Override
 			public void invoke(RpcResponseBody responseBody) {
-				LOGGER.info("响应输出: " + responseBody);				
-				ctx.writeAndFlush(responseBody);
+				ChannelFuture future = ctx.writeAndFlush(responseBody);
+				future.addListener(new ChannelFutureListener() {
+					@Override
+					public void operationComplete(ChannelFuture future) throws Exception {
+						if (future.isSuccess()) {
+							LOGGER.info("RPC服务端数据出站SUCCESS: " + responseBody);					
+						} else {
+							String message = StringUtil.getErrorText(future.cause());
+							LOGGER.warn("RPC服务端数据出站FAIL: " + responseBody + ", message: " + message);	
+						}
+					}
+				});
 			}
 		});
 	}

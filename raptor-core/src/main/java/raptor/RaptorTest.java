@@ -72,14 +72,11 @@ public final class RaptorTest {
 		*/
 		
 		//同步
-		for (int i = 0; i < 10; i++) {
-			long start = System.currentTimeMillis();
-		    RpcResponseBody response = rpc.sendSyncMessage("mc", "LoginAuth", data,message);
-			long end = System.currentTimeMillis();
-			
-			System.out.println("result : " + response +", 耗时: " + (end- start));
-		}
-
+		long start = System.currentTimeMillis();
+	    RpcResponseBody response = rpc.sendSyncMessage("mc", "LoginAuth", data,message);
+		long end = System.currentTimeMillis();
+		
+		System.out.println("result : " + response +", 耗时: " + (end- start));
 	}
 
 }

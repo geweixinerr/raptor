@@ -18,7 +18,7 @@ public final class Heartbeat {
 	/**心跳**/
 	@RpcMethod
 	public void heartbeat(String tcpId) {
-		LOGGER.warn("================心跳检测,tcp_id: " +tcpId+ "================");
+		LOGGER.warn("================心跳检测,tcpId: " +tcpId+ "================");
 	}
 	
 }

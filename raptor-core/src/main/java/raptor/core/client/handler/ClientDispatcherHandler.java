@@ -66,16 +66,17 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 				if (future.isSuccess()) {
+					LOGGER.info("RPC客户端数据出站SUCCESS: " + requestBody);					
 					try {
 						pool.returnObject(rpcObject);
 					} catch (Exception e) {
 						String message = StringUtil.getErrorText(e);
-						LOGGER.error("资源释放异常,tcpId: "+rpcObject.getTcpId()+ ", serverNode: " + serverNode +", message: " + message);
-						throw new RpcException("资源释放异常,tcpId: "+rpcObject.getTcpId()+ ", serverNode: " + serverNode +", message: " + message);
+						LOGGER.error("资源释放异常,tcpId: " + rpcObject.getTcpId() + ", serverNode: " + serverNode +", message: " + message);
+						throw new RpcException("资源释放异常,tcpId: " + rpcObject.getTcpId() + ", serverNode: " + serverNode +", message: " + message);
 					}
  				} else {
 					String message = StringUtil.getErrorText(future.cause());
-					LOGGER.error("RPC请求推送异常,tcpId: "+rpcObject.getTcpId()+ ", serverNode: " + serverNode +", message: " + message);
+					LOGGER.warn("RPC客户端数据出站FAIL: " + requestBody +", tcpId: " + rpcObject.getTcpId() + ", serverNode: " + serverNode +", message: " + message);					
  					pool.invalidateObject(rpcObject);
 				}
 			}
@@ -90,9 +91,9 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 				if (future.isSuccess()) {
-					LOGGER.info("tcp连接关闭成功,tcp_id: " + rpc.getTcpId());
+					LOGGER.info("tcp连接关闭成功,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode);
 				} else {
-					LOGGER.error("tcp连接关闭失败,message: " + StringUtil.getErrorText(future.cause()));
+					LOGGER.error("tcp连接关闭失败,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + StringUtil.getErrorText(future.cause()));
 				}
 			}
 		});
@@ -119,10 +120,10 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody responseBody) throws Exception {
 		if (responseBody.getRpcMethod().equals(HEARTBEAT_METHOD)) {
-			LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcp_id: " + this.getTcpId());
+			LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcpId: " + this.getTcpId() + ", serverNode: " + this.serverNode);
 			return;
 		}
-		LOGGER.info("客户端收到响应: " + responseBody);
+		LOGGER.info("RPC客户端收到响应: " + responseBody);
 		responseBody.setResponseTime(new DateTime());	
 		RpcClientTaskPool.addTask(responseBody); 
 	}
@@ -140,7 +141,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		InetSocketAddress local = (InetSocketAddress) channel.localAddress();
 		InetSocketAddress remote = (InetSocketAddress) channel.remoteAddress();
 		
-		LOGGER.warn("[重要!!!]心跳检测...,tcp_id: " + this.getTcpId() + ", 客户端: " + local.getAddress() + ":" + local.getPort()
+		LOGGER.warn("[重要!!!]心跳检测...,tcpId: " + this.getTcpId() + ", 客户端: " + local.getAddress() + ":" + local.getPort()
 				+", 服务器: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + this.serverNode 
 				+ ", active: " + this.pool.getNumActive() +", Idle: " + this.pool.getNumIdle());
 		
