@@ -148,6 +148,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		RpcRequestBody requestBody = new RpcRequestBody();
 		requestBody.setMessageId(new UUID().toString());
 		requestBody.setRpcMethod(HEARTBEAT_METHOD);
+		requestBody.setBody(new String[] {this.getTcpId()});
 		ctx.writeAndFlush(requestBody);
 	}
 }
