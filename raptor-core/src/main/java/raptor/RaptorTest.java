@@ -51,6 +51,9 @@ public final class RaptorTest {
 		String message = "Netty RPC Send, Netty is VeryGood!";
 		NettyTestData data = new NettyTestData();
 		
+		HashMap<String,String> mapMessage = new HashMap<String,String>();
+		mapMessage.put("certNo", "123456");
+		
 		@SuppressWarnings("rawtypes")
 		RaptorRpc rpc = new RaptorRpc();
 		
@@ -73,7 +76,7 @@ public final class RaptorTest {
 		
 		//同步
 		long start = System.currentTimeMillis();
-	    RpcResponseBody response = rpc.sendSyncMessage("mc", "LoginAuth", data,message);
+	    RpcResponseBody response = rpc.sendSyncMessage("mc", "LoginAuth", mapMessage, message);
 		long end = System.currentTimeMillis();
 		
 		System.out.println("result : " + response +", 耗时: " + (end- start));
