@@ -1,15 +1,29 @@
 package raptor;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.springframework.util.FileSystemUtils;
+import org.springframework.util.ResourceUtils;
+
+import ch.qos.logback.classic.joran.action.ConfigurationAction;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.ext.spring.LogbackConfigurer;
 import raptor.RaptorRpc;
 import raptor.core.AbstractCallBack;
+import raptor.core.Constants;
 import raptor.core.client.NettyTestData;
 import raptor.core.client.RpcClient;
 import raptor.core.client.RpcClientTaskPool;
+import raptor.core.client.handler.ClientDispatcherHandler;
 import raptor.core.client.task.RpcClientTimeOutScan;
 import raptor.core.init.RpcParameter;
 import raptor.core.message.RpcRequestBody;
@@ -20,8 +34,18 @@ import raptor.core.message.RpcResponseBody;
  * **/
 public final class RaptorTest {
 	
+	private static final Logger LOGGER = LoggerFactory.getLogger(RaptorTest.class);
+
 	static {
-		System.out.println("初始化服务器参数...");
+		//init logback
+		try {
+			File file = ResourceUtils.getFile("classpath:raptorLogback.xml");
+			LogbackConfigurer.initLogging(file.toURI().toString());
+		} catch (FileNotFoundException | JoranException e) {
+			System.out.println("日志初始化失败!");
+		}
+		
+		LOGGER.info("初始化服务器参数...");
 		List<Map<String,String>> clientConfig = new ArrayList<Map<String,String>>();
 		
 		Map<String,String> config = new HashMap<String,String>();
@@ -40,9 +64,9 @@ public final class RaptorTest {
 		try {
 			RpcClient.start();
 		} catch (Exception e1) {
-			System.out.println("启动异常: " + e1.getMessage());			
+			LOGGER.info("启动异常: " + e1.getMessage());			
 		}
-		System.out.println("初始化完毕...");
+		LOGGER.info("初始化完毕...");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -58,17 +82,16 @@ public final class RaptorTest {
 		RaptorRpc rpc = new RaptorRpc();
 		
 		//异步
-		/*
+	    /*
 		rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
 			@Override
 			public void invoke(RpcResponseBody resp) {
-				System.out.println("RPC结果[0]: " + resp);
+				
 			}
 			
 			@Override
 			public void invoke(RpcRequestBody req, RpcResponseBody resp) {
-				System.out.println("请求对象: " + req);
-				System.out.println("RPC结果[1]: " + resp);
+			
 			}
 			
 		}, 5, data, message);
@@ -79,7 +102,7 @@ public final class RaptorTest {
 	    RpcResponseBody response = rpc.sendSyncMessage("mc", "LoginAuth", mapMessage, message);
 		long end = System.currentTimeMillis();
 		
-		System.out.println("result : " + response +", 耗时: " + (end- start));
+		LOGGER.info("result : " + response +", 耗时: " + (end- start));
 	}
 
 }
