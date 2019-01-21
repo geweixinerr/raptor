@@ -8,8 +8,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.ObjectPool;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.eaio.uuid.UUID;
 
@@ -27,8 +25,6 @@ import raptor.util.StringUtil;
  * @author gewx Raptor RPC消息的包装发送.
  **/
 public final class RaptorRpc<T extends Serializable> {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(RaptorRpc.class);
 	
 	/**
 	 * 业务超时设置,默认5秒
@@ -53,7 +49,6 @@ public final class RaptorRpc<T extends Serializable> {
 		ObjectPool<RpcPushDefine> pool = RpcClient.getRpcPoolMapping().get(serverNode);
 
 		if (pool == null) {
-			LOGGER.error("RPC服务器映射不存在,请检查配置! serverNode : " + serverNode);
 			throw new RpcException("RPC服务器映射不存在,请检查配置! serverNode : " + serverNode);
 		}
 		
@@ -67,7 +62,6 @@ public final class RaptorRpc<T extends Serializable> {
 			}
 		} catch (Exception e) {
 			String message = StringUtil.getErrorText(e);
-			LOGGER.error("RPC 连接池获取对象失败,serverNode : " + serverNode + ", message: " + message);
 			throw new RpcException("RPC 连接池获取对象失败,serverNode : " + serverNode + ", message: " + message);
 		}
 		
@@ -109,7 +103,6 @@ public final class RaptorRpc<T extends Serializable> {
 			return result;
 		} catch (InterruptedException e) {
 			String message = StringUtil.getErrorText(e);
-			LOGGER.error("RPC调用异常,serverNode : " + serverNode + ", message: " + message);
 			throw new RpcException("RPC调用异常,serverNode : " + serverNode + ", message: " + message);
 		}
 	}
@@ -141,7 +134,6 @@ public final class RaptorRpc<T extends Serializable> {
 		ObjectPool<RpcPushDefine> pool = RpcClient.getRpcPoolMapping().get(serverNode);
 
 		if (pool == null) {
-			LOGGER.error("RPC服务器映射不存在,请检查配置! serverNode : " + serverNode);
 			throw new RpcException("RPC服务器映射不存在,请检查配置! serverNode : " + serverNode);
 		}
 		
@@ -155,7 +147,6 @@ public final class RaptorRpc<T extends Serializable> {
 			}
 		} catch (Exception e) {
 			String message = StringUtil.getErrorText(e);
-			LOGGER.error("RPC 连接池获取对象失败,serverNode : " + serverNode + ", message: " + message);
 			throw new RpcException("RPC 连接池获取对象失败,serverNode : " + serverNode + ", message: " + message);
 		}
 		
