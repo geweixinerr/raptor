@@ -204,8 +204,7 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer(256);
-		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE,sb);
+		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE);
 		builder.append("messageId",messageId);
 		builder.append("rpcMethod",rpcMethod);
 		
@@ -241,8 +240,7 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 			int seconds = p2.getSeconds(); //相差的秒
 			builder.append("RPC耗时: " + (seconds * 1000 + p2.getMillis()));
 		}
-		
-		sb.trimToSize();
+
 		return builder.toString();
 	}
 	

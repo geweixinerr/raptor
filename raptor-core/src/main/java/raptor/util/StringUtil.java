@@ -31,7 +31,6 @@ public final class StringUtil {
 				throwable.printStackTrace(writer);
 
 				StringBuffer sb = strWriter.getBuffer();
-				sb.trimToSize();
 				return sb.toString();
 			} finally {
 				if (writer != null) {

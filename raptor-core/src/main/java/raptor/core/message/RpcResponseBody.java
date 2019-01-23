@@ -109,8 +109,7 @@ public final class RpcResponseBody implements RpcMessage {
 
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer(256);
-		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE,sb);
+		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE);
 		builder.append("messageId",messageId);
 		builder.append("success",success);
 		builder.append("message",message);
@@ -118,7 +117,6 @@ public final class RpcResponseBody implements RpcMessage {
 		if (this.rpcCode != null) {
 			builder.append("rpcCode",rpcCode.getComment());	
 		}
-		sb.trimToSize();
 		return builder.toString();
 	}
 	

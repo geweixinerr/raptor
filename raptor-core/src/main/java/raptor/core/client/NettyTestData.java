@@ -150,8 +150,7 @@ public final class NettyTestData implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer(1024 + 512);
-		ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE, sb);
+		ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
 
 		builder.append("age", this.age);
 		builder.append("userName", this.userName);
@@ -165,7 +164,6 @@ public final class NettyTestData implements Serializable {
 		builder.append("list", this.list);
 		builder.append("array", ArrayUtils.toString(this.array));
 
-		sb.trimToSize();
 		return builder.toString();
 	}
 
