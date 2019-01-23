@@ -12,12 +12,10 @@ import org.springframework.util.ResourceUtils;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.ext.spring.LogbackConfigurer;
 import raptor.core.AbstractCallBack;
-import raptor.core.client.NettyTestData;
 import raptor.core.client.RpcClient;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.client.task.RpcClientTimeOutScan;
 import raptor.core.init.RpcParameter;
-import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
 import raptor.log.RaptorLogger;
 

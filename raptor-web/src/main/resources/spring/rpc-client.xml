@@ -21,16 +21,6 @@
 	<!-- 开启注解扫描 -->
 	<context:component-scan base-package="raptor.*"/>
 	
-    <!-- 引入支持LogBack -->
-	<bean id="logInitialization"
-		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-		<property name="targetClass" value="ch.qos.logback.ext.spring.LogbackConfigurer" />
-		<property name="targetMethod" value="initLogging" />
-		<property name="arguments">
-			<value>classpath:logback.xml</value>
-		</property>
-	</bean>
-	
 	<!-- Netty Pool客户端配置 -->
 	<bean id="NettyPoolConfig"
 		class="org.springframework.beans.factory.config.ListFactoryBean">
