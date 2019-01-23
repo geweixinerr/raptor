@@ -8,8 +8,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import raptor.core.AbstractCallBack;
 
@@ -18,12 +16,6 @@ import raptor.core.AbstractCallBack;
  * **/
 public final class RpcRequestBody implements RpcMessage, Delayed {
 
-	
-	/**
-	 * 线程安全格式化类-Joda API
-	 * **/
-    private  static transient DateTimeFormatter dateTimeFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss:SSS");
-    
 	/**
 	 */
 	private static final long serialVersionUID = 1584389395921234145L;
@@ -203,7 +195,6 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE,sb);
 		builder.append("messageId",messageId);
 		builder.append("rpcMethod",rpcMethod);
-		builder.append("isSync",isSync);
 		
 		if (body != null) {
 			builder.append("body",ArrayUtils.toStringArray(body));
@@ -211,11 +202,12 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 			builder.append("body","");
 		}
 		
+		/*		
+		 * DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss:SSS");
 		if (this.requestTime != null) {
 			builder.append("reqDate", this.requestTime.toString(dateTimeFormat));
 		}
 		
-		/*
 		if (this.timeOut != null) {
 			builder.append("timeOut",this.timeOut.toString(dateTimeFormat));
 		}
@@ -227,6 +219,8 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 		if (this.responseTime != null) {
 			builder.append("callDate", this.responseTime.toString(dateTimeFormat));
 		}
+		
+		builder.append("isSync",isSync);
 		*/
 		
 		if(this.requestTime != null && this.responseTime != null) {

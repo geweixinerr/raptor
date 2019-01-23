@@ -80,11 +80,6 @@ public final class RaptorRpc<T extends Serializable> {
 			public void invoke(RpcResponseBody resp) {
 				blockQueue.offer(resp);
 			}
-			
-			@Override
-			public void invoke(RpcRequestBody req, RpcResponseBody resp) {
-				blockQueue.offer(resp);
-			}
 		});
 		requestBody.setSync(true);
 		RpcClientTaskPool.pushTask(requestBody); 

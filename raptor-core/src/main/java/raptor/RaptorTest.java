@@ -77,12 +77,7 @@ public final class RaptorTest {
 		rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
 			@Override
 			public void invoke(RpcResponseBody resp) {
-				
-			}
-			
-			@Override
-			public void invoke(RpcRequestBody req, RpcResponseBody resp) {
-		        LOGGER.info("异步响应: " + req);		        
+		        LOGGER.info("异步响应: " + resp);		        
 			}
 			
 		}, 5, mapMessage, message);

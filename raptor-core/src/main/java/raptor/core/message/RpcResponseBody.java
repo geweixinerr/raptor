@@ -3,8 +3,6 @@ package raptor.core.message;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import raptor.core.RpcResult;
 
@@ -12,12 +10,6 @@ import raptor.core.RpcResult;
  * @author gewx RPC消息响应主体
  * **/
 public final class RpcResponseBody implements RpcMessage {
-	
-	/**
-	 * 线程安全格式化类-Joda API
-	 * **/
-    private  static transient DateTimeFormatter dateTimeFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss:SSS");
-    
 
 	/**
 	 */
@@ -119,16 +111,12 @@ public final class RpcResponseBody implements RpcMessage {
 	public String toString() {
 		StringBuffer sb = new StringBuffer(256);
 		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE,sb);
-		builder.append("message",message);
 		builder.append("messageId",messageId);
 		builder.append("success",success);
+		builder.append("message",message);
 		builder.append("body",body);
 		if (this.rpcCode != null) {
 			builder.append("rpcCode",rpcCode.getComment());	
-		}
-		
-		if (this.responseTime != null) {
-			builder.append("responseTime", this.responseTime.toString(dateTimeFormat));
 		}
 		sb.trimToSize();
 		return builder.toString();
