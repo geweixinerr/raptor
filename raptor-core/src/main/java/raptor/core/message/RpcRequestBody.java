@@ -41,6 +41,11 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 	private boolean isSync;
 	
 	/**
+	 * 线程号-分布式日志采集
+	 * **/
+	private String threadId;
+	
+	/**
 	 * 业务超时时间,默认5秒(单位:秒)
 	 * **/
 	private transient DateTime timeOut; 
@@ -75,6 +80,14 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 	 * **/
 	private transient Long delayTime;
 	
+	public String getThreadId() {
+		return threadId;
+	}
+
+	public void setThreadId(String threadId) {
+		this.threadId = threadId;
+	}
+
 	public Long getDelayTime() {
 		return delayTime;
 	}

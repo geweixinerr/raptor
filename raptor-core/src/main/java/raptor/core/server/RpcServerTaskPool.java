@@ -68,7 +68,8 @@ public final class RpcServerTaskPool {
 						if (handler == null) {
 							throw new RpcException("RPC参数缺失,RpcMethod is null !");
 						}
-						RaptorLogger.THREAD_ID.set(requestBody.getMessageId());
+						
+						RaptorLogger.THREAD_ID.set(requestBody.getThreadId());
 						
 						Object result = null;
 						Object [] objArray = requestBody.getBody();

@@ -19,6 +19,7 @@ import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
 import raptor.exception.RpcException;
+import raptor.log.RaptorLogger;
 import raptor.util.StringUtil;
 
 /**
@@ -71,6 +72,7 @@ public final class RaptorRpc<T extends Serializable> {
 		
 		RpcRequestBody requestBody = new RpcRequestBody();
 		requestBody.setMessageId(uuid);
+		requestBody.setThreadId(RaptorLogger.THREAD_ID.get());
 		requestBody.setBody(body);
 		requestBody.setRpcMethod(rpcMethodName);
 		requestBody.setRequestTime(reqDate);
@@ -150,6 +152,7 @@ public final class RaptorRpc<T extends Serializable> {
 		
 		RpcRequestBody requestBody = new RpcRequestBody();
 		requestBody.setMessageId(uuid);
+		requestBody.setThreadId(RaptorLogger.THREAD_ID.get());
 		requestBody.setBody(body);
 		requestBody.setRpcMethod(rpcMethodName);
 		requestBody.setRequestTime(reqDate);
