@@ -8,6 +8,7 @@ import raptor.core.annotation.RpcHandler;
 import raptor.core.annotation.RpcMethod;
 import raptor.core.client.NettyTestData;
 import raptor.dao.member.MemberInfoDao;
+import raptor.log.RaptorLogger;
 
 /**
  * @author gewx 业务服务类 Test类
@@ -16,6 +17,8 @@ import raptor.dao.member.MemberInfoDao;
 @RpcHandler
 public final class AlibabaService {
 
+	private static final RaptorLogger LOGGER = new RaptorLogger(AlibabaService.class);
+	
 	@Autowired
 	private MemberInfoDao memberInfoDao;
 	
@@ -28,7 +31,11 @@ public final class AlibabaService {
 	/**登录认证**/
 	@RpcMethod
 	public String LoginAuth(Map<String,String> params,String message) {
-		return message;
+		String methodName = "LoginAuth";
+		LOGGER.enter(methodName, "单点服务认证请求,params: " + params +",message : " + message);
+		String msg = "SUCCESS";
+		LOGGER.exit(methodName, "单点认证服务请求结束!");
+		return msg;
 	}
 	
 	/**登录认证**/

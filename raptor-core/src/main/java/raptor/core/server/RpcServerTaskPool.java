@@ -18,6 +18,7 @@ import raptor.core.init.RpcMappingInit;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
 import raptor.exception.RpcException;
+import raptor.log.RaptorLogger;
 
 /**
  * @author gewx RPC Server端业务线程池
@@ -67,6 +68,8 @@ public final class RpcServerTaskPool {
 						if (handler == null) {
 							throw new RpcException("RPC参数缺失,RpcMethod is null !");
 						}
+						RaptorLogger.THREAD_ID.set(requestBody.getMessageId());
+						
 						Object result = null;
 						Object [] objArray = requestBody.getBody();
 						if (ArrayUtils.isNotEmpty(objArray)) {

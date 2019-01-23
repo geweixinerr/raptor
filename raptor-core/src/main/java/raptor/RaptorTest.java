@@ -2,39 +2,31 @@ package raptor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ResourceUtils;
 
-import ch.qos.logback.classic.joran.action.ConfigurationAction;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.ext.spring.LogbackConfigurer;
-import raptor.RaptorRpc;
 import raptor.core.AbstractCallBack;
-import raptor.core.Constants;
 import raptor.core.client.NettyTestData;
 import raptor.core.client.RpcClient;
 import raptor.core.client.RpcClientTaskPool;
-import raptor.core.client.handler.ClientDispatcherHandler;
 import raptor.core.client.task.RpcClientTimeOutScan;
 import raptor.core.init.RpcParameter;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
+import raptor.log.RaptorLogger;
 
 /**
  * Raptor单元测试类
  * **/
 public final class RaptorTest {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(RaptorTest.class);
+	private static final RaptorLogger LOGGER = new RaptorLogger(RaptorTest.class);
 
 	static {
 		//init logback
@@ -73,7 +65,7 @@ public final class RaptorTest {
 	public static void main(String[] args) {
 		// 组装发送消息
 		String message = "Netty RPC Send, Netty is VeryGood!";
-		NettyTestData data = new NettyTestData();
+		//NettyTestData data = new NettyTestData();
 		
 		HashMap<String,String> mapMessage = new HashMap<String,String>();
 		mapMessage.put("certNo", "123456");
@@ -82,7 +74,6 @@ public final class RaptorTest {
 		RaptorRpc rpc = new RaptorRpc();
 		
 		//异步
-	    /*
 		rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
 			@Override
 			public void invoke(RpcResponseBody resp) {
@@ -91,18 +82,17 @@ public final class RaptorTest {
 			
 			@Override
 			public void invoke(RpcRequestBody req, RpcResponseBody resp) {
-			
+		        LOGGER.info("异步响应: " + req);		        
 			}
 			
-		}, 5, data, message);
-		*/
+		}, 5, mapMessage, message);
 		
 		//同步
+		LOGGER.enter("queryFinalResult","服务身份证信息查询[start]");
 		long start = System.currentTimeMillis();
 	    RpcResponseBody response = rpc.sendSyncMessage("mc", "LoginAuth", mapMessage, message);
 		long end = System.currentTimeMillis();
-		
-		LOGGER.info("result : " + response +", 耗时: " + (end- start));
+		LOGGER.exit("queryFinalResult","服务身份证信息查询[end],result : " + response +", 耗时: " + (end- start));
 	}
 
 }
