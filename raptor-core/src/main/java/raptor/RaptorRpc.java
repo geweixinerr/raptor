@@ -65,7 +65,7 @@ public final class RaptorRpc<T extends Serializable> {
 			throw new RpcException("RPC 连接池获取对象失败,serverNode : " + serverNode + ", message: " + message);
 		}
 		
-		BlockingQueue<RpcResponseBody> blockQueue = new LinkedBlockingQueue<>(1);
+		BlockingQueue<RpcResponseBody> blockQueue = new LinkedBlockingQueue<RpcResponseBody>(1);
 		String uuid = new UUID().toString();
 		DateTime reqDate = new DateTime();
 		
