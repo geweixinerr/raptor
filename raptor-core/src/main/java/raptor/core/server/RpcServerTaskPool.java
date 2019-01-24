@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,8 +99,6 @@ public final class RpcServerTaskPool {
 
 			@Override
 			public void onFailure(Throwable throwable) {
-				Throwable ex = throwable.getCause();
-				String message = (ex != null) ? ex.getMessage() : throwable.getMessage();
 				/**
 				 * 定义回调异常,默认响应体
 				 * **/
@@ -107,7 +106,7 @@ public final class RpcServerTaskPool {
 				body.setSuccess(false);
 				body.setMessageId(requestBody.getMessageId());
 				body.setRpcMethod(rpcMethod);
-				body.setMessage("RPC 服务调用失败,message:[" + message + "]");
+				body.setMessage("RPC 服务调用失败,message:[" + ExceptionUtils.getRootCauseMessage(throwable) + "]");
 				
 				call.invoke(body);
 			}

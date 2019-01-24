@@ -1,6 +1,7 @@
 package raptor.core.client.handler;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -123,9 +124,14 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcpId: " + this.getTcpId() + ", serverNode: " + this.serverNode);
 			return;
 		}
-		LOGGER.info("RPC客户端收到响应: " + responseBody);
-		responseBody.setResponseTime(new DateTime());	
-		RpcClientTaskPool.addTask(responseBody); 
+		
+		//备注:客户端超时处理后,对于延迟到达的服务器响应不予处理.
+		Map<String, RpcRequestBody> requestPool = RpcClientTaskPool.listMapPool();  
+		if (requestPool.get(responseBody.getMessageId()) != null) {
+			LOGGER.info("RPC客户端收到响应: " + responseBody);
+			responseBody.setResponseTime(new DateTime());	
+			RpcClientTaskPool.addTask(responseBody); 
+		}
 	}
 
 	@Override
