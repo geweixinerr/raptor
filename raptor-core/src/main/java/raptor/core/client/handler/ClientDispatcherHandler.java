@@ -121,7 +121,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody responseBody) throws Exception {
 		if (responseBody.getRpcMethod().equals(HEARTBEAT_METHOD)) {
-			LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcpId: " + this.getTcpId() + ", serverNode: " + this.serverNode);
+			LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcpId: " + getTcpId() + ", serverNode: " + serverNode);
 			return;
 		}
 		
@@ -137,7 +137,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		String message = StringUtil.getErrorText(cause);
-		LOGGER.error("RPC IO异常,tcpId: "+this.getTcpId()+ ", serverNode: " + this.serverNode + ", message: " + message);
+		LOGGER.error("RPC IO异常,tcpId: "+ getTcpId() + ", serverNode: " + serverNode + ", message: " + message);
 		pool.invalidateObject(this);
 	}
 
@@ -146,15 +146,26 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		Channel channel = ctx.channel();
 		InetSocketAddress local = (InetSocketAddress) channel.localAddress();
 		InetSocketAddress remote = (InetSocketAddress) channel.remoteAddress();
-		
-		LOGGER.warn("[重要!!!]心跳检测...,tcpId: " + this.getTcpId() + ", 客户端: " + local.getAddress() + ":" + local.getPort()
-				+", 服务器: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + this.serverNode 
-				+ ", active: " + this.pool.getNumActive() +", Idle: " + this.pool.getNumIdle());
-		
+				
 		RpcRequestBody requestBody = new RpcRequestBody();
 		requestBody.setMessageId(new UUID().toString());
 		requestBody.setRpcMethod(HEARTBEAT_METHOD);
-		requestBody.setBody(new String[] {this.getTcpId()});
-		ctx.writeAndFlush(requestBody);
+		requestBody.setBody(new String[] {getTcpId()});
+		ChannelFuture future = ctx.writeAndFlush(requestBody);
+		future.addListener(new ChannelFutureListener() {
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				StringBuilder state = new StringBuilder();
+				if (future.isSuccess()) {
+					state.append("SUCCESS");
+				} else {
+					state.append("FAIL");
+				}
+				
+				LOGGER.warn("[重要!!!]心跳检测,发送" + state.toString() + ", tcpId: " + getTcpId() + ", 客户端: " + local.getAddress() + ":" + local.getPort()
+				+", 服务器: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + serverNode 
+				+ ", active: " + pool.getNumActive() +", Idle: " + pool.getNumIdle());
+			}
+		});
 	}
 }
