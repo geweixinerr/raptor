@@ -131,6 +131,8 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			LOGGER.info("RPC客户端收到响应: " + responseBody);
 			responseBody.setResponseTime(new DateTime());	
 			RpcClientTaskPool.addTask(responseBody); 
+		} else {
+			LOGGER.warn("[重要!!!]RPC客户端收到延迟响应: " + responseBody);
 		}
 	}
 

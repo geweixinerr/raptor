@@ -1,7 +1,7 @@
 package raptor.log;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jboss.logging.MDC;
+import org.slf4j.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
