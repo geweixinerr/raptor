@@ -2,6 +2,7 @@ package raptor.core.client.handler;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -35,13 +36,17 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClientDispatcherHandler.class);
 	
-	private final ObjectPool<RpcPushDefine> pool;
+	private static final Integer DEFAULT_HEARTBEAT_COUNT = 5;
 	
-	private ChannelHandlerContext ctx;
+	private final AtomicInteger heartbeatCount = new AtomicInteger();
+	
+	private final ObjectPool<RpcPushDefine> pool;
 	
 	private final String tcpId; 
 	
 	private final String serverNode;
+	
+	private ChannelHandlerContext ctx;
 	
 	public ClientDispatcherHandler(String tcpId, String serverNode) {
 		this.tcpId = tcpId;
@@ -114,6 +119,11 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	}
 
 	@Override
+	public void returnClean() {
+		heartbeatCount.set(0);
+	}
+	
+	@Override
 	public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
 		this.ctx = ctx;
 	}
@@ -121,6 +131,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody responseBody) throws Exception {
 		if (responseBody.getRpcMethod().equals(HEARTBEAT_METHOD)) {
+			heartbeatCount.decrementAndGet();
 			LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcpId: " + getTcpId() + ", serverNode: " + serverNode);
 			return;
 		}
@@ -145,10 +156,20 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 
 	@Override
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+		heartbeatCount.incrementAndGet();
+		
 		Channel channel = ctx.channel();
 		InetSocketAddress local = (InetSocketAddress) channel.localAddress();
 		InetSocketAddress remote = (InetSocketAddress) channel.remoteAddress();
-				
+		
+		if (heartbeatCount.intValue() >= DEFAULT_HEARTBEAT_COUNT) {
+			LOGGER.warn("[重要!!!]心跳检测无响应, tcpId: " + getTcpId() + ", 客户端: " + local.getAddress() + ":" + local.getPort()
+			+", 服务器: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + serverNode 
+			+ ", active: " + pool.getNumActive() +", Idle: " + pool.getNumIdle());
+			pool.invalidateObject(this);
+			return;
+		}
+		
 		RpcRequestBody requestBody = new RpcRequestBody();
 		requestBody.setMessageId(new UUID().toString());
 		requestBody.setRpcMethod(HEARTBEAT_METHOD);
@@ -169,5 +190,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 				+ ", active: " + pool.getNumActive() +", Idle: " + pool.getNumIdle());
 			}
 		});
+		
 	}
+	
 }

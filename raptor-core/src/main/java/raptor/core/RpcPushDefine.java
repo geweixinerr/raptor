@@ -40,6 +40,11 @@ public interface RpcPushDefine {
 	ObjectPool<RpcPushDefine> getRpcPoolObject();
 	
 	/**
+	 * @author gewx return pool clean
+	 * **/
+	void returnClean();
+	
+	/**
 	 * @author gewx 心跳检测包方法名
 	 * **/
 	String HEARTBEAT_METHOD = "heartbeat";

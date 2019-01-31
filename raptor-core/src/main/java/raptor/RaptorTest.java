@@ -44,8 +44,7 @@ public final class RaptorTest {
 		config.put("port", "8090"); //端口号
 		config.put("maxclients", "32"); //最大TCP连接数
 		config.put("minclients", "6"); //最小TCP连接数
-		config.put("speedNum", "1024"); //最大单条TCP速率[在途事务数]
-		
+				
 		clientConfig.add(config);
 		
 		RpcParameter.INSTANCE.initRpcParameter(clientConfig);		
