@@ -131,7 +131,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody responseBody) throws Exception {
 		if (responseBody.getRpcMethod().equals(HEARTBEAT_METHOD)) {
-			heartbeatCount.decrementAndGet();
+			heartbeatCount.set(0);
 			LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcpId: " + getTcpId() + ", serverNode: " + serverNode);
 			return;
 		}
