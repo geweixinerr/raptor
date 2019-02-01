@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import raptor.core.AbstractCallBack;
 import raptor.core.client.NettyTestData;
 import raptor.core.message.RpcResponseBody;
+import raptor.exception.RpcException;
 
 /**
  * Servlet implementation class PushMessageServlet
@@ -53,12 +54,17 @@ public class PushMessageServlet extends HttpServlet {
 		@SuppressWarnings("rawtypes")
 		RaptorRpc rpc = new RaptorRpc();
 
-		rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
-			@Override
-			public void invoke(RpcResponseBody responseBody) {
-			//	System.out.println("请求结果: " + responseBody);
-			}
-		}, 5, data, message);
+		try {
+			rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
+				@Override
+				public void invoke(RpcResponseBody responseBody) {
+				//	System.out.println("请求结果: " + responseBody);
+				}
+			}, 5, data, message);
+		} catch (RpcException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		response.getWriter().write("RPC execute ok!");
 	}
