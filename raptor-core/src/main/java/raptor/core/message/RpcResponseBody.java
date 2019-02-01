@@ -31,11 +31,6 @@ public final class RpcResponseBody implements RpcMessage {
 	private Object body;
 	
 	/**
-	 * 执行标记
-	 * **/
-	private Boolean success;
-	
-	/**
 	 * 服务器执行方法名
 	 * **/
 	private String rpcMethod;
@@ -43,7 +38,7 @@ public final class RpcResponseBody implements RpcMessage {
 	/**
 	 * RPC响应码
 	 * **/
-	private transient RpcResult rpcCode;
+	private RpcResult rpcCode;
 	
 	
 	/**
@@ -75,14 +70,6 @@ public final class RpcResponseBody implements RpcMessage {
 		this.body = body;
 	}
 
-	public Boolean getSuccess() {
-		return success;
-	}
-
-	public void setSuccess(Boolean success) {
-		this.success = success;
-	}
-
 	public RpcResult getRpcCode() {
 		return rpcCode;
 	}
@@ -111,7 +98,6 @@ public final class RpcResponseBody implements RpcMessage {
 	public String toString() {
 		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE);
 		builder.append("messageId",messageId);
-		builder.append("success",success);
 		builder.append("message",message);
 		builder.append("body",body);
 		if (this.rpcCode != null) {

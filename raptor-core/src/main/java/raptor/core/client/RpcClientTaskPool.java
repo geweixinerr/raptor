@@ -66,7 +66,6 @@ public final class RpcClientTaskPool {
 				
 				//sync
 				if (requestBody.isSync()) {
-					responseBody.setRpcCode(RpcResult.SUCCESS);			
 					requestBody.getCall().invoke(responseBody);
 					return;
 				}
@@ -74,12 +73,10 @@ public final class RpcClientTaskPool {
 				//async				
 				if (thisDate.compareTo(requestBody.getTimeOut()) <= 0) {
 					if (!requestBody.isMessageSend()) { //是否已发送,并发串行化校验.
-						responseBody.setRpcCode(RpcResult.SUCCESS);			
 						requestBody.getCall().invoke(responseBody);
 					}
 				} else {
 					//重写响应response对象[此刻无论响应处理是否成功,但凡客户端调用超时,则认为业务端调用失败!].
-					responseBody.setSuccess(false);
 					responseBody.setMessage("RPC 服务调用超时,message:timeOut");
 					responseBody.setRpcCode(RpcResult.TIME_OUT);
 					requestBody.getCall().invoke(responseBody);

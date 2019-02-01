@@ -66,7 +66,6 @@ public final class RpcClientTimeOutScan {
 							
 							if (!requestBody.isMessageSend()) {
 								RpcResponseBody responseBody = new RpcResponseBody();
-								responseBody.setSuccess(false);
 								responseBody.setMessageId(requestBody.getMessageId());
 								responseBody.setMessage("RPC 服务调用超时,message:timeOut");
 								responseBody.setRpcCode(RpcResult.SCAN_TIME_OUT);

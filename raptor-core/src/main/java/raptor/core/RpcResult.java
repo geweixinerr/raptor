@@ -6,7 +6,8 @@ package raptor.core;
 public enum RpcResult {
 
 	FLOWER_CONTROL("流控"),
-	SUCCESS("成功"),
+	SUCCESS("RPC成功"),
+	FAIL("失败"),
 	FAIL_NETWORK_CONNECTION("网络初始化连接失败"),
 	FAIL_NETWORK_TRANSPORT("网络传输失败"),
 	ERROR("其它异常"), 

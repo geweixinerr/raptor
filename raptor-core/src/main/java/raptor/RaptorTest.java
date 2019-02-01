@@ -12,6 +12,7 @@ import org.springframework.util.ResourceUtils;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.ext.spring.LogbackConfigurer;
 import raptor.core.AbstractCallBack;
+import raptor.core.RpcResult;
 import raptor.core.client.RpcClient;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.client.task.RpcClientTimeOutScan;
@@ -60,7 +61,8 @@ public final class RaptorTest {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void main(String[] args) {
+	public static void main(String[] args) throws RpcException {
+		final String methodName = "testMethod";
 		// 组装发送消息
 		String message = "Netty RPC Send, Netty is VeryGood!";
 		//NettyTestData data = new NettyTestData();
@@ -71,6 +73,7 @@ public final class RaptorTest {
 		@SuppressWarnings("rawtypes")
 		RaptorRpc rpc = new RaptorRpc();
 		
+		System.out.println("RPC调用开始===================================>");
 		//异步
 		/*
 		rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
@@ -83,16 +86,32 @@ public final class RaptorTest {
 		*/
 		
 		//同步
-		LOGGER.enter("queryFinalResult","服务身份证信息查询[start]");
+		LOGGER.enter(methodName, "服务身份证信息查询[start]");
 		long start = System.currentTimeMillis();
 	    RpcResponseBody response = null;
 		try {
 			response = rpc.sendSyncMessage("mc", "LoginAuth", mapMessage, message);
+			if (response.getRpcCode().equals(RpcResult.SUCCESS)) {
+				LOGGER.info(methodName, "服务调用SUCCESS~");
+			} else if (response.getRpcCode().equals(RpcResult.FAIL)) {
+				LOGGER.warn(methodName, "服务端业务调用异常~");
+			} else if (response.getRpcCode().equals(RpcResult.TIME_OUT) || response.getRpcCode().equals(RpcResult.SCAN_TIME_OUT)) {
+				LOGGER.warn(methodName, "RPC调用超时~");
+			} else {
+				LOGGER.warn(methodName, "服务调用异常, rpcCode: " + response.getRpcCode());
+			}
 		} catch (RpcException e) {
-	 
+			if (RpcResult.FAIL_NETWORK_CONNECTION.equals(e.getRpcCode())) {
+				LOGGER.error(methodName, "网络连接异常, message: " + e.getMessage());
+			} else if (RpcResult.FAIL_NETWORK_TRANSPORT.equals(e.getRpcCode())) {
+				LOGGER.error(methodName, "数据传输异常, message: " + e.getMessage());
+			} else {
+				LOGGER.error(methodName, "其它异常, message: " + e.getMessage());
+			}
 		}
+		
 		long end = System.currentTimeMillis();
-		LOGGER.exit("queryFinalResult","服务身份证信息查询[end],result : " + response +", 耗时: " + (end- start));
+		LOGGER.exit(methodName, "服务身份证信息查询[end],result : " + response +", 耗时: " + (end- start));
 	}
 
 }

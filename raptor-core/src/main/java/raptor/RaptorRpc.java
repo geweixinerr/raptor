@@ -62,8 +62,13 @@ public final class RaptorRpc<T extends Serializable> {
 				}
 			}
 		} catch (Exception e) {
-			String message = StringUtil.getErrorText(e);
-			throw new RpcException("RPC 连接池获取对象失败,serverNode : " + serverNode + ", message: " + message, RpcResult.ERROR);
+			if (e instanceof RpcException) {
+				RpcException rpcEx = (RpcException) e;
+				throw rpcEx;
+			} else {
+				String message = StringUtil.getErrorText(e);
+				throw new RpcException("RPC 连接池获取对象失败,serverNode : " + serverNode + ", message: " + message, RpcResult.ERROR);
+			}
 		}
 		
 		BlockingQueue<RpcResponseBody> blockQueue = new LinkedBlockingQueue<RpcResponseBody>(1);
@@ -95,8 +100,7 @@ public final class RaptorRpc<T extends Serializable> {
 				result.setRpcCode(RpcResult.TIME_OUT);
 				result.setMessage("服务调用超时.");
 				result.setMessageId(uuid);
-				result.setRpcMethod(rpcMethodName);
-				result.setSuccess(false);
+				result.setRpcMethod(rpcMethodName);				
 			}
 			return result;
 		} catch (InterruptedException e) {
@@ -144,8 +148,13 @@ public final class RaptorRpc<T extends Serializable> {
 				}
 			}
 		} catch (Exception e) {
-			String message = StringUtil.getErrorText(e);
-			throw new RpcException("RPC 连接池获取对象失败,serverNode : " + serverNode + ", message: " + message, RpcResult.ERROR);
+			if (e instanceof RpcException) {
+				RpcException rpcEx = (RpcException) e;
+				throw rpcEx;
+			} else {
+				String message = StringUtil.getErrorText(e);
+				throw new RpcException("RPC 连接池获取对象失败,serverNode : " + serverNode + ", message: " + message, RpcResult.ERROR);
+			}
 		}
 		
 		String uuid = new UUID().toString();
