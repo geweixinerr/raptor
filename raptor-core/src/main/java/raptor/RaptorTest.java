@@ -74,7 +74,7 @@ public final class RaptorTest {
 		@SuppressWarnings("rawtypes")
 		RaptorRpc rpc = new RaptorRpc();
 		
-		System.out.println("RPC异步调用开始===================================>");
+		System.out.println("RPC调用开始===================================>");
 		//异步
 		try {
 			rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
@@ -101,7 +101,6 @@ public final class RaptorTest {
 			}
 		}
 		
-		System.out.println("RPC同步调用开始===================================>");
 		//同步
 		LOGGER.enter(methodName, "服务身份证信息查询[start]");
 		long start = System.currentTimeMillis();
