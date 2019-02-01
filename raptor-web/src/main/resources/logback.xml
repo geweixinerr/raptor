@@ -35,7 +35,7 @@
 	<appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
 		<!-- 不丢失日志.默认的. 如果discardingThreshold大于0,队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
 		<discardingThreshold>0</discardingThreshold>
-		<queueSize>1024</queueSize>
+		<queueSize>10240</queueSize>
 		<immediateFlush>false</immediateFlush>
 		<appender-ref ref="FILE" />
 	</appender>
