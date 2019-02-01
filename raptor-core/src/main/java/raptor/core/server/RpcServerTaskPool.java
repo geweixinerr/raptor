@@ -7,8 +7,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
@@ -29,7 +27,7 @@ import raptor.log.RaptorLogger;
 
 public final class RpcServerTaskPool {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RpcServerTaskPool.class);
+	private static final RaptorLogger LOGGER = new RaptorLogger(RpcServerTaskPool.class);
 
 	private static final ThreadPoolTaskExecutor POOLTASKEXECUTOR = new ThreadPoolTaskExecutor();
 
@@ -63,19 +61,20 @@ public final class RpcServerTaskPool {
 	 * @return void
 	 **/
 	public static void addTask(RpcRequestBody requestBody, AbstractCallBack call) {
-		final String rpcMethod = requestBody.getRpcMethod();
+	    String rpcMethod = requestBody.getRpcMethod();
+	    String threadId = requestBody.getThreadId();
 		ListenableFuture<RpcResponseBody> future = POOLTASKEXECUTOR
 				.submitListenable(new Callable<RpcResponseBody>() {
 					@Override
 					public RpcResponseBody call() throws Exception {
+						RaptorLogger.THREAD_ID.set(requestBody.getThreadId());
+
 						LOGGER.info("RPC服务端收到请求信息: " + requestBody);		
 						
 						RpcHandlerObject handler = RPC_MAPPING.get(rpcMethod);
 						if (handler == null) {
 							throw new RpcException("RPC参数缺失,RpcMethod is null !", RpcResult.ERROR);
 						}
-						
-						RaptorLogger.THREAD_ID.set(requestBody.getThreadId());
 						
 						Object result = null;
 						Object [] objArray = requestBody.getBody();
@@ -88,6 +87,7 @@ public final class RpcServerTaskPool {
 						RpcResponseBody body = new RpcResponseBody();
 						body.setRpcCode(RpcResult.SUCCESS);
 						body.setMessageId(requestBody.getMessageId());
+						body.setThreadId(threadId);
 						body.setRpcMethod(rpcMethod);
 						body.setBody(result);
 						body.setMessage("RPC调用成功!");
@@ -104,14 +104,19 @@ public final class RpcServerTaskPool {
 
 			@Override
 			public void onFailure(Throwable throwable) {
+				String methodName = "onFailure";
+				String message = "RPC 服务调用失败,message:[" + ExceptionUtils.getRootCauseMessage(throwable) + "]";
+				LOGGER.warn(methodName, message);	
+
 				/**
 				 * 定义回调异常,默认响应体
 				 * **/
 				RpcResponseBody body = new RpcResponseBody();
 				body.setRpcCode(RpcResult.FAIL);
 				body.setMessageId(requestBody.getMessageId());
+				body.setThreadId(threadId);
 				body.setRpcMethod(rpcMethod);
-				body.setMessage("RPC 服务调用失败,message:[" + ExceptionUtils.getRootCauseMessage(throwable) + "]");
+				body.setMessage(message);
 				
 				call.invoke(body);
 			}

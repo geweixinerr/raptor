@@ -5,14 +5,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import raptor.core.Constants;
 import raptor.core.RpcResult;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
+import raptor.log.RaptorLogger;
 
 /**
  * @author gewx RPC Client端业务线程池
@@ -20,8 +19,8 @@ import raptor.core.message.RpcResponseBody;
 
 public final class RpcClientTaskPool {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RpcClientTaskPool.class);
-	 
+	private static final RaptorLogger LOGGER = new RaptorLogger(RpcClientTaskPool.class);
+
 	private static final ThreadPoolTaskExecutor POOLTASKEXECUTOR = new ThreadPoolTaskExecutor();
 
 	private static final Map<String, RpcRequestBody> MESSAGEID_MAPPING = new ConcurrentHashMap<String, RpcRequestBody>(1024 * 10);
@@ -57,6 +56,8 @@ public final class RpcClientTaskPool {
 		POOLTASKEXECUTOR.execute(new Runnable() {
 			@Override
 			public void run() {
+				RaptorLogger.THREAD_ID.set(responseBody.getThreadId());
+
 				LOGGER.info("RPC客户端收到响应: " + responseBody);
 				
 				RpcRequestBody requestBody = MESSAGEID_MAPPING.remove(responseBody.getMessageId());

@@ -40,12 +40,24 @@ public final class RpcResponseBody implements RpcMessage {
 	 * **/
 	private RpcResult rpcCode;
 	
+	/**
+	 * 线程号-分布式日志采集
+	 * **/
+	private String threadId;
 	
 	/**
 	 * 服务器响应到达客户端时间.(仅测试使用)
 	 * **/
-	private  transient DateTime responseTime; 
-	
+	private transient DateTime responseTime; 
+
+	public String getThreadId() {
+		return threadId;
+	}
+
+	public void setThreadId(String threadId) {
+		this.threadId = threadId;
+	}
+
 	public String getMessage() {
 		return message;
 	}
