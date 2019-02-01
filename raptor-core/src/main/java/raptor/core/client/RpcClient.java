@@ -141,7 +141,7 @@ public final class RpcClient {
 
 	    	RPC_OBJECT_POOL.put(en.get(SERVER_NODE), pool);
 	    		    	
-	        LOGGER.info("初始化客户端:" + en.get(SERVER_NODE) +", tcp连接池最小连接数: " + minclients);
+	        LOGGER.info("初始化客户端:" + en.get(SERVER_NODE) + ", tcp连接池最小连接数: " + minclients);
 	    	int num = Integer.parseInt(minclients);	    	
 	    	for (int i = 0; i < num; i++) {
 				pool.addObject();
