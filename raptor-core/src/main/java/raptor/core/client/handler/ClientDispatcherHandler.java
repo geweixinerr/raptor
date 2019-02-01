@@ -90,16 +90,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	
 	@Override
 	public void close() {
-		RpcPushDefine rpc = this;
-		ChannelFuture future = ctx.close();
-		future.addListener(new ChannelFutureListener() {
-			@Override
-			public void operationComplete(ChannelFuture future) throws Exception {
-				if (!future.isSuccess()) {
-					LOGGER.warn("tcp连接关闭失败,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + StringUtil.getErrorText(future.cause()));
-				}
-			}
-		});
+		ctx.close();
 	}
 
 	@Override
