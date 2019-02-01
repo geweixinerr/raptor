@@ -104,9 +104,8 @@ public final class RpcServerTaskPool {
 
 			@Override
 			public void onFailure(Throwable throwable) {
-				String methodName = "onFailure";
 				String message = "RPC 服务调用失败,message:[" + ExceptionUtils.getRootCauseMessage(throwable) + "]";
-				LOGGER.warn(methodName, message);	
+				LOGGER.warn(rpcMethod, message);	
 
 				/**
 				 * 定义回调异常,默认响应体

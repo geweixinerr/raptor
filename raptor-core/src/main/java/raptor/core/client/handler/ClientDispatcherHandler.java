@@ -79,7 +79,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 						pool.invalidateObject(rpc);
 					}
  				} else {
- 					outboundException(requestBody.getMessageId(), "Rpc出站Fail.", RpcResult.FAIL_NETWORK_TRANSPORT);
+ 					outboundException(requestBody.getMessageId(), requestBody.getThreadId(), "Rpc出站Fail.", RpcResult.FAIL_NETWORK_TRANSPORT);
 					String message = StringUtil.getErrorText(future.cause()); 
 					LOGGER.warn("RPC客户端数据出站FAIL: " + requestBody + ", tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);	
  					pool.invalidateObject(rpc);
@@ -175,11 +175,12 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		
 	}
 	
-	private static void outboundException(String messageId, String message, RpcResult rpcCode) {
+	private static void outboundException(String messageId, String threadId, String message, RpcResult rpcCode) {
 		RpcResponseBody responseBody = new RpcResponseBody();
 		responseBody.setRpcCode(rpcCode);
 		responseBody.setMessage(message);
 		responseBody.setMessageId(messageId);
+		responseBody.setThreadId(threadId);
 		responseBody.setResponseTime(new DateTime());	
 		RpcClientTaskPool.addTask(responseBody); 
 	}
