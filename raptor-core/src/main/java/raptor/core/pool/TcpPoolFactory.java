@@ -3,7 +3,6 @@ package raptor.core.pool;
 import java.net.InetSocketAddress;
 
 import org.apache.commons.pool2.BasePooledObjectFactory;
-import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.slf4j.Logger;
@@ -78,14 +77,14 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 
 	@Override
 	public void passivateObject(PooledObject<RpcPushDefine> pooledObject) {
-		LOGGER.info("资源入池,tcpId: " + pooledObject.getObject().getTcpId());
+		//LOGGER.info("资源入池,tcpId: " + pooledObject.getObject().getTcpId());
 		pooledObject.getObject().returnClean();
 	}
 
 	@Override
 	public void destroyObject(PooledObject<RpcPushDefine> pooledObject) throws Exception {
-		ObjectPool<RpcPushDefine> pool = pooledObject.getObject().getRpcPoolObject();
-		LOGGER.info("资源销毁,tcpId: " + pooledObject.getObject().getTcpId() + ", active: " + pool.getNumActive() + ", Idle: " + pool.getNumIdle());
+		//ObjectPool<RpcPushDefine> pool = pooledObject.getObject().getRpcPoolObject();
+		//LOGGER.info("资源销毁,tcpId: " + pooledObject.getObject().getTcpId() + ", active: " + pool.getNumActive() + ", Idle: " + pool.getNumIdle());
 		pooledObject.getObject().close();
 	}
 	
