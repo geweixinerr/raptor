@@ -62,7 +62,7 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 				} else {
 					String message = StringUtil.getErrorText(future.cause());
 					LOGGER.warn("tcp连接建立初始化异常-0,serverNode: " + serverNode + ", message: " + message);
-					throw new RpcException("tcp连接建立初始化异常-0,serverNode: " + serverNode + ", message: " + message, RpcResult.FAIL_NETWORK_TRANSPORT);
+					throw new RpcException("tcp连接建立初始化异常-0,serverNode: " + serverNode + ", message: " + message, RpcResult.FAIL_NETWORK_CONNECTION);
 				}
 			}
 		});

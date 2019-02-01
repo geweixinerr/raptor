@@ -100,7 +100,6 @@ public final class RaptorRpc<T extends Serializable> {
 				result.setRpcCode(RpcResult.TIME_OUT);
 				result.setMessage("服务调用超时.");
 				result.setMessageId(uuid);
-				result.setRpcMethod(rpcMethodName);				
 			}
 			return result;
 		} catch (InterruptedException e) {

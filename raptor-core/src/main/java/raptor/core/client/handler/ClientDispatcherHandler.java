@@ -20,6 +20,7 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import raptor.core.RpcPushDefine;
+import raptor.core.RpcResult;
 import raptor.core.client.RpcClient;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
@@ -80,8 +81,9 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 						pool.invalidateObject(rpc);
 					}
  				} else {
+ 					outboundHandException(requestBody.getMessageId(), "Rpc出站Fail.", RpcResult.FAIL_NETWORK_TRANSPORT);
 					String message = StringUtil.getErrorText(future.cause()); 
-					LOGGER.warn("RPC客户端数据出站FAIL: " + requestBody + ", tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);					
+					LOGGER.warn("RPC客户端数据出站FAIL: " + requestBody + ", tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);	
  					pool.invalidateObject(rpc);
 				}
 			}
@@ -190,6 +192,15 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			}
 		});
 		
+	}
+	
+	private static void outboundHandException(String messageId, String message, RpcResult rpcCode) {
+		RpcResponseBody responseBody = new RpcResponseBody();
+		responseBody.setRpcCode(rpcCode);
+		responseBody.setMessage(message);
+		responseBody.setMessageId(messageId);
+		responseBody.setResponseTime(new DateTime());	
+		RpcClientTaskPool.addTask(responseBody); 
 	}
 	
 }

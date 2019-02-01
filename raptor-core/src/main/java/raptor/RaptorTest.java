@@ -97,14 +97,14 @@ public final class RaptorTest {
 				LOGGER.warn(methodName, "服务端业务调用异常~");
 			} else if (response.getRpcCode().equals(RpcResult.TIME_OUT) || response.getRpcCode().equals(RpcResult.SCAN_TIME_OUT)) {
 				LOGGER.warn(methodName, "RPC调用超时~");
+			} else if (RpcResult.FAIL_NETWORK_TRANSPORT.equals(response.getRpcCode())) {
+				LOGGER.error(methodName, "数据传输异常, rpcCode: " + response.getRpcCode());
 			} else {
 				LOGGER.warn(methodName, "服务调用异常, rpcCode: " + response.getRpcCode());
 			}
 		} catch (RpcException e) {
 			if (RpcResult.FAIL_NETWORK_CONNECTION.equals(e.getRpcCode())) {
 				LOGGER.error(methodName, "网络连接异常, message: " + e.getMessage());
-			} else if (RpcResult.FAIL_NETWORK_TRANSPORT.equals(e.getRpcCode())) {
-				LOGGER.error(methodName, "数据传输异常, message: " + e.getMessage());
 			} else {
 				LOGGER.error(methodName, "其它异常, message: " + e.getMessage());
 			}
