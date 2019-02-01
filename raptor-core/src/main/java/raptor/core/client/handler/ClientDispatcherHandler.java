@@ -24,7 +24,6 @@ import raptor.core.client.RpcClient;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
-import raptor.exception.RpcException;
 import raptor.util.StringUtil;
 
 /**
@@ -76,13 +75,9 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 					try {
 						pool.returnObject(rpc);
 					} catch (Exception e) {
-						try {
-							String message = StringUtil.getErrorText(e);
-							LOGGER.error("资源释放异常,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);
-							throw new RpcException("资源释放异常,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);
-						} finally {
-							pool.invalidateObject(rpc);
-						}
+						String message = StringUtil.getErrorText(e);
+						LOGGER.error("资源释放异常,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);
+						pool.invalidateObject(rpc);
 					}
  				} else {
 					String message = StringUtil.getErrorText(future.cause()); 
