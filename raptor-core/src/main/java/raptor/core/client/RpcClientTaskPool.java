@@ -2,6 +2,7 @@ package raptor.core.client;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -39,6 +40,7 @@ public final class RpcClientTaskPool {
 		POOLTASKEXECUTOR.setMaxPoolSize(Constants.CPU_CORE * 4); // 最大线程数.
 		POOLTASKEXECUTOR.setKeepAliveSeconds(60 * 5); //线程最大空闲时间5分钟可回收,默认60秒.
 		POOLTASKEXECUTOR.setThreadNamePrefix("TASK_RPC_CLIENT_"); // 线程名前缀.
+		POOLTASKEXECUTOR.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy()); //discard
 		POOLTASKEXECUTOR.initialize();
 
 		// 启动全部核心线程,避免线程在服务运行期间NEW,继而导致系统吞吐能力抖动.
