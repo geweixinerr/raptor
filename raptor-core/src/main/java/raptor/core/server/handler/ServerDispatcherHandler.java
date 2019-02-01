@@ -22,7 +22,6 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcRequestBody msg) throws Exception {
-		LOGGER.info("RPC服务端收到请求信息: " + msg);		
 		RpcServerTaskPool.addTask(msg, new AbstractCallBack() {
 			@Override
 			public void invoke(RpcResponseBody responseBody) {
@@ -30,9 +29,7 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 				future.addListener(new ChannelFutureListener() {
 					@Override
 					public void operationComplete(ChannelFuture future) throws Exception {
-						if (future.isSuccess()) {
-							LOGGER.info("RPC服务端数据出站SUCCESS: " + responseBody);					
-						} else {
+						if (!future.isSuccess()) {
 							String message = StringUtil.getErrorText(future.cause());
 							LOGGER.warn("RPC服务端数据出站FAIL: " + responseBody + ", message: " + message);	
 						}

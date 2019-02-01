@@ -1,7 +1,6 @@
 package raptor.core.client.handler;
 
 import java.net.InetSocketAddress;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.concurrent.ThreadSafe;
@@ -72,7 +71,6 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 				if (future.isSuccess()) {
-					LOGGER.info("RPC客户端数据出站SUCCESS: " + requestBody);					
 					try {
 						pool.returnObject(rpc);
 					} catch (Exception e) {
@@ -97,10 +95,8 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		future.addListener(new ChannelFutureListener() {
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
-				if (future.isSuccess()) {
-					LOGGER.info("tcp连接关闭成功,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode);
-				} else {
-					LOGGER.error("tcp连接关闭失败,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + StringUtil.getErrorText(future.cause()));
+				if (!future.isSuccess()) {
+					LOGGER.warn("tcp连接关闭失败,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + StringUtil.getErrorText(future.cause()));
 				}
 			}
 		});
@@ -136,16 +132,10 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcpId: " + getTcpId() + ", serverNode: " + serverNode);
 			return;
 		}
+
+		responseBody.setResponseTime(new DateTime());	
+		RpcClientTaskPool.addTask(responseBody); 
 		
-		//备注:客户端超时处理后,对于延迟到达的服务器响应不予处理.
-		Map<String, RpcRequestBody> requestPool = RpcClientTaskPool.listMapPool();  
-		if (requestPool.get(responseBody.getMessageId()) != null) {
-			LOGGER.info("RPC客户端收到响应: " + responseBody);
-			responseBody.setResponseTime(new DateTime());	
-			RpcClientTaskPool.addTask(responseBody); 
-		} else {
-			LOGGER.warn("[重要!!!]RPC客户端收到延迟响应: " + responseBody);
-		}
 	}
 
 	@Override

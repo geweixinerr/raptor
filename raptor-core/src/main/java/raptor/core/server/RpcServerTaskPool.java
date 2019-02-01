@@ -68,6 +68,8 @@ public final class RpcServerTaskPool {
 				.submitListenable(new Callable<RpcResponseBody>() {
 					@Override
 					public RpcResponseBody call() throws Exception {
+						LOGGER.info("RPC服务端收到请求信息: " + requestBody);		
+						
 						RpcHandlerObject handler = RPC_MAPPING.get(rpcMethod);
 						if (handler == null) {
 							throw new RpcException("RPC参数缺失,RpcMethod is null !", RpcResult.ERROR);

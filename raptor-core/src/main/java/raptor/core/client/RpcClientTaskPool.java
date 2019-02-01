@@ -57,11 +57,13 @@ public final class RpcClientTaskPool {
 		POOLTASKEXECUTOR.execute(new Runnable() {
 			@Override
 			public void run() {
+				LOGGER.info("RPC客户端收到响应: " + responseBody);
+				
 				RpcRequestBody requestBody = MESSAGEID_MAPPING.remove(responseBody.getMessageId());
 				if (requestBody == null) {
 					return;
 				}
-				
+
 				DateTime thisDate = new DateTime();
 				requestBody.setClientTime(responseBody.getResponseTime()); 
 				requestBody.setResponseTime(thisDate);
