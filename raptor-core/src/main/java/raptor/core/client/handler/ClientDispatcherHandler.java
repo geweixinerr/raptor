@@ -66,7 +66,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 
 	@Override
 	public void pushMessage(RpcRequestBody requestBody) {
-		RpcPushDefine rpcObject = this;
+		RpcPushDefine rpc = this;
 		ChannelFuture future = ctx.writeAndFlush(requestBody);
 		future.addListener(new ChannelFutureListener() {
 			@Override
@@ -74,16 +74,20 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 				if (future.isSuccess()) {
 					LOGGER.info("RPC客户端数据出站SUCCESS: " + requestBody);					
 					try {
-						pool.returnObject(rpcObject);
+						pool.returnObject(rpc);
 					} catch (Exception e) {
-						String message = StringUtil.getErrorText(e);
-						LOGGER.error("资源释放异常,tcpId: " + rpcObject.getTcpId() + ", serverNode: " + serverNode +", message: " + message);
-						throw new RpcException("资源释放异常,tcpId: " + rpcObject.getTcpId() + ", serverNode: " + serverNode +", message: " + message);
+						try {
+							String message = StringUtil.getErrorText(e);
+							LOGGER.error("资源释放异常,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode +", message: " + message);
+							throw new RpcException("资源释放异常,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode +", message: " + message);
+						} finally {
+							pool.invalidateObject(rpc);
+						}
 					}
  				} else {
 					String message = StringUtil.getErrorText(future.cause());
-					LOGGER.warn("RPC客户端数据出站FAIL: " + requestBody +", tcpId: " + rpcObject.getTcpId() + ", serverNode: " + serverNode +", message: " + message);					
- 					pool.invalidateObject(rpcObject);
+					LOGGER.warn("RPC客户端数据出站FAIL: " + requestBody +", tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode +", message: " + message);					
+ 					pool.invalidateObject(rpc);
 				}
 			}
 		});
