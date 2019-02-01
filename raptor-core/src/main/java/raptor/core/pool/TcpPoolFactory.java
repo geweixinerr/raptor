@@ -14,6 +14,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import raptor.core.Constants;
 import raptor.core.RpcPushDefine;
+import raptor.core.RpcResult;
 import raptor.exception.RpcException;
 import raptor.util.StringUtil;
 
@@ -40,31 +41,32 @@ public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine>
 	}
 
 	@Override
-	public RpcPushDefine create() {
+	public RpcPushDefine create() throws RpcException {
 		ChannelFuture future = null;
 		try {
-			future = bootStrap.connect(this.remoteAddr,this.port).sync(); 
-			future.addListener(new ChannelFutureListener() {
-				@Override
-				public void operationComplete(ChannelFuture future) throws Exception {
-					if (future.isSuccess()) {
-						InetSocketAddress local = (InetSocketAddress) future.channel().localAddress();
-						InetSocketAddress remote = (InetSocketAddress) future.channel().remoteAddress();
-						LOGGER.info("客户端连接成功,localAddress: " + local.getAddress() + ":" + local.getPort()
-								+ ", remoteAddress: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + serverNode);
-					} else {
-						String message = StringUtil.getErrorText(future.cause());
-						LOGGER.warn("tcp连接建立初始化异常-0,serverNode: " + serverNode + ", message: " + message);
-						throw new RpcException("tcp连接建立初始化异常-0,serverNode: " + serverNode + ", message: " + message);
-					}
-				}
-			});
+			future = bootStrap.connect(this.remoteAddr,this.port).sync();
 		} catch (Exception e) {
 			String message = StringUtil.getErrorText(e);
 			LOGGER.error("tcp连接建立初始化异常-1,serverNode: " + serverNode + ", message: " + message);
-			throw new RpcException("tcp连接建立初始化异常-1,serverNode: " + serverNode + ", message: " + message);
+			throw new RpcException("tcp连接建立初始化异常-1,serverNode: " + serverNode + ", message: " + message, RpcResult.FAIL_NETWORK_CONNECTION);
 		}
-
+				
+		future.addListener(new ChannelFutureListener() {
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				if (future.isSuccess()) {
+					InetSocketAddress local = (InetSocketAddress) future.channel().localAddress();
+					InetSocketAddress remote = (InetSocketAddress) future.channel().remoteAddress();
+					LOGGER.info("客户端连接成功,localAddress: " + local.getAddress() + ":" + local.getPort()
+							+ ", remoteAddress: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + serverNode);
+				} else {
+					String message = StringUtil.getErrorText(future.cause());
+					LOGGER.warn("tcp连接建立初始化异常-0,serverNode: " + serverNode + ", message: " + message);
+					throw new RpcException("tcp连接建立初始化异常-0,serverNode: " + serverNode + ", message: " + message, RpcResult.FAIL_NETWORK_TRANSPORT);
+				}
+			}
+		});
+		
 		RpcPushDefine handler = (RpcPushDefine) future.channel().pipeline().get(Constants.CLIENT_DISPATCHER);
 		return handler;
 	}

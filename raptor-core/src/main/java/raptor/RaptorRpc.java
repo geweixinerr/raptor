@@ -50,7 +50,7 @@ public final class RaptorRpc<T extends Serializable> {
 		ObjectPool<RpcPushDefine> pool = RpcClient.getRpcPoolMapping().get(serverNode);
 
 		if (pool == null) {
-			throw new RpcException("RPC服务器映射不存在,请检查配置! serverNode : " + serverNode);
+			throw new RpcException("RPC服务器映射不存在,请检查配置! serverNode : " + serverNode, RpcResult.ERROR);
 		}
 		
 		RpcPushDefine rpc = null;
@@ -63,7 +63,7 @@ public final class RaptorRpc<T extends Serializable> {
 			}
 		} catch (Exception e) {
 			String message = StringUtil.getErrorText(e);
-			throw new RpcException("RPC 连接池获取对象失败,serverNode : " + serverNode + ", message: " + message);
+			throw new RpcException("RPC 连接池获取对象失败,serverNode : " + serverNode + ", message: " + message, RpcResult.ERROR);
 		}
 		
 		BlockingQueue<RpcResponseBody> blockQueue = new LinkedBlockingQueue<RpcResponseBody>(1);
@@ -101,7 +101,7 @@ public final class RaptorRpc<T extends Serializable> {
 			return result;
 		} catch (InterruptedException e) {
 			String message = StringUtil.getErrorText(e);
-			throw new RpcException("RPC调用异常,serverNode : " + serverNode + ", message: " + message);
+			throw new RpcException("RPC调用异常,serverNode : " + serverNode + ", message: " + message, RpcResult.ERROR);
 		}
 	}
 
@@ -132,7 +132,7 @@ public final class RaptorRpc<T extends Serializable> {
 		ObjectPool<RpcPushDefine> pool = RpcClient.getRpcPoolMapping().get(serverNode);
 
 		if (pool == null) {
-			throw new RpcException("RPC服务器映射不存在,请检查配置! serverNode : " + serverNode);
+			throw new RpcException("RPC服务器映射不存在,请检查配置! serverNode : " + serverNode, RpcResult.ERROR);
 		}
 		
 		RpcPushDefine rpc = null;
@@ -145,7 +145,7 @@ public final class RaptorRpc<T extends Serializable> {
 			}
 		} catch (Exception e) {
 			String message = StringUtil.getErrorText(e);
-			throw new RpcException("RPC 连接池获取对象失败,serverNode : " + serverNode + ", message: " + message);
+			throw new RpcException("RPC 连接池获取对象失败,serverNode : " + serverNode + ", message: " + message, RpcResult.ERROR);
 		}
 		
 		String uuid = new UUID().toString();

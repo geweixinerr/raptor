@@ -17,6 +17,7 @@ import raptor.core.client.RpcClientTaskPool;
 import raptor.core.client.task.RpcClientTimeOutScan;
 import raptor.core.init.RpcParameter;
 import raptor.core.message.RpcResponseBody;
+import raptor.exception.RpcException;
 import raptor.log.RaptorLogger;
 
 /**
@@ -71,6 +72,7 @@ public final class RaptorTest {
 		RaptorRpc rpc = new RaptorRpc();
 		
 		//异步
+		/*
 		rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
 			@Override
 			public void invoke(RpcResponseBody resp) {
@@ -78,11 +80,17 @@ public final class RaptorTest {
 			}
 			
 		}, 5, mapMessage, message);
+		*/
 		
 		//同步
 		LOGGER.enter("queryFinalResult","服务身份证信息查询[start]");
 		long start = System.currentTimeMillis();
-	    RpcResponseBody response = rpc.sendSyncMessage("mc", "LoginAuth", mapMessage, message);
+	    RpcResponseBody response = null;
+		try {
+			response = rpc.sendSyncMessage("mc", "LoginAuth", mapMessage, message);
+		} catch (RpcException e) {
+	 
+		}
 		long end = System.currentTimeMillis();
 		LOGGER.exit("queryFinalResult","服务身份证信息查询[end],result : " + response +", 耗时: " + (end- start));
 	}

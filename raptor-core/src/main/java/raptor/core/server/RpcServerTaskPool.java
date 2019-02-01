@@ -14,6 +14,7 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import raptor.core.AbstractCallBack;
 import raptor.core.Constants;
+import raptor.core.RpcResult;
 import raptor.core.init.RpcHandlerObject;
 import raptor.core.init.RpcMappingInit;
 import raptor.core.message.RpcRequestBody;
@@ -67,7 +68,7 @@ public final class RpcServerTaskPool {
 					public RpcResponseBody call() throws Exception {
 						RpcHandlerObject handler = RPC_MAPPING.get(rpcMethod);
 						if (handler == null) {
-							throw new RpcException("RPC参数缺失,RpcMethod is null !");
+							throw new RpcException("RPC参数缺失,RpcMethod is null !", RpcResult.ERROR);
 						}
 						
 						RaptorLogger.THREAD_ID.set(requestBody.getThreadId());
