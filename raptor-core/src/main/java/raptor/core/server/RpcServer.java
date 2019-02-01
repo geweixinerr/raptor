@@ -60,12 +60,12 @@ public final class RpcServer {
 			LOGGER.info("Linux系统下,RPC Server启动...");
 			// Linux Epoll
 			EventLoopGroup acceptGroup = new EpollEventLoopGroup(1); 
-			EventLoopGroup ioGroup = new EpollEventLoopGroup(Constants.CPU_CORE * 2); 
+			EventLoopGroup ioGroup = new EpollEventLoopGroup(Constants.CPU_CORE + 1); 
 			server.group(acceptGroup, ioGroup).channel(EpollServerSocketChannel.class);
 		} else {
 			LOGGER.info("非Linux系统下,RPC Server启动...");
 			EventLoopGroup acceptGroup = new NioEventLoopGroup(1); 
-			EventLoopGroup ioGroup = new NioEventLoopGroup(Constants.CPU_CORE * 2); 
+			EventLoopGroup ioGroup = new NioEventLoopGroup(Constants.CPU_CORE + 1); 
 			server.group(acceptGroup, ioGroup).channel(NioServerSocketChannel.class);
 		}
 		
