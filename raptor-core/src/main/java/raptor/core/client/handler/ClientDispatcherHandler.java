@@ -78,15 +78,15 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 					} catch (Exception e) {
 						try {
 							String message = StringUtil.getErrorText(e);
-							LOGGER.error("资源释放异常,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode +", message: " + message);
-							throw new RpcException("资源释放异常,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode +", message: " + message);
+							LOGGER.error("资源释放异常,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);
+							throw new RpcException("资源释放异常,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);
 						} finally {
 							pool.invalidateObject(rpc);
 						}
 					}
  				} else {
-					String message = StringUtil.getErrorText(future.cause());
-					LOGGER.warn("RPC客户端数据出站FAIL: " + requestBody +", tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode +", message: " + message);					
+					String message = StringUtil.getErrorText(future.cause()); 
+					LOGGER.warn("RPC客户端数据出站FAIL: " + requestBody + ", tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);					
  					pool.invalidateObject(rpc);
 				}
 			}
@@ -168,7 +168,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		
 		if (heartbeatCount.intValue() >= DEFAULT_HEARTBEAT_COUNT) {
 			LOGGER.warn("[重要!!!]心跳检测无响应, tcpId: " + getTcpId() + ", 客户端: " + local.getAddress() + ":" + local.getPort()
-			+", 服务器: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + serverNode 
+			+ ", 服务器: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + serverNode 
 			+ ", active: " + pool.getNumActive() +", Idle: " + pool.getNumIdle());
 			pool.invalidateObject(this);
 			return;
@@ -190,7 +190,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 				}
 				
 				LOGGER.warn("[重要!!!]心跳检测,发送" + state.toString() + ", tcpId: " + getTcpId() + ", 客户端: " + local.getAddress() + ":" + local.getPort()
-				+", 服务器: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + serverNode 
+				+ ", 服务器: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + serverNode 
 				+ ", active: " + pool.getNumActive() +", Idle: " + pool.getNumIdle());
 			}
 		});
