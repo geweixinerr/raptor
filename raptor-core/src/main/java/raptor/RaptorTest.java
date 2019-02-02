@@ -81,15 +81,15 @@ public final class RaptorTest {
 				@Override
 				public void invoke(RpcResponseBody response) {
 					if (response.getRpcCode().equals(RpcResult.SUCCESS)) {
-						LOGGER.info(methodName, "服务调用SUCCESS~ " + response);
+						LOGGER.info(methodName, "服务调用SUCCESS~ ");
 					} else if (response.getRpcCode().equals(RpcResult.FAIL)) {
 						LOGGER.warn(methodName, "服务端业务执行异常~");
 					} else if (response.getRpcCode().equals(RpcResult.TIME_OUT) || response.getRpcCode().equals(RpcResult.SCAN_TIME_OUT)) {
 						LOGGER.warn(methodName, "RPC调用超时~");
 					} else if (RpcResult.FAIL_NETWORK_TRANSPORT.equals(response.getRpcCode())) {
-						LOGGER.error(methodName, "数据传输异常, rpcCode: " + response.getRpcCode());
+						LOGGER.error(methodName, "数据传输异常");
 					} else {
-						LOGGER.warn(methodName, "服务调用异常, rpcCode: " + response.getRpcCode());
+						LOGGER.warn(methodName, "服务调用异常");
 					}
 				}
 			}, 5, data, message);
