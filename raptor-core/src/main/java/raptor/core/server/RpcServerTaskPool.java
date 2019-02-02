@@ -22,6 +22,7 @@ import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
 import raptor.exception.RpcException;
 import raptor.log.RaptorLogger;
+import raptor.util.StringUtil;
 
 /**
  * @author gewx RPC Server端业务线程池
@@ -108,7 +109,7 @@ public final class RpcServerTaskPool {
 
 			@Override
 			public void onFailure(Throwable throwable) {
-				String message = "RPC 服务调用失败,message:[" + ExceptionUtils.getRootCauseMessage(throwable) + "]";
+				String message = "RPC 服务调用失败,message:[" + StringUtil.getErrorText(throwable) + "]";
 				LOGGER.warn(rpcMethod, message);	
 
 				/**
@@ -119,7 +120,7 @@ public final class RpcServerTaskPool {
 				body.setMessageId(requestBody.getMessageId());
 				body.setThreadId(threadId);
 				body.setRpcMethod(rpcMethod);
-				body.setMessage(message);
+				body.setMessage("RPC 服务调用失败,message:[" + ExceptionUtils.getRootCauseMessage(throwable) + "]");
 				
 				call.invoke(body);
 			}

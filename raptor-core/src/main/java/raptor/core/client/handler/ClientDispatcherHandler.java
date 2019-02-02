@@ -24,6 +24,7 @@ import raptor.core.client.RpcClient;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
+import raptor.log.RaptorLogger;
 import raptor.util.StringUtil;
 
 /**
@@ -33,8 +34,10 @@ import raptor.util.StringUtil;
 @Sharable
 public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResponseBody> implements RpcPushDefine {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ClientDispatcherHandler.class);
-	
+	private static final RaptorLogger LOGGER = new RaptorLogger(ClientDispatcherHandler.class);
+
+	private static final Logger RAW_LOGGER = LoggerFactory.getLogger(ClientDispatcherHandler.class);
+
 	private static final Integer DEFAULT_HEARTBEAT_COUNT = 5;
 	
 	private final AtomicInteger heartbeatCount = new AtomicInteger();
@@ -71,18 +74,18 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 				if (future.isSuccess()) {
-					LOGGER.info("RPC客户端数据出站SUCCESS, " + requestBody);
+					RAW_LOGGER.info("RPC客户端数据出站SUCCESS, " + requestBody);
 					try {
 						pool.returnObject(rpc);
 					} catch (Exception e) {
 						String message = StringUtil.getErrorText(e);
-						LOGGER.error("资源释放异常,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);
+						RAW_LOGGER.error("资源释放异常,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);
 						pool.invalidateObject(rpc);
 					}
  				} else {
  					outboundException(requestBody.getMessageId(), requestBody.getThreadId(), "Rpc出站Fail.", RpcResult.FAIL_NETWORK_TRANSPORT);
 					String message = StringUtil.getErrorText(future.cause()); 
-					LOGGER.warn("RPC客户端数据出站FAIL: " + requestBody + ", tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);	
+					RAW_LOGGER.warn("RPC客户端数据出站FAIL: " + requestBody + ", tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);	
  					pool.invalidateObject(rpc);
 				}
 			}

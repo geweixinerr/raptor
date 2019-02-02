@@ -159,10 +159,11 @@ public final class RpcRequestBody implements RpcMessage {
 	@Override
 	public String toString() {
 		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE);
-		builder.append("messageId",messageId);
 		builder.append("rpcMethod",rpcMethod);
 		builder.append("isSync",isSync);
-		builder.append("reqDate", this.requestTime.toString(DATE_FORMATE));
+		if (this.requestTime != null) {			
+			builder.append("reqDate", this.requestTime.toString(DATE_FORMATE));
+		}
 
 		if (body != null) {
 			builder.append("body",ArrayUtils.toStringArray(body));

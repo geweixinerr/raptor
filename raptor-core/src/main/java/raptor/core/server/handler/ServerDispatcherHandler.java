@@ -11,6 +11,7 @@ import raptor.core.AbstractCallBack;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
 import raptor.core.server.RpcServerTaskPool;
+import raptor.log.RaptorLogger;
 import raptor.util.StringUtil;
 
 /**
@@ -18,7 +19,9 @@ import raptor.util.StringUtil;
  **/
 public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<RpcRequestBody> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ServerDispatcherHandler.class);
+	private static final RaptorLogger LOGGER = new RaptorLogger(ServerDispatcherHandler.class);
+
+	private static final Logger RAW_LOGGER = LoggerFactory.getLogger(ServerDispatcherHandler.class);
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcRequestBody msg) throws Exception {
@@ -30,10 +33,10 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 					@Override
 					public void operationComplete(ChannelFuture future) throws Exception {
 						if (future.isSuccess()) {
-							LOGGER.info("RPC服务端数据出站SUCCESS, " + responseBody);
+							RAW_LOGGER.info("RPC服务端数据出站SUCCESS, " + responseBody);
 						} else {
 							String message = StringUtil.getErrorText(future.cause());
-							LOGGER.warn("RPC服务端数据出站FAIL: " + responseBody + ", message: " + message);	
+							RAW_LOGGER.warn("RPC服务端数据出站FAIL: " + responseBody + ", message: " + message);	
 						}
 					}
 				});
