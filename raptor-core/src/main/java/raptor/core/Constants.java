@@ -33,8 +33,4 @@ public final class Constants {
 	 * **/
 	public static final Integer ONE_KB = 1024; 
 	
-	/**
-	 * logback MDC
-	 * **/
-	public static final String MDC_KEY = "invokeId";
 }

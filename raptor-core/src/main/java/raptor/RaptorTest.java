@@ -103,10 +103,8 @@ public final class RaptorTest {
 		
 		//同步
 		LOGGER.enter(methodName, "服务身份证信息查询[start]");
-		long start = System.currentTimeMillis();
-	    RpcResponseBody response = null;
 		try {
-			response = rpc.sendSyncMessage("mc", "LoginAuth", mapMessage, message);
+			RpcResponseBody response = rpc.sendSyncMessage("mc", "LoginAuth", mapMessage, message);
 			if (response.getRpcCode().equals(RpcResult.SUCCESS)) {
 				LOGGER.info(methodName, "服务调用SUCCESS~");
 			} else if (response.getRpcCode().equals(RpcResult.FAIL)) {
@@ -114,9 +112,9 @@ public final class RaptorTest {
 			} else if (response.getRpcCode().equals(RpcResult.TIME_OUT)) {
 				LOGGER.warn(methodName, "RPC调用超时~");
 			} else if (RpcResult.FAIL_NETWORK_TRANSPORT.equals(response.getRpcCode())) {
-				LOGGER.error(methodName, "数据传输异常, rpcCode: " + response.getRpcCode());
+				LOGGER.error(methodName, "数据传输异常");
 			} else {
-				LOGGER.warn(methodName, "服务调用异常, rpcCode: " + response.getRpcCode());
+				LOGGER.warn(methodName, "服务调用异常");
 			}
 		} catch (RpcException e) {
 			if (RpcResult.FAIL_NETWORK_CONNECTION.equals(e.getRpcCode())) {
@@ -125,9 +123,7 @@ public final class RaptorTest {
 				LOGGER.error(methodName, "其它异常, message: " + e.getMessage());
 			}
 		}
-		
-		long end = System.currentTimeMillis();
-		LOGGER.exit(methodName, "服务身份证信息查询[end],result : " + response +", 耗时: " + (end- start));
+		LOGGER.exit(methodName, "服务身份证信息查询[end]");
 	}
 
 }
