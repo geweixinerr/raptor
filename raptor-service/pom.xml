@@ -20,6 +20,10 @@
 		</dependency>
 		<dependency>
 			<groupId>cn.raptor</groupId>
+			<artifactId>raptor-plugin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cn.raptor</groupId>
 			<artifactId>raptor-dao</artifactId>
 		</dependency>
 	</dependencies>

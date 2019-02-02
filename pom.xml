@@ -11,10 +11,11 @@
 	<!-- 子模块 -->
 	<modules>
 		<module>raptor-core</module>
+		<module>raptor-plugin</module>
 		<module>raptor-dao</module>
         <module>raptor-service</module>
         <module>raptor-web</module>
-  </modules>
+	</modules>
 
 	<!-- POM自定义属性 -->
 	<properties>
@@ -28,6 +29,11 @@
           <dependency>
              <groupId>cn.raptor</groupId>
              <artifactId>raptor-core</artifactId>
+             <version>1.0</version>
+          </dependency>
+          <dependency>
+             <groupId>cn.raptor</groupId>
+             <artifactId>raptor-plugin</artifactId>
              <version>1.0</version>
           </dependency>
           <dependency>
