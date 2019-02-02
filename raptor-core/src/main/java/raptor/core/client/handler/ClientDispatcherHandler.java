@@ -69,6 +69,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		future.addListener(new ChannelFutureListener() {
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
+				//mark:回调此处会发生一次线程上下文切换,需要重置线程号.
 				RaptorLogger.THREAD_ID.set(requestBody.getThreadId());
 				if (future.isSuccess()) {
 					LOGGER.info("RPC客户端数据出站SUCCESS, " + requestBody);
