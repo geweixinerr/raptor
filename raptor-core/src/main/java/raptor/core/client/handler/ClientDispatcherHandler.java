@@ -64,14 +64,13 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 
 	@Override
 	public void pushMessage(RpcRequestBody requestBody) {
-		System.out.println("出站前线程号: " + RaptorLogger.THREAD_ID.get());
 		RpcPushDefine rpc = this;
 		ChannelFuture future = ctx.writeAndFlush(requestBody);
 		future.addListener(new ChannelFutureListener() {
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
+				RaptorLogger.THREAD_ID.set(requestBody.getThreadId());
 				if (future.isSuccess()) {
-					System.out.println("出站后线程号: " + RaptorLogger.THREAD_ID.get());
 					LOGGER.info("RPC客户端数据出站SUCCESS, " + requestBody);
 					try {
 						pool.returnObject(rpc);

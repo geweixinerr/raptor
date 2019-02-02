@@ -26,7 +26,7 @@ import raptor.log.RaptorLogger;
  * Raptor单元测试类
  * **/
 public final class RaptorTest {
-	
+
 	private static final RaptorLogger LOGGER = new RaptorLogger(RaptorTest.class);
 
 	static {
@@ -75,6 +75,7 @@ public final class RaptorTest {
 		RaptorRpc rpc = new RaptorRpc();
 		
 		LOGGER.info("RPC调用开始===================================>");
+		/*
 		//异步
 		try {
 			rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
@@ -95,6 +96,7 @@ public final class RaptorTest {
 				LOGGER.error(methodName, "其它异常, message: " + e.getMessage());
 			}
 		}
+		*/
 		
 		//同步
 		LOGGER.enter(methodName, "服务身份证信息查询[start]");
