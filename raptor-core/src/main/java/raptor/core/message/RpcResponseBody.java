@@ -122,6 +122,7 @@ public final class RpcResponseBody implements RpcMessage {
 	@Override
 	public String toString() {
 		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE);
+		builder.append("messageId",messageId);
 		builder.append("message",message);
 		builder.append("rpcCode",rpcCode.getCode());
 		

@@ -73,7 +73,7 @@ public final class RpcClientTaskPool {
 				Integer rpcTime = StringUtil.timeDiffForMilliSecond(requestBody.getRequestTime(),thisDate);
 				responseBody.setRpcTime(rpcTime);
 				
-				LOGGER.warn("RPC客户端收到响应: " + responseBody);
+				LOGGER.info("RPC客户端收到响应: " + responseBody);
 				//sync
 				if (requestBody.isSync()) {
 					requestBody.getCall().invoke(responseBody);

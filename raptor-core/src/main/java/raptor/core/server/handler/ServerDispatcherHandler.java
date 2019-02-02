@@ -33,10 +33,10 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 					@Override
 					public void operationComplete(ChannelFuture future) throws Exception {
 						if (future.isSuccess()) {
-							RAW_LOGGER.info("RPC服务端数据出站SUCCESS, " + responseBody);
+							LOGGER.info("RPC服务端数据出站SUCCESS, " + responseBody);
 						} else {
 							String message = StringUtil.getErrorText(future.cause());
-							RAW_LOGGER.warn("RPC服务端数据出站FAIL: " + responseBody + ", message: " + message);	
+							LOGGER.warn("RPC服务端数据出站FAIL: " + responseBody + ", message: " + message);	
 						}
 					}
 				});
@@ -47,7 +47,7 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		String message = StringUtil.getErrorText(cause);
-		LOGGER.warn("RPC服务端异常,message: " + message);
+		RAW_LOGGER.warn("RPC服务端异常,message: " + message);
 	}
 	
 }
