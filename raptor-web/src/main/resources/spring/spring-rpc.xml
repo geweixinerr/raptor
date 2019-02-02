@@ -36,4 +36,43 @@
 		</property>    
 	</bean>  
 	
+	<!-- Netty Pool客户端配置 -->
+	<bean id="NettyPoolConfig"
+		class="org.springframework.beans.factory.config.ListFactoryBean">
+		<property name="targetListClass" value="java.util.concurrent.CopyOnWriteArrayList" />
+		<property name="singleton" value="false" />
+		<property name="sourceList">
+			<list>
+			    <bean class="org.springframework.beans.factory.config.MapFactoryBean">
+					<property name="targetMapClass">
+						<value>java.util.HashMap</value>
+					</property>
+					<property name="sourceMap">
+						<map>
+						    <entry key="serverNode" value="mc"/>
+							<entry key="remote" value="localhost"/> 
+							<entry key="port" value="8090"/>
+							<entry key="maxclients" value="32"/> 
+							<entry key="minclients" value="6"/> 
+						</map>
+					</property>    
+				</bean>  
+			    <bean class="org.springframework.beans.factory.config.MapFactoryBean">
+					<property name="targetMapClass">
+						<value>java.util.HashMap</value>
+					</property>
+					<property name="sourceMap">
+						<map>
+						    <entry key="serverNode" value="tcs"/>
+							<entry key="remote" value="localhost"/> 
+							<entry key="port" value="8090"/>
+							<entry key="maxclients" value="32"/> 
+							<entry key="minclients" value="6"/> 
+						</map>
+					</property>    
+				</bean>  
+			</list>
+		</property>
+	</bean>
+	
 </beans>
