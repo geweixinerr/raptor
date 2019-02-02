@@ -43,9 +43,12 @@ public final class AlibabaService {
 		LOGGER.enter(methodName, "单点服务认证请求,params: " + params +",message : " + message);
 		StringBuilder sb = new StringBuilder();
 		try {
-			String value = plugin.casLonginAuth();
-			sb.append(value);
+			Object result = plugin.casLonginAuth();
+			if (result != null) {
+				sb.append(result);	
+			}
 		} catch (RpcException e) {
+			//根据实际业务,处理.这里只打印日志.
 			if (RpcResult.FAIL_NETWORK_CONNECTION.equals(e.getRpcCode())) {
 				LOGGER.error(methodName, "网络连接异常, message: " + e.getMessage());
 			} else {
