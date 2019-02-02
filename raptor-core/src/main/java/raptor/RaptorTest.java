@@ -74,22 +74,17 @@ public final class RaptorTest {
 		@SuppressWarnings("rawtypes")
 		RaptorRpc rpc = new RaptorRpc();
 		
-		System.out.println("RPC调用开始===================================>");
+		LOGGER.info("RPC调用开始===================================>");
 		//异步
 		try {
 			rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
 				@Override
 				public void invoke(RpcResponseBody response) {
+					LOGGER.info("RPC异步响应: " + response);
 					if (response.getRpcCode().equals(RpcResult.SUCCESS)) {
 						LOGGER.info(methodName, "服务调用SUCCESS~ ");
-					} else if (response.getRpcCode().equals(RpcResult.FAIL)) {
-						LOGGER.warn(methodName, "服务端业务执行异常~");
-					} else if (response.getRpcCode().equals(RpcResult.TIME_OUT) || response.getRpcCode().equals(RpcResult.SCAN_TIME_OUT)) {
-						LOGGER.warn(methodName, "RPC调用超时~");
-					} else if (RpcResult.FAIL_NETWORK_TRANSPORT.equals(response.getRpcCode())) {
-						LOGGER.error(methodName, "数据传输异常");
 					} else {
-						LOGGER.warn(methodName, "服务调用异常");
+						LOGGER.warn(methodName, "RPC服务调用异常!");
 					}
 				}
 			}, 5, data, message);
@@ -107,14 +102,8 @@ public final class RaptorTest {
 			RpcResponseBody response = rpc.sendSyncMessage("mc", "LoginAuth", mapMessage, message);
 			if (response.getRpcCode().equals(RpcResult.SUCCESS)) {
 				LOGGER.info(methodName, "服务调用SUCCESS~");
-			} else if (response.getRpcCode().equals(RpcResult.FAIL)) {
-				LOGGER.warn(methodName, "服务端业务执行异常~");
-			} else if (response.getRpcCode().equals(RpcResult.TIME_OUT)) {
-				LOGGER.warn(methodName, "RPC调用超时~");
-			} else if (RpcResult.FAIL_NETWORK_TRANSPORT.equals(response.getRpcCode())) {
-				LOGGER.error(methodName, "数据传输异常");
 			} else {
-				LOGGER.warn(methodName, "服务调用异常");
+				LOGGER.warn(methodName, "RPC服务调用异常!");
 			}
 		} catch (RpcException e) {
 			if (RpcResult.FAIL_NETWORK_CONNECTION.equals(e.getRpcCode())) {

@@ -1,22 +1,24 @@
 package raptor.core.message;
 
-import java.util.concurrent.Delayed;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import raptor.core.AbstractCallBack;
 
 /**
  * @author gewx RPC消息发送主体
  * **/
-public final class RpcRequestBody implements RpcMessage, Delayed {
+public final class RpcRequestBody implements RpcMessage {
 
 	/**
-	 */
+	 * thread safe 
+	 * **/
+	private transient static final DateTimeFormatter DATE_FORMATE = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss:SSS");
+	
 	private static final long serialVersionUID = 1584389395921234145L;
 
 	/**
@@ -155,33 +157,13 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 	}
 	
 	@Override
-	public int compareTo(Delayed o) {
-		if (this == o) {
-			return 0;
-		}
-		
-		RpcRequestBody other = (RpcRequestBody)o;
-		if (this.getDelayTime() > other.getDelayTime()) {
-			return 1;
-		} else if (this.getDelayTime() < other.getDelayTime()) {
-			return -1;
-		} else {
-			return 0;	
-		}
-	}
-	
-	@Override
-	public long getDelay(TimeUnit unit) {
-		return unit.convert(this.getDelayTime() - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
-	}
-
-	@Override
 	public String toString() {
 		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE);
 		builder.append("messageId",messageId);
 		builder.append("rpcMethod",rpcMethod);
 		builder.append("isSync",isSync);
-		
+		builder.append("reqDate", this.requestTime.toString(DATE_FORMATE));
+
 		if (body != null) {
 			builder.append("body",ArrayUtils.toStringArray(body));
 		} else {
@@ -189,11 +171,7 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 		}
 		
 		/*		
-		 * DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss:SSS");
-		if (this.requestTime != null) {
-			builder.append("reqDate", this.requestTime.toString(dateTimeFormat));
-		}
-		
+		 * 
 		if (this.timeOut != null) {
 			builder.append("timeOut",this.timeOut.toString(dateTimeFormat));
 		}

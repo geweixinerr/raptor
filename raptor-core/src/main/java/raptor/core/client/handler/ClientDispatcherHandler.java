@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.apache.commons.pool2.ObjectPool;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +71,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 				if (future.isSuccess()) {
+					LOGGER.info("RPC客户端数据出站SUCCESS, " + requestBody);
 					try {
 						pool.returnObject(rpc);
 					} catch (Exception e) {
@@ -123,7 +125,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			return;
 		}
 
-		//responseBody.setReturnTime(new DateTime());	
+		responseBody.setReturnTime(new DateTime());	
 		RpcClientTaskPool.addTask(responseBody); 
 		
 	}
