@@ -5,6 +5,7 @@ import org.slf4j.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.ttl.TransmittableThreadLocal;
 import com.eaio.uuid.UUID;
 
 /**
@@ -12,7 +13,7 @@ import com.eaio.uuid.UUID;
  **/
 public final class RaptorLogger {
 	
-	public static final InheritableThreadLocal<String> THREAD_ID = new InheritableThreadLocal<String>() {
+	public static final TransmittableThreadLocal<String> THREAD_ID = new TransmittableThreadLocal<String>() {
 		@Override
 		protected String initialValue() {
 			String invokeId = new UUID().toString();

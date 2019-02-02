@@ -1,8 +1,5 @@
 package raptor.core.server.handler;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,10 +18,9 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 
 	private static final RaptorLogger LOGGER = new RaptorLogger(ServerDispatcherHandler.class);
 
-	private static final Logger RAW_LOGGER = LoggerFactory.getLogger(ServerDispatcherHandler.class);
-
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcRequestBody msg) throws Exception {
+		RaptorLogger.THREAD_ID.set(msg.getThreadId());
 		RpcServerTaskPool.addTask(msg, new AbstractCallBack() {
 			@Override
 			public void invoke(RpcResponseBody responseBody) {
@@ -47,7 +43,7 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		String message = StringUtil.getErrorText(cause);
-		RAW_LOGGER.warn("RPC服务端异常,message: " + message);
+		LOGGER.warn("RPC服务端异常,message: " + message);
 	}
 	
 }

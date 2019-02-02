@@ -7,11 +7,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
+
+import com.alibaba.ttl.TtlCallable;
 
 import raptor.core.AbstractCallBack;
 import raptor.core.Constants;
@@ -32,8 +32,6 @@ public final class RpcServerTaskPool {
 
 	private static final RaptorLogger LOGGER = new RaptorLogger(RpcServerTaskPool.class);
 	
-	private static final Logger RAW_LOGGER = LoggerFactory.getLogger(RpcServerTaskPool.class);
-
 	private static final ThreadPoolTaskExecutor POOLTASKEXECUTOR = new ThreadPoolTaskExecutor();
 
 	private static final Map<String,RpcHandlerObject> RPC_MAPPING = RpcMappingInit.listRpcMapping();
@@ -46,7 +44,7 @@ public final class RpcServerTaskPool {
 	 * 
 	 **/
 	public static void initPool() {
-		RAW_LOGGER.info("初始化RPC Server业务线程池对象...");
+		LOGGER.info("初始化RPC Server业务线程池对象...");
 		POOLTASKEXECUTOR.setQueueCapacity(Constants.CPU_CORE * 10240); //队列深度. 
 		POOLTASKEXECUTOR.setCorePoolSize(Constants.CPU_CORE); // 核心线程数. 
 		POOLTASKEXECUTOR.setMaxPoolSize(Constants.CPU_CORE * 4); // 最大线程数. 
@@ -69,11 +67,9 @@ public final class RpcServerTaskPool {
 	    String rpcMethod = requestBody.getRpcMethod();
 	    String threadId = requestBody.getThreadId();
 		ListenableFuture<RpcResponseBody> future = POOLTASKEXECUTOR
-				.submitListenable(new Callable<RpcResponseBody>() {
+				.submitListenable(TtlCallable.get(new Callable<RpcResponseBody>() {
 					@Override
 					public RpcResponseBody call() throws Exception {
-						RaptorLogger.THREAD_ID.set(requestBody.getThreadId());
-
 						LOGGER.info("RPC服务端收到请求信息: " + requestBody);		
 						
 						RpcHandlerObject handler = RPC_MAPPING.get(rpcMethod);
@@ -89,6 +85,7 @@ public final class RpcServerTaskPool {
 						} else {
 							result = MethodUtils.invokeMethod(handler.getObject(), handler.getRpcKey());
 						}
+						
 						RpcResponseBody body = new RpcResponseBody();
 						body.setRpcCode(RpcResult.SUCCESS);
 						body.setMessageId(requestBody.getMessageId());
@@ -98,7 +95,7 @@ public final class RpcServerTaskPool {
 						body.setMessage("RPC调用成功!");
 						return body;
 					}
-				});
+				}));
 
 		future.addCallback(new ListenableFutureCallback<RpcResponseBody>() {
 

@@ -7,8 +7,6 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import org.apache.commons.pool2.ObjectPool;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.eaio.uuid.UUID;
 
@@ -35,8 +33,6 @@ import raptor.util.StringUtil;
 public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResponseBody> implements RpcPushDefine {
 
 	private static final RaptorLogger LOGGER = new RaptorLogger(ClientDispatcherHandler.class);
-
-	private static final Logger RAW_LOGGER = LoggerFactory.getLogger(ClientDispatcherHandler.class);
 
 	private static final Integer DEFAULT_HEARTBEAT_COUNT = 5;
 	
@@ -68,12 +64,14 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 
 	@Override
 	public void pushMessage(RpcRequestBody requestBody) {
+		System.out.println("出站前线程号: " + RaptorLogger.THREAD_ID.get());
 		RpcPushDefine rpc = this;
 		ChannelFuture future = ctx.writeAndFlush(requestBody);
 		future.addListener(new ChannelFutureListener() {
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 				if (future.isSuccess()) {
+					System.out.println("出站后线程号: " + RaptorLogger.THREAD_ID.get());
 					LOGGER.info("RPC客户端数据出站SUCCESS, " + requestBody);
 					try {
 						pool.returnObject(rpc);
@@ -124,10 +122,11 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody responseBody) throws Exception {
 		if (responseBody.getRpcMethod().equals(HEARTBEAT_METHOD)) {
 			heartbeatCount.set(0);
-			RAW_LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcpId: " + getTcpId() + ", serverNode: " + serverNode);
+			LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcpId: " + getTcpId() + ", serverNode: " + serverNode);
 			return;
 		}
-
+		
+		RaptorLogger.THREAD_ID.set(responseBody.getThreadId());
 		responseBody.setReturnTime(new DateTime());	
 		RpcClientTaskPool.addTask(responseBody); 
 		
@@ -136,7 +135,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		String message = StringUtil.getErrorText(cause);
-		RAW_LOGGER.error("RPC IO异常,tcpId: "+ getTcpId() + ", serverNode: " + serverNode + ", message: " + message);
+		LOGGER.error("RPC IO异常,tcpId: "+ getTcpId() + ", serverNode: " + serverNode + ", message: " + message);
 		pool.invalidateObject(this);
 	}
 
@@ -149,7 +148,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		InetSocketAddress remote = (InetSocketAddress) channel.remoteAddress();
 		
 		if (heartbeatCount.intValue() >= DEFAULT_HEARTBEAT_COUNT) {
-			RAW_LOGGER.warn("[重要!!!]心跳检测无响应, tcpId: " + getTcpId() + ", 客户端: " + local.getAddress() + ":" + local.getPort()
+			LOGGER.warn("[重要!!!]心跳检测无响应, tcpId: " + getTcpId() + ", 客户端: " + local.getAddress() + ":" + local.getPort()
 			+ ", 服务器: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + serverNode 
 			+ ", active: " + pool.getNumActive() +", Idle: " + pool.getNumIdle());
 			pool.invalidateObject(this);
@@ -171,7 +170,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 					state.append("FAIL");
 				}
 				
-				RAW_LOGGER.warn("[重要!!!]心跳检测,发送" + state.toString() + ", tcpId: " + getTcpId() + ", 客户端: " + local.getAddress() + ":" + local.getPort()
+				LOGGER.warn("[重要!!!]心跳检测,发送" + state.toString() + ", tcpId: " + getTcpId() + ", 客户端: " + local.getAddress() + ":" + local.getPort()
 				+ ", 服务器: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + serverNode 
 				+ ", active: " + pool.getNumActive() +", Idle: " + pool.getNumIdle());
 			}
