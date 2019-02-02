@@ -23,16 +23,16 @@ public final class DemoPlugin {
 	 * 示例
 	 * **/
 	@SuppressWarnings("unchecked")
-	public String casLonginAuth() throws RpcException {
+	public Object casLonginAuth() throws RpcException {
 		String methodName = "casLonginAuth";
-		LOGGER.info(methodName, "DEMO插件调用[start]");
-		StringBuilder sb = new StringBuilder();
+		LOGGER.enter(methodName, "DEMO插件调用[start]");
 		RpcResponseBody response = rpc.sendSyncMessage(serverNode, "LoginAuth");
 		LOGGER.info("RPC响应: " + response);
-		if (response.getRpcCode().equals(RpcResult.SUCCESS)) {
-			sb.append(response.getBody());
+		Object result = null;
+		if (RpcResult.SUCCESS.equals(response.getRpcCode())) {
+			result = response.getBody();
 		}
-		LOGGER.info(methodName, "DEMO插件调用[end], result: " + sb.toString());
-		return sb.toString();
+		LOGGER.exit(methodName, "DEMO插件调用[end], result: " + result);
+		return result;
 	}
 }
