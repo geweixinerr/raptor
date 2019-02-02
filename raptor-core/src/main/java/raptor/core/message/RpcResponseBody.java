@@ -46,9 +46,14 @@ public final class RpcResponseBody implements RpcMessage {
 	private String threadId;
 	
 	/**
-	 * 服务器响应到达客户端时间.(仅测试使用)
+	 * 业务-->服务器响应到达客户端时间
 	 * **/
-	private transient DateTime responseTime; 
+	private  transient DateTime returnTime; 
+	
+	/**
+	 * 业务-->RPC耗时
+	 * **/
+	private  transient Integer rpcTime; 
 
 	public String getThreadId() {
 		return threadId;
@@ -89,14 +94,6 @@ public final class RpcResponseBody implements RpcMessage {
 	public void setRpcCode(RpcResult rpcCode) {
 		this.rpcCode = rpcCode;
 	}
-	
-	public DateTime getResponseTime() {
-		return responseTime;
-	}
-
-	public void setResponseTime(DateTime responseTime) {
-		this.responseTime = responseTime;
-	}
 
 	public String getRpcMethod() {
 		return rpcMethod;
@@ -106,15 +103,35 @@ public final class RpcResponseBody implements RpcMessage {
 		this.rpcMethod = rpcMethod;
 	}
 
+	public DateTime getReturnTime() {
+		return returnTime;
+	}
+
+	public void setReturnTime(DateTime returnTime) {
+		this.returnTime = returnTime;
+	}
+
+	public Integer getRpcTime() {
+		return rpcTime;
+	}
+
+	public void setRpcTime(Integer rpcTime) {
+		this.rpcTime = rpcTime;
+	}
+
 	@Override
 	public String toString() {
 		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE);
 		builder.append("messageId",messageId);
 		builder.append("message",message);
+		builder.append("rpcCode",rpcCode.getCode());
+		
+		/**
+		 * DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss:SSS");
+		 * builder.append("returnTime",returnTime);
+		 * **/
+		builder.append("rpcTime",rpcTime);
 		builder.append("body",body);
-		if (this.rpcCode != null) {
-			builder.append("rpcCode",rpcCode.getComment());	
-		}
 		return builder.toString();
 	}
 	

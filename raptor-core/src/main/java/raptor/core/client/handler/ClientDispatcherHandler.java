@@ -6,7 +6,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.apache.commons.pool2.ObjectPool;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,7 +123,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			return;
 		}
 
-		responseBody.setResponseTime(new DateTime());	
+		//responseBody.setReturnTime(new DateTime());	
 		RpcClientTaskPool.addTask(responseBody); 
 		
 	}
@@ -181,7 +180,6 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		responseBody.setMessage(message);
 		responseBody.setMessageId(messageId);
 		responseBody.setThreadId(threadId);
-		responseBody.setResponseTime(new DateTime());	
 		RpcClientTaskPool.addTask(responseBody); 
 	}
 	

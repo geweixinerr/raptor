@@ -12,6 +12,7 @@ import raptor.core.RpcResult;
 import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
+import raptor.util.StringUtil;
 
 /**
  * @author gewx RPC请求客户端超时扫描: 本线程执行过期消息清理.
@@ -65,14 +66,12 @@ public final class RpcClientTimeOutScan {
 							requestPool.remove(messageId);
 							
 							if (!requestBody.isMessageSend()) {
+								Integer rpcTime = StringUtil.timeDiffForMilliSecond(requestBody.getRequestTime(),thisDate);
 								RpcResponseBody responseBody = new RpcResponseBody();
 								responseBody.setMessageId(requestBody.getMessageId());
 								responseBody.setMessage("RPC 服务调用超时,message:timeOut");
 								responseBody.setRpcCode(RpcResult.SCAN_TIME_OUT);
-								
-								if (requestBody.getResponseTime() == null) {
-									requestBody.setResponseTime(thisDate);	
-								}
+								responseBody.setRpcTime(rpcTime);
 								
 								requestBody.getCall().invoke(responseBody); // 回调通知
 							}

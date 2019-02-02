@@ -7,7 +7,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.joda.time.DateTime;
-import org.joda.time.Period;
 
 import raptor.core.AbstractCallBack;
 
@@ -54,16 +53,6 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 	 * 业务-->请求时间
 	 * **/
 	private  transient DateTime requestTime; 
-	
-	/**
-	 * 业务-->客户端回调时间
-	 * **/
-	private  transient DateTime responseTime; 
-	
-	/**
-	 * 业务-->服务器响应达到客户端时间
-	 * **/
-	private  transient DateTime clientTime; 
 	
 	/**
 	 * 客户端调用回调对象
@@ -144,22 +133,6 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 		this.requestTime = requestTime;
 	}
 
-	public DateTime getResponseTime() {
-		return responseTime;
-	}
-
-	public void setResponseTime(DateTime responseTime) {
-		this.responseTime = responseTime;
-	}
-
-	public DateTime getClientTime() {
-		return clientTime;
-	}
-
-	public void setClientTime(DateTime clientTime) {
-		this.clientTime = clientTime;
-	}
-
 	public boolean isSync() {
 		return isSync;
 	}
@@ -207,6 +180,7 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 		ToStringBuilder builder = new ToStringBuilder(this,ToStringStyle.SHORT_PREFIX_STYLE);
 		builder.append("messageId",messageId);
 		builder.append("rpcMethod",rpcMethod);
+		builder.append("isSync",isSync);
 		
 		if (body != null) {
 			builder.append("body",ArrayUtils.toStringArray(body));
@@ -223,24 +197,7 @@ public final class RpcRequestBody implements RpcMessage, Delayed {
 		if (this.timeOut != null) {
 			builder.append("timeOut",this.timeOut.toString(dateTimeFormat));
 		}
-		
-		if (this.clientTime != null) {
-			builder.append("respDate", this.clientTime.toString(dateTimeFormat));
-		}
-		
-		if (this.responseTime != null) {
-			builder.append("callDate", this.responseTime.toString(dateTimeFormat));
-		}
-		
-		builder.append("isSync",isSync);
 		*/
-		
-		if(this.requestTime != null && this.responseTime != null) {
-			Period p2 = new Period(this.requestTime, this.responseTime);
-			int seconds = p2.getSeconds(); //相差的秒
-			builder.append("RPC耗时: " + (seconds * 1000 + p2.getMillis()));
-		}
-
 		return builder.toString();
 	}
 	

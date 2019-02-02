@@ -14,6 +14,7 @@ import raptor.core.RpcResult;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
 import raptor.log.RaptorLogger;
+import raptor.util.StringUtil;
 
 /**
  * @author gewx RPC Client端业务线程池
@@ -68,18 +69,18 @@ public final class RpcClientTaskPool {
 				if (requestBody == null) {
 					return;
 				}
-
+				
 				DateTime thisDate = new DateTime();
-				requestBody.setClientTime(responseBody.getResponseTime()); 
-				requestBody.setResponseTime(thisDate);
+				Integer rpcTime = StringUtil.timeDiffForMilliSecond(requestBody.getRequestTime(),thisDate);
+				responseBody.setRpcTime(rpcTime);
 				
 				//sync
 				if (requestBody.isSync()) {
 					requestBody.getCall().invoke(responseBody);
 					return;
 				}
-				
-				//async				
+								
+				//async
 				if (thisDate.compareTo(requestBody.getTimeOut()) <= 0) {
 					if (!requestBody.isMessageSend()) { //是否已发送,并发串行化校验.
 						requestBody.getCall().invoke(responseBody);
