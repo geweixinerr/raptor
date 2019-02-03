@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.springframework.util.ResourceUtils;
 
@@ -75,7 +78,7 @@ public final class RaptorTest {
 		RaptorRpc rpc = new RaptorRpc();
 		
 		LOGGER.info("RPC调用开始===================================>");
-		/*
+
 		//异步
 		try {
 			rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
@@ -96,7 +99,6 @@ public final class RaptorTest {
 				LOGGER.error(methodName, "其它异常, message: " + e.getMessage());
 			}
 		}
-		*/
 		
 		//同步
 		LOGGER.enter(methodName, "服务身份证信息查询[start]");
@@ -115,6 +117,41 @@ public final class RaptorTest {
 			}
 		}
 		LOGGER.exit(methodName, "服务身份证信息查询[end]");
+		
+		boolean isTest = false;
+		if (isTest) {
+			//测试分布式日志
+			int cpuNum = Runtime.getRuntime().availableProcessors();
+			Executor pool = Executors.newFixedThreadPool(cpuNum);
+			CyclicBarrier lock = new CyclicBarrier(cpuNum);
+			for (int i = 0; i < cpuNum; i++) {
+				pool.execute(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							lock.await();
+						} catch (Exception e1) {
+						}
+						
+						try {
+							RpcResponseBody response = rpc.sendSyncMessage("mc", "LoginAuth", mapMessage, message);
+							System.out.println("响应: " + response);
+							if (response.getRpcCode().equals(RpcResult.SUCCESS)) {
+								LOGGER.info(methodName, "服务调用SUCCESS~");
+							} else {
+								LOGGER.warn(methodName, "RPC服务调用异常!");
+							}
+						} catch (RpcException e) {
+							if (RpcResult.FAIL_NETWORK_CONNECTION.equals(e.getRpcCode())) {
+								LOGGER.error(methodName, "网络连接异常, message: " + e.getMessage());
+							} else {
+								LOGGER.error(methodName, "其它异常, message: " + e.getMessage());
+							}
+						}
+					}
+				});
+			}
+		}
 	}
 
 }
