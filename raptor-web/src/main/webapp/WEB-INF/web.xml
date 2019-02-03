@@ -11,11 +11,13 @@
 		<param-name>contextConfigLocation</param-name>
 		<param-value>classpath:spring/spring*.xml</param-value>
 	</context-param>
-
 	<!-- logback,配置自定义路径 -->
-	<!-- <context-param> <param-name>logbackConfigLocation</param-name> <param-value>classpath:logback.xml</param-value> 
-		</context-param> -->
-
+	<!-- 
+	<context-param>
+	    <param-name>logbackConfigLocation</param-name>
+	    <param-value>classpath:logback.xml</param-value> 
+	</context-param> 
+	-->
 	<filter>
 		<filter-name>characterEncodingFilter</filter-name>
 		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -32,19 +34,17 @@
 		<filter-name>characterEncodingFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-
+	
 	<!-- 日志监听器必须配置在spring核心监听器之前 -->
 	<!-- 
 	    <listener> 
 	          <listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class> 
 		</listener>
 	-->
-
+	
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
-
-    <!-- 阿里巴巴druid监控 -->
 	<servlet>
 		<servlet-name>DruidStatView</servlet-name>
 		<servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
@@ -53,5 +53,4 @@
 		<servlet-name>DruidStatView</servlet-name>
 		<url-pattern>/druid/*</url-pattern>
 	</servlet-mapping>
-	
 </web-app>
