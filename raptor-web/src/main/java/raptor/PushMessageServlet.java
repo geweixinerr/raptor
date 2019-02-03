@@ -17,6 +17,9 @@ public class PushMessageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	private static final String serverNode = "tcs";
+	
+	@SuppressWarnings("rawtypes")
+	private static RaptorRpc rpc = new RaptorRpc();
 
 	/**
 	 * Default constructor.
@@ -44,9 +47,6 @@ public class PushMessageServlet extends HttpServlet {
 
 		response.getWriter().write("RPC execute start!");
 
-		@SuppressWarnings("rawtypes")
-		RaptorRpc rpc = new RaptorRpc();
-		
 		try {
 			RpcResponseBody result = rpc.sendSyncMessage(serverNode, "LoginAuth");
 			System.out.println("RPC Result: " + result);
