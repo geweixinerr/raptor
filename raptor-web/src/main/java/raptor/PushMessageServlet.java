@@ -8,18 +8,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import raptor.core.AbstractCallBack;
-import raptor.core.client.NettyTestData;
 import raptor.core.message.RpcResponseBody;
 import raptor.exception.RpcException;
 
-/**
- * Servlet implementation class PushMessageServlet
- */
 @WebServlet("/pushMessageServlet")
 public class PushMessageServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static final String serverNode = "tcs";
 
 	/**
 	 * Default constructor.
@@ -47,23 +44,14 @@ public class PushMessageServlet extends HttpServlet {
 
 		response.getWriter().write("RPC execute start!");
 
-		// 组装发送消息
-		String message = "Netty RPC Send, Netty is VeryGood!";
-		NettyTestData data = new NettyTestData();
-		
 		@SuppressWarnings("rawtypes")
 		RaptorRpc rpc = new RaptorRpc();
-
+		
 		try {
-			rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
-				@Override
-				public void invoke(RpcResponseBody responseBody) {
-				//	System.out.println("请求结果: " + responseBody);
-				}
-			}, 5, data, message);
+			RpcResponseBody result = rpc.sendSyncMessage(serverNode, "LoginAuth");
+			System.out.println("RPC Result: " + result);
 		} catch (RpcException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("异常: " + e.getMessage());
 		}
 		
 		response.getWriter().write("RPC execute ok!");
