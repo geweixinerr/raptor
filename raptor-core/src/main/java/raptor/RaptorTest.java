@@ -12,6 +12,8 @@ import java.util.concurrent.Executors;
 
 import org.springframework.util.ResourceUtils;
 
+import com.eaio.uuid.UUID;
+
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.ext.spring.LogbackConfigurer;
 import raptor.core.AbstractCallBack;
@@ -118,13 +120,13 @@ public final class RaptorTest {
 		}
 		LOGGER.exit(methodName, "服务身份证信息查询[end]");
 		
-		boolean isTest = false;
+		boolean isTest = true;
 		if (isTest) {
 			//测试分布式日志
 			int cpuNum = Runtime.getRuntime().availableProcessors();
 			Executor pool = Executors.newFixedThreadPool(cpuNum);
 			CyclicBarrier lock = new CyclicBarrier(cpuNum);
-			for (int i = 0; i < cpuNum; i++) {
+			for (int i = 0; i < cpuNum * 10; i++) {
 				pool.execute(new Runnable() {
 					@Override
 					public void run() {
@@ -132,10 +134,9 @@ public final class RaptorTest {
 							lock.await();
 						} catch (Exception e1) {
 						}
-						
+						RaptorLogger.THREAD_ID.set(new UUID().toString());
 						try {
-							RpcResponseBody response = rpc.sendSyncMessage("mc", "LoginAuth", mapMessage, message);
-							System.out.println("响应: " + response);
+							RpcResponseBody response = rpc.sendSyncMessage("mc", "LoginAuth");
 							if (response.getRpcCode().equals(RpcResult.SUCCESS)) {
 								LOGGER.info(methodName, "服务调用SUCCESS~");
 							} else {

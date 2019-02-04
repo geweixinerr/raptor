@@ -115,7 +115,7 @@ public final class RpcClient {
 	    	
 	    	//对象池配置
 	    	GenericObjectPoolConfig conf = new GenericObjectPoolConfig();
-	    	conf.setLifo(false); //池中实例的操作是否按照LIFO（后进先出）的原则,默认true[先入池的TCP连接先出]
+	    	conf.setLifo(true);
 	    	conf.setMaxTotal(Integer.parseInt(maxclients));  //池中最多可用的实例个数
 	    	conf.setMaxIdle(Integer.parseInt(maxclients)); //连接池中最大空闲的连接数,默认为8
 	    	conf.setMinIdle(Integer.parseInt(minclients)); //连接池中最少空闲的连接数,默认为0
@@ -129,7 +129,7 @@ public final class RpcClient {
 				@Override
 				protected void initChannel(SocketChannel ch) throws Exception {
 					ChannelPipeline pipline = ch.pipeline();
-					pipline.addLast(new IdleStateHandler(0,60 * 2,0, TimeUnit.SECONDS)); //心跳检测2分钟[单个tcp连接2分钟内没有出站动作]
+					pipline.addLast(new IdleStateHandler(0, 60 * 5, 0, TimeUnit.SECONDS)); //心跳检测2分钟[单个tcp连接2分钟内没有出站动作]
 					pipline.addLast(new RpcByteToMessageDecoder());
 					pipline.addLast(new RpcMessageToByteEncoder());
 					pipline.addLast(Constants.CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString(), serverNode));
