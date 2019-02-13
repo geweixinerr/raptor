@@ -36,13 +36,25 @@ public final class RaptorLogger {
 		this.logger = LoggerFactory.getLogger(c);
 	}
 
-	public void enter(String methodName, String msg) {		
+	public void enter(String methodName, String msg, boolean repeatThreadId) {		
+		if (!repeatThreadId) {
+			THREAD_ID.set(new UUID().toString());
+		}
+		
 		MDC.put(MDC_STATE, StringUtils.trimToEmpty(methodName) + " | " + LOGGER.enter);
 		MDC.put(MDC_INVOKE, THREAD_ID.get());
 		logger.info(msg);
 		MDC.clear();
 	}
+	
+	public void enter(String methodName, String msg) {		
+		enter(methodName, msg, true);
+	}
 
+	public void enter(String msg, boolean repeatThreadId) {
+		enter(null, msg, repeatThreadId);
+	}
+	
 	public void enter(String msg) {
 		enter(null, msg);
 	}
@@ -58,13 +70,25 @@ public final class RaptorLogger {
 		exit(null, msg);
 	}
 
-	public void info(String methodName, String msg) {
+	public void info(String methodName, String msg, boolean repeatThreadId) {
+		if (!repeatThreadId) {
+			THREAD_ID.set(new UUID().toString());
+		}
+		
 		MDC.put(MDC_STATE, StringUtils.trimToEmpty(methodName));
 		MDC.put(MDC_INVOKE, THREAD_ID.get());
 		logger.info(msg);		
 		MDC.clear();
 	}
+	
+	public void info(String methodName, String msg) {
+		info(methodName, msg, true);
+	}
 
+	public void info(String msg, boolean repeatThreadId) {
+		info(null, msg, repeatThreadId);
+	}
+	
 	public void info(String msg) {
 		info(null, msg);
 	}

@@ -120,7 +120,7 @@ public final class RaptorTest {
 		}
 		LOGGER.exit(methodName, "服务身份证信息查询[end]");
 		
-		boolean isTest = true;
+		boolean isTest = false;
 		if (isTest) {
 			//测试分布式日志
 			int cpuNum = Runtime.getRuntime().availableProcessors();
