@@ -29,6 +29,7 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 				future.addListener(new ChannelFutureListener() {
 					@Override
 					public void operationComplete(ChannelFuture future) throws Exception {
+						ThreadContext.TRACEID.set(msg.getTraceId());
 						if (future.isSuccess()) {
 							LOGGER.info("RPC服务端数据出站SUCCESS, " + responseBody);
 						} else {

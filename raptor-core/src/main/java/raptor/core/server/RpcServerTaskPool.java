@@ -7,8 +7,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
@@ -33,9 +31,7 @@ import raptor.util.StringUtil;
 public final class RpcServerTaskPool {
 
 	private static final RaptorLogger LOGGER = new RaptorLogger(RpcServerTaskPool.class);
-	
-	private static final Logger RAW_LOGGER = LoggerFactory.getLogger(RpcServerTaskPool.class);
-	
+		
 	private static final ThreadPoolTaskExecutor POOLTASKEXECUTOR = new ThreadPoolTaskExecutor();
 
 	private static final Map<String,RpcHandlerObject> RPC_MAPPING = RpcMappingInit.listRpcMapping();
@@ -48,7 +44,7 @@ public final class RpcServerTaskPool {
 	 * 
 	 **/
 	public static void initPool() {
-		RAW_LOGGER.info("初始化RPC Server业务线程池对象...");
+		LOGGER.info("初始化RPC Server业务线程池对象...");
 		POOLTASKEXECUTOR.setQueueCapacity(Constants.CPU_CORE * 10240); //队列深度. 
 		POOLTASKEXECUTOR.setCorePoolSize(Constants.CPU_CORE); // 核心线程数. 
 		POOLTASKEXECUTOR.setMaxPoolSize(Constants.CPU_CORE * 4); // 最大线程数. 

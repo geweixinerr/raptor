@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.raptor</groupId>
 	<artifactId>raptor</artifactId>
-	<version>1.0</version>
+	<version>1.1</version>
 	<packaging>pom</packaging>
 	<name>raptor project[猛禽项目]</name>
 	<description>基于Netty4开发的RPC服务框架raptor</description>
@@ -29,22 +29,22 @@
           <dependency>
              <groupId>cn.raptor</groupId>
              <artifactId>raptor-core</artifactId>
-             <version>1.0</version>
+             <version>1.1</version>
           </dependency>
           <dependency>
              <groupId>cn.raptor</groupId>
              <artifactId>raptor-plugin</artifactId>
-             <version>1.0</version>
+             <version>1.1</version>
           </dependency>
           <dependency>
              <groupId>cn.raptor</groupId>
              <artifactId>raptor-dao</artifactId>
-             <version>1.0</version>
+             <version>1.1</version>
           </dependency>
           <dependency>
              <groupId>cn.raptor</groupId>
              <artifactId>raptor-service</artifactId>
-             <version>1.0</version>
+             <version>1.1</version>
           </dependency>
         </dependencies>       
     </dependencyManagement>

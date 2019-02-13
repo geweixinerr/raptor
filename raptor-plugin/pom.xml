@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>cn.raptor</groupId>
 		<artifactId>raptor</artifactId>
-		<version>1.0</version>
+		<version>1.1</version>
 	</parent>
 	<artifactId>raptor-plugin</artifactId>
 	<name>raptor-service[RPC插件实现层]</name>

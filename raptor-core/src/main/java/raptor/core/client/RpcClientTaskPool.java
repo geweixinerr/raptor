@@ -5,8 +5,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.alibaba.ttl.TtlRunnable;
@@ -25,8 +23,6 @@ import raptor.util.StringUtil;
 public final class RpcClientTaskPool {
 
 	private static final RaptorLogger LOGGER = new RaptorLogger(RpcClientTaskPool.class);
-
-	private static final Logger RAW_LOGGER = LoggerFactory.getLogger(RpcClientTaskPool.class);
 	
 	private static final ThreadPoolTaskExecutor POOLTASKEXECUTOR = new ThreadPoolTaskExecutor();
 
@@ -40,7 +36,7 @@ public final class RpcClientTaskPool {
 	 * 
 	 **/
 	public static void initPool() {
-		RAW_LOGGER.info("初始化RPC Client业务线程池对象...");
+		LOGGER.info("初始化RPC Client业务线程池对象...");
 		POOLTASKEXECUTOR.setQueueCapacity(Constants.CPU_CORE * 10240); // 队列深度.
 		POOLTASKEXECUTOR.setCorePoolSize(Constants.CPU_CORE); // 核心线程数.
 		POOLTASKEXECUTOR.setMaxPoolSize(Constants.CPU_CORE * 4); // 最大线程数.
