@@ -26,6 +26,7 @@ import raptor.core.init.RpcParameter;
 import raptor.core.message.RpcResponseBody;
 import raptor.exception.RpcException;
 import raptor.log.RaptorLogger;
+import raptor.log.ThreadContext;
 
 /**
  * Raptor单元测试类
@@ -134,7 +135,7 @@ public final class RaptorTest {
 							lock.await();
 						} catch (Exception e1) {
 						}
-						RaptorLogger.THREAD_ID.set(new UUID().toString());
+						ThreadContext.TRACEID.set(new UUID().toString());
 						try {
 							RpcResponseBody response = rpc.sendSyncMessage("mc", "LoginAuth");
 							if (response.getRpcCode().equals(RpcResult.SUCCESS)) {

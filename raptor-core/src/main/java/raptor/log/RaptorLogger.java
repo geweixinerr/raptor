@@ -5,21 +5,12 @@ import org.slf4j.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alibaba.ttl.TransmittableThreadLocal;
 import com.eaio.uuid.UUID;
 
 /**
  * @author gewx Raptor PRC 日志框架
  **/
 public final class RaptorLogger {
-	
-	public static final TransmittableThreadLocal<String> THREAD_ID = new TransmittableThreadLocal<String>() {
-		@Override
-		protected String initialValue() {
-			String invokeId = new UUID().toString();
-			return invokeId;
-		}
-	};
 
 	enum LOGGER {
 		enter, exit, info, warn, error
@@ -27,7 +18,7 @@ public final class RaptorLogger {
 
 	private static final String MDC_STATE = "state";
 	
-	private static final String MDC_INVOKE = "invokeId";
+	private static final String MDC_TRACEID = "traceId";
 
 	private final Logger logger;
 
@@ -36,13 +27,13 @@ public final class RaptorLogger {
 		this.logger = LoggerFactory.getLogger(c);
 	}
 
-	public void enter(String methodName, String msg, boolean repeatThreadId) {		
-		if (!repeatThreadId) {
-			THREAD_ID.set(new UUID().toString());
+	public void enter(String methodName, String msg, boolean isRepeatTraceId) {		
+		if (!isRepeatTraceId) {
+			ThreadContext.TRACEID.set(new UUID().toString());
 		}
 		
 		MDC.put(MDC_STATE, StringUtils.trimToEmpty(methodName) + " | " + LOGGER.enter);
-		MDC.put(MDC_INVOKE, THREAD_ID.get());
+		MDC.put(MDC_TRACEID, ThreadContext.TRACEID.get());
 		logger.info(msg);
 		MDC.clear();
 	}
@@ -51,8 +42,8 @@ public final class RaptorLogger {
 		enter(methodName, msg, true);
 	}
 
-	public void enter(String msg, boolean repeatThreadId) {
-		enter(null, msg, repeatThreadId);
+	public void enter(String msg, boolean isRepeatTraceId) {
+		enter(null, msg, isRepeatTraceId);
 	}
 	
 	public void enter(String msg) {
@@ -61,7 +52,7 @@ public final class RaptorLogger {
 
 	public void exit(String methodName, String msg) {
 		MDC.put(MDC_STATE, StringUtils.trimToEmpty(methodName) + " | " + LOGGER.exit);
-		MDC.put(MDC_INVOKE, THREAD_ID.get());
+		MDC.put(MDC_TRACEID, ThreadContext.TRACEID.get());
 		logger.info(msg);
 		MDC.clear();
 	}
@@ -70,13 +61,13 @@ public final class RaptorLogger {
 		exit(null, msg);
 	}
 
-	public void info(String methodName, String msg, boolean repeatThreadId) {
-		if (!repeatThreadId) {
-			THREAD_ID.set(new UUID().toString());
+	public void info(String methodName, String msg, boolean isRepeatTraceId) {
+		if (!isRepeatTraceId) {
+			ThreadContext.TRACEID.set(new UUID().toString());
 		}
 		
 		MDC.put(MDC_STATE, StringUtils.trimToEmpty(methodName));
-		MDC.put(MDC_INVOKE, THREAD_ID.get());
+		MDC.put(MDC_TRACEID, ThreadContext.TRACEID.get());
 		logger.info(msg);		
 		MDC.clear();
 	}
@@ -85,8 +76,8 @@ public final class RaptorLogger {
 		info(methodName, msg, true);
 	}
 
-	public void info(String msg, boolean repeatThreadId) {
-		info(null, msg, repeatThreadId);
+	public void info(String msg, boolean isRepeatTraceId) {
+		info(null, msg, isRepeatTraceId);
 	}
 	
 	public void info(String msg) {
@@ -95,7 +86,7 @@ public final class RaptorLogger {
 
 	public void warn(String methodName, String msg) {
 		MDC.put(MDC_STATE, StringUtils.trimToEmpty(methodName));
-		MDC.put(MDC_INVOKE, THREAD_ID.get());
+		MDC.put(MDC_TRACEID, ThreadContext.TRACEID.get());
 		logger.warn(msg);
 		MDC.clear();
 	}
@@ -106,7 +97,7 @@ public final class RaptorLogger {
 
 	public void error(String methodName, String msg) {
 		MDC.put(MDC_STATE, StringUtils.trimToEmpty(methodName));
-		MDC.put(MDC_INVOKE, THREAD_ID.get());
+		MDC.put(MDC_TRACEID, ThreadContext.TRACEID.get());
 		logger.error(msg);
 		MDC.clear();
 	}

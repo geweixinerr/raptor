@@ -69,7 +69,7 @@ public final class RpcServerTaskPool {
 	 **/
 	public static void addTask(RpcRequestBody requestBody, AbstractCallBack call) {
 	    String rpcMethod = requestBody.getRpcMethod();
-	    String threadId = requestBody.getThreadId();
+	    String traceId = requestBody.getTraceId();
 		ListenableFuture<RpcResponseBody> future = POOLTASKEXECUTOR
 				.submitListenable(TtlCallable.get(new Callable<RpcResponseBody>() {
 					@Override
@@ -93,7 +93,7 @@ public final class RpcServerTaskPool {
 						RpcResponseBody body = new RpcResponseBody();
 						body.setRpcCode(RpcResult.SUCCESS);
 						body.setMessageId(requestBody.getMessageId());
-						body.setThreadId(threadId);
+						body.setTraceId(traceId);
 						body.setRpcMethod(rpcMethod);
 						body.setBody(result);
 						body.setMessage("RPC调用成功!");
@@ -119,7 +119,7 @@ public final class RpcServerTaskPool {
 				RpcResponseBody body = new RpcResponseBody();
 				body.setRpcCode(RpcResult.FAIL);
 				body.setMessageId(requestBody.getMessageId());
-				body.setThreadId(threadId);
+				body.setTraceId(traceId);
 				body.setRpcMethod(rpcMethod);
 				body.setMessage("RPC 服务调用失败,message:[" + ExceptionUtils.getRootCauseMessage(throwable) + "]");
 				

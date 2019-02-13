@@ -44,7 +44,7 @@ public final class RpcRequestBody implements RpcMessage {
 	/**
 	 * 线程号-分布式日志采集
 	 * **/
-	private String threadId;
+	private String traceId;
 	
 	/**
 	 * 业务超时时间,默认5秒(单位:秒)
@@ -71,12 +71,12 @@ public final class RpcRequestBody implements RpcMessage {
 	 * **/
 	private transient Long delayTime;
 	
-	public String getThreadId() {
-		return threadId;
+	public String getTraceId() {
+		return traceId;
 	}
 
-	public void setThreadId(String threadId) {
-		this.threadId = threadId;
+	public void setTraceId(String traceId) {
+		this.traceId = traceId;
 	}
 
 	public Long getDelayTime() {

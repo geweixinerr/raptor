@@ -43,7 +43,7 @@ public final class RpcResponseBody implements RpcMessage {
 	/**
 	 * 线程号-分布式日志采集
 	 * **/
-	private String threadId;
+	private String traceId;
 	
 	/**
 	 * 业务-->服务器响应到达客户端时间
@@ -55,12 +55,12 @@ public final class RpcResponseBody implements RpcMessage {
 	 * **/
 	private  transient Integer rpcTime; 
 
-	public String getThreadId() {
-		return threadId;
+	public String getTraceId() {
+		return traceId;
 	}
 
-	public void setThreadId(String threadId) {
-		this.threadId = threadId;
+	public void setTraceId(String traceId) {
+		this.traceId = traceId;
 	}
 
 	public String getMessage() {

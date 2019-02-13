@@ -49,7 +49,6 @@ public final class ThreadLocalCleanUpListener implements ServletRequestListener 
 			Method getMethod = Reference.class.getDeclaredMethod("get");
 			if (entry != null) {
 				ThreadLocal threadLocal = (ThreadLocal) getMethod.invoke(entry);
-				System.out.println(threadLocal);
 				removeInThreadLocalMap.invoke(threadLocalsInThread, threadLocal);
 			}
 		}
@@ -57,7 +56,6 @@ public final class ThreadLocalCleanUpListener implements ServletRequestListener 
 
 	@Override
 	public void requestDestroyed(ServletRequestEvent paramServletRequestEvent) {
-		System.out.println("destory");
 		try {
 			cleanUpThreadLocals();
 		} catch (Exception e) {
@@ -67,7 +65,7 @@ public final class ThreadLocalCleanUpListener implements ServletRequestListener 
 
 	@Override
 	public void requestInitialized(ServletRequestEvent paramServletRequestEvent) {
-		System.out.println("init");
+		
 	}
 
 }

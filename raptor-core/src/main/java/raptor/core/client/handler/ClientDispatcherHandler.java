@@ -23,6 +23,7 @@ import raptor.core.client.RpcClientTaskPool;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
 import raptor.log.RaptorLogger;
+import raptor.log.ThreadContext;
 import raptor.util.StringUtil;
 
 /**
@@ -70,7 +71,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 				//mark:回调此处会发生一次线程上下文切换,需要重置线程号.
-				RaptorLogger.THREAD_ID.set(requestBody.getThreadId());
+				ThreadContext.TRACEID.set(requestBody.getTraceId());
 				if (future.isSuccess()) {
 					LOGGER.info("RPC客户端数据出站SUCCESS, " + requestBody);
 					try {
@@ -81,7 +82,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 						pool.invalidateObject(rpc);
 					}
  				} else {
- 					outboundException(requestBody.getMessageId(), requestBody.getThreadId(), "Rpc出站Fail.", RpcResult.FAIL_NETWORK_TRANSPORT);
+ 					outboundException(requestBody.getMessageId(), requestBody.getTraceId(), "Rpc出站Fail.", RpcResult.FAIL_NETWORK_TRANSPORT);
 					String message = StringUtil.getErrorText(future.cause()); 
 					LOGGER.warn("RPC客户端数据出站FAIL: " + requestBody + ", tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);	
  					pool.invalidateObject(rpc);
@@ -126,7 +127,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			return;
 		}
 		
-		RaptorLogger.THREAD_ID.set(responseBody.getThreadId());
+		ThreadContext.TRACEID.set(responseBody.getTraceId());
 		responseBody.setReturnTime(new DateTime());	
 		RpcClientTaskPool.addTask(responseBody); 
 		
@@ -178,12 +179,12 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		
 	}
 	
-	private static void outboundException(String messageId, String threadId, String message, RpcResult rpcCode) {
+	private static void outboundException(String messageId, String traceId, String message, RpcResult rpcCode) {
 		RpcResponseBody responseBody = new RpcResponseBody();
 		responseBody.setRpcCode(rpcCode);
 		responseBody.setMessage(message);
 		responseBody.setMessageId(messageId);
-		responseBody.setThreadId(threadId);
+		responseBody.setTraceId(traceId);
 		RpcClientTaskPool.addTask(responseBody); 
 	}
 	

@@ -9,6 +9,7 @@ import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
 import raptor.core.server.RpcServerTaskPool;
 import raptor.log.RaptorLogger;
+import raptor.log.ThreadContext;
 import raptor.util.StringUtil;
 
 /**
@@ -20,7 +21,7 @@ public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<R
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcRequestBody msg) throws Exception {
-		RaptorLogger.THREAD_ID.set(msg.getThreadId());
+		ThreadContext.TRACEID.set(msg.getTraceId());
 		RpcServerTaskPool.addTask(msg, new AbstractCallBack() {
 			@Override
 			public void invoke(RpcResponseBody responseBody) {
