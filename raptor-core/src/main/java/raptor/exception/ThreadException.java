@@ -1,8 +1,6 @@
 package raptor.exception;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import raptor.log.RaptorLogger;
 import raptor.util.StringUtil;
 
 
@@ -12,7 +10,7 @@ import raptor.util.StringUtil;
 
 public final class ThreadException implements Thread.UncaughtExceptionHandler{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ThreadException.class);
+	private static final RaptorLogger LOGGER = new RaptorLogger(ThreadException.class);
 
 	public ThreadException() {
 	}

@@ -129,7 +129,7 @@ public final class RpcClient {
 				@Override
 				protected void initChannel(SocketChannel ch) throws Exception {
 					ChannelPipeline pipline = ch.pipeline();
-					pipline.addLast(new IdleStateHandler(0, 60 * 5, 0, TimeUnit.SECONDS)); //心跳检测2分钟[单个tcp连接2分钟内没有出站动作]
+					pipline.addLast(new IdleStateHandler(0, 60 * 5, 0, TimeUnit.SECONDS)); //心跳检测5分钟[单个tcp连接5分钟内没有出站/入站动作]
 					pipline.addLast(new RpcByteToMessageDecoder());
 					pipline.addLast(new RpcMessageToByteEncoder());
 					pipline.addLast(Constants.CLIENT_DISPATCHER, new ClientDispatcherHandler(new UUID().toString(), serverNode));
