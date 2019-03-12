@@ -59,7 +59,7 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 	
 		//初始化建立服务端RPC映射关系
 		Map<String,Object> rpcMap = context.getBeansWithAnnotation(RpcHandler.class);
-		RpcMappingInit.initRpcMapping(rpcMap);
+		RpcMapping.initRpcMapping(rpcMap);
 	}
 	
 	@Override

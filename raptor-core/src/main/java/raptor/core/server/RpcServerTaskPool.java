@@ -17,7 +17,7 @@ import raptor.core.AbstractCallBack;
 import raptor.core.Constants;
 import raptor.core.RpcResult;
 import raptor.core.init.RpcHandlerObject;
-import raptor.core.init.RpcMappingInit;
+import raptor.core.init.RpcMapping;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
 import raptor.exception.RpcException;
@@ -34,7 +34,7 @@ public final class RpcServerTaskPool {
 		
 	private static final ThreadPoolTaskExecutor POOLTASKEXECUTOR = new ThreadPoolTaskExecutor();
 
-	private static final Map<String,RpcHandlerObject> RPC_MAPPING = RpcMappingInit.listRpcMapping();
+	private static final Map<String,RpcHandlerObject> RPC_MAPPING = RpcMapping.listRpcMapping();
 	
 	private RpcServerTaskPool() {
 	}

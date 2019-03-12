@@ -10,9 +10,9 @@ import raptor.core.annotation.RpcMethod;
 /**
  * @author gewx RPC服务端映射初始化类
  * **/
-public final class RpcMappingInit {
+public final class RpcMapping {
 
-	private RpcMappingInit() {
+	private RpcMapping() {
 	}
 	
 	private static final Map<String,RpcHandlerObject> RPC_MAPPING = new ConcurrentHashMap<String,RpcHandlerObject>(64);

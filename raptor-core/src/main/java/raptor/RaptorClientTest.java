@@ -26,11 +26,11 @@ import raptor.exception.RpcException;
 import raptor.log.RaptorLogger;
 
 /**
- * Raptor单元测试类
+ * Raptor客户端测试类
  * **/
-public final class RaptorTest {
+public final class RaptorClientTest {
 
-	private static final RaptorLogger LOGGER = new RaptorLogger(RaptorTest.class);
+	private static final RaptorLogger LOGGER = new RaptorLogger(RaptorClientTest.class);
 
 	static {
 		//init logback
@@ -41,7 +41,7 @@ public final class RaptorTest {
 			System.out.println("日志初始化失败!");
 		}
 		
-		LOGGER.info("初始化服务器参数...");
+		LOGGER.info("初始化客户端参数...");
 		List<Map<String,String>> clientConfig = new ArrayList<Map<String,String>>();
 		
 		Map<String,String> config = new HashMap<String,String>();
@@ -119,7 +119,7 @@ public final class RaptorTest {
 		}
 		LOGGER.exit(methodName, "服务身份证信息查询[end]");
 		
-		boolean isTest = true;
+		boolean isTest = false;
 		if (isTest) {
 			//测试分布式日志
 			int cpuNum = Runtime.getRuntime().availableProcessors();
