@@ -20,13 +20,10 @@ import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 import raptor.core.Constants;
 import raptor.core.handler.codec.RpcByteToMessageDecoder;
 import raptor.core.handler.codec.RpcMessageToByteEncoder;
 import raptor.core.init.RpcParameter;
-import raptor.core.init.RpcParameterEnum;
 import raptor.core.server.handler.ServerDispatcherHandler;
 import raptor.exception.RpcException;
 import raptor.util.StringUtil;
@@ -83,11 +80,7 @@ public final class RpcServer {
 				.childHandler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
-						String logOnOff = serverConfig.get(RpcParameterEnum.LOGONOFF.getCode());
 						ChannelPipeline pipline = ch.pipeline();
-						if (Constants.LogOn.equals(logOnOff)) {
-							pipline.addLast(new LoggingHandler(LogLevel.INFO));
-						}
 						pipline.addLast(new RpcByteToMessageDecoder());
 						pipline.addLast(new RpcMessageToByteEncoder());
 						pipline.addLast(new ServerDispatcherHandler());
