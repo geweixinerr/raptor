@@ -57,7 +57,7 @@ public final class RaptorClientTest {
 		RpcClientTaskPool.initPool();	
 		RpcClientTimeOutScan.scan();
 		try {
-			RpcClient.start();
+			RpcClient.connection();
 		} catch (Exception e1) {
 			LOGGER.info("启动异常: " + e1.getMessage());			
 		}

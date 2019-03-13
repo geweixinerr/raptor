@@ -54,7 +54,7 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 			RpcParameter.INSTANCE.initRpcParameter(clientConfig);		
 			RpcClientTaskPool.initPool();	
 			RpcClientTimeOutScan.scan(); //启动客户端超时请求清理器
-			RpcClient.start();
+			RpcClient.connection();
 		}
 	
 		//初始化建立服务端RPC映射关系

@@ -99,7 +99,7 @@ public final class RpcClient {
 	 * @throws Exception
 	 **/
 	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static void start() throws Exception {
+	public static void connection() throws Exception {
 		Bootstrap boot = new Bootstrap();
 		EventLoopGroup eventGroup = new NioEventLoopGroup(Constants.CPU_CORE + 1);
 		boot.group(eventGroup).channel(NioSocketChannel.class)
