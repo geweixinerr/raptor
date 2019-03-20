@@ -40,7 +40,7 @@ public final class RpcServerTaskPool {
 	}
 
 	/**
-	 * @author gewx 初始化线程配置
+	 * @author gewx 初始化线程配置[根据各自系统实际情况,可自行定制]
 	 * 
 	 **/
 	public static void initPool() {

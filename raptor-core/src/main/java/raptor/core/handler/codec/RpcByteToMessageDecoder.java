@@ -14,12 +14,14 @@ import io.netty.handler.codec.ByteToMessageDecoder;
  * **/
 public final class RpcByteToMessageDecoder extends ByteToMessageDecoder {
 
+	private static final int INT_BYTE_LEN = 4; 
+	
 	private final FSTConfiguration configuration = FSTConfiguration.createDefaultConfiguration();
 	
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
 		in.markReaderIndex();
-		if (in.readableBytes() < 4) {
+		if (in.readableBytes() < INT_BYTE_LEN) {
 			return;
 		}
 		
@@ -32,7 +34,7 @@ public final class RpcByteToMessageDecoder extends ByteToMessageDecoder {
 
 		byte [] rpcByteArray = new byte[rpcByteCount];
 		in.readBytes(rpcByteArray);
-//		in.discardReadBytes(); //清理无效堆外内存.时间换CPU空间[这行代码可不加].
+//		in.discardReadBytes(); //清理已读取后的无效堆外内存空间.[原理是: 时间(CPU)换空间(堆外内存),这行代码可不加].
 
 		Object rpcObject = configuration.asObject(rpcByteArray); //反序列化
 		out.add(rpcObject);	
