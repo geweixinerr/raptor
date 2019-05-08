@@ -15,16 +15,16 @@ import raptor.core.message.RpcResponseBody;
 import raptor.util.StringUtil;
 
 /**
- * @author gewx RPC请求客户端超时扫描: 本线程执行过期消息清理.
+ * @author gewx RPC 客户端监视器,定时执行超时扫描: 本线程执行过期消息清理.
  * 
  **/
-public final class RpcClientTimeOutScan {
+public final class RpcClientMonitor {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RpcClientTimeOutScan.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RpcClientMonitor.class);
 
 	private static final ScheduledExecutorFactoryBean factory = new ScheduledExecutorFactoryBean();
 
-	private RpcClientTimeOutScan() {
+	private RpcClientMonitor() {
 	}
 
 	/**

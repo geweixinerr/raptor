@@ -48,4 +48,9 @@ public interface RpcPushDefine {
 	 * @author gewx 心跳检测包方法名
 	 * **/
 	String HEARTBEAT_METHOD = "heartbeat";
+	
+	/**
+	 * @author gewx 熔断
+	 * **/
+	String CIRCUIT_BREAKER = "CircuitBreaker";
 }

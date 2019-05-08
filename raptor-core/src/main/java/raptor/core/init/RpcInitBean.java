@@ -15,9 +15,10 @@ import org.springframework.stereotype.Service;
 import raptor.core.annotation.RpcHandler;
 import raptor.core.client.RpcClient;
 import raptor.core.client.RpcClientTaskPool;
-import raptor.core.client.task.RpcClientTimeOutScan;
+import raptor.core.client.task.RpcClientMonitor;
 import raptor.core.server.RpcServer;
 import raptor.core.server.RpcServerTaskPool;
+import raptor.core.server.task.RpcServerMonitor;
 
 /**
  * @author gewx RPC客户端/服务端初始化,并负责RPC服务关闭资源释放
@@ -45,6 +46,7 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 			RpcParameter.INSTANCE.initRpcParameter(serverConfig);
 			RpcServerTaskPool.initPool();
 			RpcServer.start();	
+			RpcServerMonitor.scan();
 		}
 		
 		//客户端启动
@@ -53,8 +55,8 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 			List<Map<String,String>> clientConfig = (List<Map<String,String>>) context.getBean("NettyPoolConfig");
 			RpcParameter.INSTANCE.initRpcParameter(clientConfig);		
 			RpcClientTaskPool.initPool();	
-			RpcClientTimeOutScan.scan(); //启动客户端超时请求清理器
 			RpcClient.connection();
+			RpcClientMonitor.scan(); //启动客户端超时请求清理器
 		}
 	
 		//初始化建立服务端RPC映射关系
