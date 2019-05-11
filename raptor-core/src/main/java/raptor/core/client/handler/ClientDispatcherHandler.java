@@ -125,10 +125,7 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 			heartbeatCount.set(0);
 			LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcpId: " + getTcpId() + ", serverNode: " + serverNode);
 			return;
-		} else if (CIRCUIT_BREAKER.equals(responseBody.getRpcMethod())) {
-			//处理熔断
-			return;
-		}
+		} 
 		
 		ThreadContext.TRACEID.set(responseBody.getTraceId());
 		responseBody.setReturnTime(new DateTime());	
