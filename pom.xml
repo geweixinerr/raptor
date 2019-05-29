@@ -359,7 +359,15 @@
 		    <artifactId>p6spy</artifactId>
 		    <version>3.8.1</version>
 		</dependency>
-
+		
+		<!-- 硬件采集开源工具 -->
+		<!-- https://mvnrepository.com/artifact/org.fusesource/sigar -->
+		<dependency>
+		    <groupId>org.fusesource</groupId>
+		    <artifactId>sigar</artifactId>
+		    <version>1.6.4</version>
+		</dependency>
+		
 	</dependencies>
 
 	<build>
