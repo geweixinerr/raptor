@@ -28,7 +28,7 @@ public class PushMessageServlet extends HttpServlet {
 	 * Default constructor.
 	 */
 	public PushMessageServlet() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/**

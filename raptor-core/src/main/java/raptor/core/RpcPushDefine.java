@@ -52,5 +52,5 @@ public interface RpcPushDefine {
 	/**
 	 * @author gewx 熔断
 	 * **/
-	String CIRCUIT_BREAKER = "CircuitBreaker";
+	String CIRCUIT_BREAKER = "circuitBreaker";
 }

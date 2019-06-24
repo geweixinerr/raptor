@@ -8,7 +8,6 @@ import raptor.core.RpcResult;
 import raptor.core.annotation.RpcHandler;
 import raptor.core.annotation.RpcMethod;
 import raptor.core.client.NettyTestData;
-import raptor.dao.member.MemberInfoDao;
 import raptor.exception.RpcException;
 import raptor.log.RaptorLogger;
 import raptor.plugin.demo.DemoPlugin;
@@ -25,9 +24,13 @@ public final class AlibabaService {
 	@Autowired
 	private DemoPlugin plugin;
 
+	/**
+	 * @author gewx 剔除MySQL操作
+	 * **/
+	/*
 	@Autowired
 	private MemberInfoDao memberInfoDao;
-	
+	*/
 	/**登录认证**/
 	@RpcMethod
 	public String LoginAuth() {
@@ -62,8 +65,8 @@ public final class AlibabaService {
 	/**登录认证**/
 	@RpcMethod
 	public String LoginAuth(NettyTestData params,String message) {
-		String dbMessage = memberInfoDao.selectOne();
-		return message +", dbMessage: " + dbMessage;
+		//String dbMessage = memberInfoDao.selectOne();
+		return "return: " + message;
 	}
 	
 }
