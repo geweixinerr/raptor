@@ -15,7 +15,7 @@ http://localhost:9090/raptor/druid/index.html
 
 # 其他
 raptor为个人研发项目,在研发过程中可能需要兼顾模拟实际的业务场景测试而引入第三方外部资源依赖[MySQL/Redis]等,继而会引入一些配置.
-这些配置需要您在下载之后根据实际情况进行修改. 如遇到问题可issue与我沟通交流,我将感激不尽.
+这些配置需要您在下载之后根据实际情况进行修改. 如遇到问题可Issues与我沟通交流,我将感激不尽.
 
 # MySQL数据源配置
 raptor\deploy\vars <br>
