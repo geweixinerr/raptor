@@ -101,7 +101,7 @@ public final class RpcClient {
 	@SuppressWarnings({ "rawtypes", "unchecked"})
 	public static void connection() throws Exception {
 		Bootstrap boot = new Bootstrap();
-		EventLoopGroup eventGroup = new NioEventLoopGroup(Constants.CPU_CORE + 1);
+		EventLoopGroup eventGroup = new NioEventLoopGroup(Constants.CPU_CORE * 2);
 		boot.group(eventGroup).channel(NioSocketChannel.class)
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DEFAULT_TIME_OUT) 
 				.option(ChannelOption.SO_RCVBUF, 256 * Constants.ONE_KB) 

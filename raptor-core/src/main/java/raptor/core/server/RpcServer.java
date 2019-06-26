@@ -57,12 +57,12 @@ public final class RpcServer {
 			LOGGER.info("Linux系统下,RPC Server启动...");
 			// Linux Epoll
 			EventLoopGroup acceptGroup = new EpollEventLoopGroup(1); 
-			EventLoopGroup ioGroup = new EpollEventLoopGroup(Constants.CPU_CORE + 1); 
+			EventLoopGroup ioGroup = new EpollEventLoopGroup(Constants.CPU_CORE * 2); 
 			server.group(acceptGroup, ioGroup).channel(EpollServerSocketChannel.class);
 		} else {
 			LOGGER.info("非Linux系统下,RPC Server启动...");
 			EventLoopGroup acceptGroup = new NioEventLoopGroup(1); 
-			EventLoopGroup ioGroup = new NioEventLoopGroup(Constants.CPU_CORE + 1); 
+			EventLoopGroup ioGroup = new NioEventLoopGroup(Constants.CPU_CORE * 2); 
 			server.group(acceptGroup, ioGroup).channel(NioServerSocketChannel.class);
 		}
 		
@@ -73,7 +73,10 @@ public final class RpcServer {
 			localAddress = new InetSocketAddress(Integer.parseInt(serverConfig.get(PORT)));
 		}
 		
-		server.option(ChannelOption.SO_BACKLOG, 8192) // 服务端接受连接的队列长度，如果队列已满，客户端连接将被拒绝。默认值，Windows为200，其他为128。
+		/**
+		 *  服务端接受连接的队列长度，如果队列已满，客户端连接将被拒绝。默认值，Windows为200，其他为128。
+		 * **/
+		server.option(ChannelOption.SO_BACKLOG, 8192) 
 				.childOption(ChannelOption.SO_RCVBUF, 256 * Constants.ONE_KB)
 				.childOption(ChannelOption.SO_SNDBUF, 256 * Constants.ONE_KB)
 				.localAddress(localAddress)
@@ -99,7 +102,6 @@ public final class RpcServer {
 				}
 			}
 		});
-
 	}
 
 	/**
