@@ -10,8 +10,21 @@ http://localhost:9090/raptor/
 # Druid监控
 http://localhost:9090/raptor/druid/index.html
 
-# 客户端测试
-参考: raptor.RaptorClientTest
+# 测试
+服务器启动： 已eclipse为例，选中raptor-web子模块, 执行Maven插件命令 jetty:run
+```
+2019-08-10 13:27:20.609||[main] INFO   raptor.core.init.RpcInitBean - 应用服务器启动,RPC服务端参数初始化...
+2019-08-10 13:27:20.689||[main] INFO   raptor.core.server.RpcServerTaskPool - 初始化RPC Server业务线程池对象...
+2019-08-10 13:27:20.691||[main] INFO   o.s.s.c.ThreadPoolTaskExecutor - Initializing ExecutorService
+2019-08-10 13:27:20.724||[main] INFO   raptor.core.server.RpcServer - 非Linux系统下,RPC Server启动...
+2019-08-10 13:27:21.340||[nioEventLoopGroup-2-1] INFO   raptor.core.server.RpcServer - RPC 服务启动成功!
+2019-08-10 13:27:21.342||[main] INFO   r.core.server.task.RpcServerMonitor - RpcServerMonitor监视器扫描...
+2019-08-10 13:27:21.344||[main] INFO   o.s.s.c.ScheduledExecutorFactoryBean - Initializing ExecutorService
+2019-08-10 13:27:21.348||[main] INFO   raptor.core.init.RpcInitBean - 应用服务器启动,RPC客户端参数初始化...
+2019-08-10 13:27:21.386||[main] INFO   raptor.core.client.RpcClientTaskPool - 初始化RPC Client业务线程池对象...
+........
+```
+客户端连接测试参考: raptor.RaptorClientTest
 
 # 其他
 raptor为个人研发项目,在研发过程中可能需要兼顾模拟实际的业务场景测试而引入第三方外部资源依赖[MySQL/Redis]等,继而会引入一些配置.
