@@ -333,7 +333,7 @@
 					<configuration>
 						<!-- <scanIntervalSeconds>10</scanIntervalSeconds> -->
 						<stopPort>9091</stopPort>
-						<stopKey>foo</stopKey>
+						<stopKey>stopJetty</stopKey>
 						<stopWait>10</stopWait>
 						<webApp>
 							<contextPath>/raptor</contextPath>
