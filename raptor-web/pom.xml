@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
 <project
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>cn.raptor</groupId>
-		<artifactId>raptor</artifactId>		
+		<artifactId>raptor</artifactId>
 		<version>1.1</version>
 	</parent>
 
@@ -20,11 +21,30 @@
 			<groupId>cn.raptor</groupId>
 			<artifactId>raptor-core</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>cn.raptor</groupId>
 			<artifactId>raptor-service</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>javax.servlet.jsp-api</artifactId>
+		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 	
 </project>
