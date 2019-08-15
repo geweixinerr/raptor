@@ -26,7 +26,7 @@ http://localhost:9090/raptor/druid/index.html
 ```
 客户端连接测试参考: raptor.RaptorClientTest
 
-#raptor中间件核心目录说明:
+# raptor中间件核心目录说明:
 raptor-core [核心模块,可独立剥离出来。其他的模块是作为常规项目演示如何引用raptor-core使用而创立]
 
 # 其他
