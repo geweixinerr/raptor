@@ -52,11 +52,6 @@
 			</dependency>
 
 			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-			</dependency>
-
-			<dependency>
 				<groupId>io.netty</groupId>
 				<artifactId>netty-all</artifactId>
 			</dependency>
@@ -135,8 +130,8 @@
 			</dependency>
 			
 			<dependency>
-				<groupId>com.alibaba</groupId>
-				<artifactId>druid</artifactId>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
 			</dependency>
 	</dependencies>
 </project>
