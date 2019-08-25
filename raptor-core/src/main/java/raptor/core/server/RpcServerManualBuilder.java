@@ -19,15 +19,17 @@ public final class RpcServerManualBuilder {
 	private static final String ADDRESS_KEY = "localAddress";
 
 	private static final String PORT = "port";
+	
+	private static final int ZERO = 0;
 
 	private final Map<String, String> CONFIG_MAP;
 
 	private final ApplicationContext context;
 
-	private RpcServerManualBuilder(String address, String port, ApplicationContext context) {
+	private RpcServerManualBuilder(String address, int port, ApplicationContext context) {
 		CONFIG_MAP = new HashMap<>();
 		CONFIG_MAP.put(ADDRESS_KEY, address);
-		CONFIG_MAP.put(PORT, port);
+		CONFIG_MAP.put(PORT, String.valueOf(port));
 		this.context = context;
 	}
 
@@ -49,22 +51,22 @@ public final class RpcServerManualBuilder {
 
 		private String address;
 
-		private String port;
+		private int port;
 
 		private ApplicationContext context;
 
-		public Builder address(String address) {
-			this.address = address;
+		public Builder address(String _address) {
+			this.address = _address;
 			return this;
 		}
 
-		public Builder port(String port) {
-			this.port = port;
+		public Builder port(int _port) {
+			this.port = _port;
 			return this;
 		}
 
-		public Builder setContext(ApplicationContext context) {
-			this.context = context;
+		public Builder setContext(ApplicationContext _context) {
+			this.context = _context;
 			return this;
 		}
 
@@ -78,7 +80,7 @@ public final class RpcServerManualBuilder {
 			throw new NullPointerException("Rpc Server Configuration --> localAddress is Empty!");
 		}
 
-		if (StringUtils.isBlank(CONFIG_MAP.get(PORT))) {
+		if (Integer.parseInt(CONFIG_MAP.get(PORT)) == ZERO) {
 			throw new NullPointerException("Rpc Server Configuration --> port is Empty!");
 		}
 	}

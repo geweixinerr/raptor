@@ -5,15 +5,15 @@
 3.支持分布式日志采集[traceId设计]
 
 # 启动
-raptor 服务端启动分为两种方式:
+服务端启动分为两种方式:
 1.Spring方式 可以在服务端配置文件中设置初始化Bean
 ```
 <bean name="RpcinitBean" class="raptor.core.init.RpcInitBean"/>
 ```
 同时也需要配置 RpcServerConfig,如下:
 ```
-    <!-- RPC服务端配置,NIO线程池大小根据服务器所在物理主机CPU核心数动态拓展,数值设定为: core * 2 -->
-    <bean id="RpcServerConfig" class="org.springframework.beans.factory.config.MapFactoryBean">
+ <!-- RPC服务端配置,NIO线程池大小根据服务器所在物理主机CPU核心数动态拓展,数值设定为: core * 2 -->
+<bean id="RpcServerConfig" class="org.springframework.beans.factory.config.MapFactoryBean">
 		<property name="targetMapClass">
 			<value>java.util.HashMap</value>
 		</property>
@@ -24,15 +24,76 @@ raptor 服务端启动分为两种方式:
 				<entry key="port" value="8090"/> <!-- 服务端口号 -->
 			</map>
 		</property>    
-	</bean>  
+</bean>  
 ```
 备注:以上配置必须同时出现在系统中,才可以配合启动服务.
 
 2.编码式手工启动方式
 ```
+// 模拟启动Spring,以作测试.
+ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
 
+//手工构建Server参数,启动服务
+RpcServerManualBuilder server = new RpcServerManualBuilder.Builder().address("localhost").port(8090)
+		.setContext(context).build();
+server.start();
 ```
+客户端启动分为两种方式: 
+1.Spring方式 可以在服务端配置文件中设置客户端初始化
+```
+<!-- Netty Pool客户端配置 -->
+<bean id="NettyPoolConfig"
+	class="org.springframework.beans.factory.config.ListFactoryBean">
+	<property name="targetListClass" value="java.util.concurrent.CopyOnWriteArrayList" />
+	<property name="singleton" value="false" />
+	<property name="sourceList">
+		<list>
+		    <bean class="org.springframework.beans.factory.config.MapFactoryBean">
+				<property name="targetMapClass">
+					<value>java.util.HashMap</value>
+				</property>
+				<property name="sourceMap">
+					<map>
+					    <entry key="serverNode" value="mc"/>
+						<entry key="remote" value="localhost"/> 
+						<entry key="port" value="8090"/>
+						<entry key="maxclients" value="32"/> 
+						<entry key="minclients" value="6"/> 
+					</map>
+				</property>    
+			</bean>  
+		    <bean class="org.springframework.beans.factory.config.MapFactoryBean">
+				<property name="targetMapClass">
+					<value>java.util.HashMap</value>
+				</property>
+				<property name="sourceMap">
+					<map>
+					    <entry key="serverNode" value="tcs"/>
+						<entry key="remote" value="localhost"/> 
+						<entry key="port" value="8090"/>
+						<entry key="maxclients" value="32"/> 
+						<entry key="minclients" value="6"/> 
+					</map>
+				</property>    
+			</bean>  
+		</list>
+	</property>
+</bean>
+```
+2.编码式手工启动方式
+```
+//在类的静态模块里建立与服务器的连接
+static {
+	RpcClientManualBuilder clientBuilder = new RpcClientManualBuilder.Builder().serverNode("mc").remote("localhost")
+			.port(8090).addClient().build();
 
+	try {
+		clientBuilder.connection();
+	} catch (Exception e) {
+		LOGGER.error("客户端初始化异常: " + StringUtil.getErrorText(e));
+	}
+}
+```
 # 测试
 服务器启动： 已eclipse为例，选中raptor-web子模块, 执行Maven插件命令 jetty:run
 ```

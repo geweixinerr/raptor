@@ -115,11 +115,11 @@ public final class RpcClient {
 	    	
 	    	//对象池配置
 	    	GenericObjectPoolConfig conf = new GenericObjectPoolConfig();
-	    	conf.setLifo(true);
+	    	conf.setLifo(false);
 	    	conf.setMaxTotal(Integer.parseInt(maxclients));  //池中最多可用的实例个数
 	    	conf.setMaxIdle(Integer.parseInt(maxclients)); //连接池中最大空闲的连接数,默认为8
 	    	conf.setMinIdle(Integer.parseInt(minclients)); //连接池中最少空闲的连接数,默认为0
-	    	conf.setBlockWhenExhausted(true); //池无可用对象,是否堵塞等待对象创建. (true:等待,false:不等待)
+	    	conf.setBlockWhenExhausted(false); //池无可用对象,是否堵塞等待对象创建. (true:等待,false:不等待)
 	    	conf.setMaxWaitMillis(-1); //调用borrowObject方法时，需要等待的最长时间. 单位:毫秒
 	    	conf.setMinEvictableIdleTimeMillis(-1); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除 （-1 :不移除,使用setSoftMinEvictableIdleTimeMillis配置）
 	    	conf.setSoftMinEvictableIdleTimeMillis(5 * 60 * DEFAULT_MILLIS); //连接空闲的最小时间，达到此值后空闲连接将可能会被移除[tcp连接空闲超时设置5分钟]
