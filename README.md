@@ -4,11 +4,34 @@
 2.支持吞吐量优先模式/支持低延迟优先模式 <br>
 3.支持分布式日志采集[traceId设计]
 
-# 项目地址访问
-http://localhost:9090/raptor/
+# 启动
+raptor 服务端启动分为两种方式:
+1.Spring方式 可以在服务端配置文件中设置初始化Bean
+```
+<bean name="RpcinitBean" class="raptor.core.init.RpcInitBean"/>
+```
+同时也需要配置 RpcServerConfig,如下:
+```
+    <!-- RPC服务端配置,NIO线程池大小根据服务器所在物理主机CPU核心数动态拓展,数值设定为: core * 2 -->
+    <bean id="RpcServerConfig" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="targetMapClass">
+			<value>java.util.HashMap</value>
+		</property>
+		
+		<property name="sourceMap">
+			<map>
+			    <entry key="localAddress" value="localhost"/> <!-- 绑定的服务器IP地址 -->
+				<entry key="port" value="8090"/> <!-- 服务端口号 -->
+			</map>
+		</property>    
+	</bean>  
+```
+备注:以上配置必须同时出现在系统中,才可以配合启动服务.
 
-# Druid监控
-http://localhost:9090/raptor/druid/index.html
+2.编码式手工启动方式
+```
+
+```
 
 # 测试
 服务器启动： 已eclipse为例，选中raptor-web子模块, 执行Maven插件命令 jetty:run

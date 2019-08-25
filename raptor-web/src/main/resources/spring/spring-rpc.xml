@@ -21,6 +21,9 @@
 	<!-- 开启注解扫描 -->
 	<context:component-scan base-package="raptor.*"/>
 
+    <!-- 手工注册初始化 -->
+    <bean name="RpcinitBean" class="raptor.core.init.RpcInitBean"/>
+    
     <!-- RPC服务端配置,NIO线程池大小根据服务器所在物理主机CPU核心数动态拓展,数值设定为: core * 2 -->
     <bean id="RpcServerConfig" class="org.springframework.beans.factory.config.MapFactoryBean">
 		<property name="targetMapClass">

@@ -3,6 +3,7 @@ package raptor.service;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import raptor.core.RpcResult;
 import raptor.core.annotation.RpcHandler;
@@ -17,6 +18,7 @@ import raptor.plugin.demo.DemoPlugin;
  * **/
 
 @RpcHandler
+@Service
 public final class AlibabaService {
 
 	private static final RaptorLogger LOGGER = new RaptorLogger(AlibabaService.class);

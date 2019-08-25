@@ -3,8 +3,6 @@ package raptor.core.client.handler;
 import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 import org.apache.commons.pool2.ObjectPool;
 import org.joda.time.DateTime;
 
@@ -13,7 +11,6 @@ import com.eaio.uuid.UUID;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import raptor.core.RpcPushDefine;
@@ -29,8 +26,6 @@ import raptor.util.StringUtil;
 /**
  * @author gewx 客户端RPC入站请求处理器
  **/
-@ThreadSafe
-@Sharable
 public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResponseBody> implements RpcPushDefine {
 
 	private static final RaptorLogger LOGGER = new RaptorLogger(ClientDispatcherHandler.class);

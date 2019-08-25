@@ -10,7 +10,6 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Service;
 
 import raptor.core.annotation.RpcHandler;
 import raptor.core.client.RpcClient;
@@ -23,8 +22,6 @@ import raptor.core.server.task.RpcServerMonitor;
 /**
  * @author gewx RPC客户端/服务端初始化,并负责RPC服务关闭资源释放
  * **/
-
-@Service
 public final class RpcInitBean implements ApplicationContextAware , InitializingBean , DisposableBean {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RpcInitBean.class);
