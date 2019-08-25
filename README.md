@@ -41,7 +41,10 @@ server.start();
 客户端启动分为两种方式: 
 1.Spring方式 可以在服务端配置文件中设置客户端初始化
 ```
-<!-- Netty Pool客户端配置 -->
+<bean name="RpcinitBean" class="raptor.core.init.RpcInitBean"/>
+```
+```
+<!-- Rpc Client 客户端配置 -->
 <bean id="NettyPoolConfig"
 	class="org.springframework.beans.factory.config.ListFactoryBean">
 	<property name="targetListClass" value="java.util.concurrent.CopyOnWriteArrayList" />
