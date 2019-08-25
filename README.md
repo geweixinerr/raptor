@@ -55,7 +55,7 @@ public final class AlibabaService {
 }
 ```
 
-**客户端启动分为两种方式: **
+客户端启动分为两种方式 :
 1.Spring方式 可以在服务端配置文件中设置客户端初始化
 ```
 <bean name="RpcinitBean" class="raptor.core.init.RpcInitBean"/>
