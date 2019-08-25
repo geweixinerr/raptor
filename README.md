@@ -5,7 +5,7 @@
 3.支持分布式日志采集[traceId设计]
 
 # 启动
-服务端启动分为两种方式:
+**服务端启动分为两种方式**:
 1.Spring方式 可以在服务端配置文件中设置初始化Bean
 ```
 <bean name="RpcinitBean" class="raptor.core.init.RpcInitBean"/>
@@ -38,7 +38,24 @@ RpcServerManualBuilder server = new RpcServerManualBuilder.Builder().address("lo
 		.setContext(context).build();
 server.start();
 ```
-客户端启动分为两种方式: 
+备注: 无论采用何种启动方式启动服务端服务,都需要借助Spring容器加载RPC服务方法,具体需要通过RpcHandler注解启用.如下所示:
+```
+@RpcHandler
+@Service
+public final class AlibabaService {
+
+	private static final RaptorLogger LOGGER = new RaptorLogger(AlibabaService.class);
+
+	/**登录认证**/
+	@RpcMethod
+	public String LoginAuth() {
+		LOGGER.info("LoginAuth----------------->");
+		return "Netty is VeryGood!";
+	}
+}
+```
+
+**客户端启动分为两种方式: **
 1.Spring方式 可以在服务端配置文件中设置客户端初始化
 ```
 <bean name="RpcinitBean" class="raptor.core.init.RpcInitBean"/>
@@ -97,22 +114,7 @@ static {
 	}
 }
 ```
-备注: 无论采用何种启动方式启动服务端服务,都需要借助Spring容器加载RPC服务方法,具体需要通过RpcHandler注解启用.如下所示:
-```
-@RpcHandler
-@Service
-public final class AlibabaService {
 
-	private static final RaptorLogger LOGGER = new RaptorLogger(AlibabaService.class);
-
-	/**登录认证**/
-	@RpcMethod
-	public String LoginAuth() {
-		LOGGER.info("LoginAuth----------------->");
-		return "Netty is VeryGood!";
-	}
-}
-```
 # 测试
 服务器启动： 已eclipse为例，选中raptor-web子模块, 执行Maven插件命令 jetty:run
 ```
