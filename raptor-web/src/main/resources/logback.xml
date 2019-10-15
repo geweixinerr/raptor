@@ -17,6 +17,7 @@
 
 	<!-- 按照每天生成日志文件 -->
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	    <file>${log_Home}/raptor.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 			<fileNamePattern>${log_Home}/raptor.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
 			<!-- kb/mb/gb -->
@@ -36,7 +37,6 @@
 		<!-- 不丢失日志.默认的. 如果discardingThreshold大于0,队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
 		<discardingThreshold>0</discardingThreshold>
 		<queueSize>10240</queueSize>
-		<immediateFlush>false</immediateFlush>
 		<appender-ref ref="FILE" />
 	</appender>
 	
