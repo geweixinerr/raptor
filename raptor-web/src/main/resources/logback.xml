@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration debug="false">
+<!-- 
+https://stackoverflow.com/questions/5731162/xml-schema-or-dtd-for-logback-xml
+ -->
+<configuration debug="false" xmlns="http://ch.qos.logback/xml/ns/logback"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://ch.qos.logback/xml/ns/logback 
+               https://raw.githubusercontent.com/enricopulatzo/logback-XSD/master/src/main/xsd/logback.xsd">
 	<contextName>${contextName}</contextName>
 	<property name="log_Home" value="/raptor/logs" />
 
