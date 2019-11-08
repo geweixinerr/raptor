@@ -48,41 +48,38 @@ public final class RpcClientMonitor {
 		 **/
 		task.setPeriod(100); // 任务间隔100毫秒.
 
-		task.setRunnable(new Runnable() {
-			 	@Override
-				public void run() {
-					Map<String, RpcRequestBody> requestPool = RpcClientTaskPool.listMapPool();  
-					String [] keys = requestPool.keySet().toArray(new String[]{}); //客户端请求-回调任务池.
-					
-					for (String key : keys) {
-						RpcRequestBody requestBody = requestPool.get(key);
-						if (requestBody == null || requestBody.isSync()) {
-							continue;
-						}
-						// 如果当前时间已超过设置的超时时间,则为过期消息.
-						DateTime thisDate = new DateTime();
-						if (thisDate.compareTo(requestBody.getTimeOut()) >= 0) {
-							String messageId = requestBody.getMessageId();
-							requestPool.remove(messageId);
-							
-							if (!requestBody.isMessageSend()) {
-								Integer rpcTime = StringUtil.timeDiffForMilliSecond(requestBody.getRequestTime(),thisDate);
-								RpcResponseBody responseBody = new RpcResponseBody();
-								responseBody.setMessageId(requestBody.getMessageId());
-								responseBody.setMessage("RPC 服务调用超时,message:timeOut");
-								responseBody.setRpcCode(RpcResult.SCAN_TIME_OUT);
-								responseBody.setRpcTime(rpcTime);
-								
-								requestBody.getCall().invoke(responseBody); // 回调通知
-							}
-						}				
+		task.setRunnable(() -> {
+			Map<String, RpcRequestBody> requestPool = RpcClientTaskPool.listMapPool();
+			String[] keys = requestPool.keySet().toArray(new String[] {}); // 客户端请求-回调任务池.
+
+			for (String key : keys) {
+				RpcRequestBody requestBody = requestPool.get(key);
+				if (requestBody == null || requestBody.isSync()) {
+					continue;
+				}
+				// 如果当前时间已超过设置的超时时间,则为过期消息.
+				DateTime thisDate = new DateTime();
+				if (thisDate.compareTo(requestBody.getTimeOut()) >= 0) {
+					String messageId = requestBody.getMessageId();
+					requestPool.remove(messageId);
+
+					if (!requestBody.isMessageSend()) {
+						Integer rpcTime = StringUtil.timeDiffForMilliSecond(requestBody.getRequestTime(), thisDate);
+						RpcResponseBody responseBody = new RpcResponseBody();
+						responseBody.setMessageId(requestBody.getMessageId());
+						responseBody.setMessage("RPC 服务调用超时,message:timeOut");
+						responseBody.setRpcCode(RpcResult.SCAN_TIME_OUT);
+						responseBody.setRpcTime(rpcTime);
+
+						requestBody.getCall().invoke(responseBody); // 回调通知
 					}
 				}
+			}
 		});
 
 		factory.setScheduledExecutorTasks(task);
 		factory.setContinueScheduledExecutionAfterException(true); // 调度遇到异常后,调度计划继续执行.
 		factory.setThreadNamePrefix("TASK_RPC_CLIENT_SCAN_");
-		factory.initialize(); 
+		factory.initialize();
 	}
 }

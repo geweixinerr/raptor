@@ -39,20 +39,8 @@ public final class RpcServerMonitor {
 		 **/
 		task.setPeriod(1000 * 30); // 任务间隔100毫秒.
 
-		task.setRunnable(new Runnable() {
-			 	@Override
-				public void run() {
-			 		/*
-					 Map<String, Channel> queue = RpcMonitorQueue.SERVER_QUEUE;
-					 for (Map.Entry<String, Channel> en : queue.entrySet()) {
-						 System.out.println("扫描服务目标IP主机: " + en.getKey());
-						 RpcResponseBody rpcBody = new RpcResponseBody();
-						 rpcBody.setBody("测试服务器主动推送熔断标记!");
-						 rpcBody.setRpcMethod("RT");
-						 en.getValue().writeAndFlush(rpcBody);
-					 }
-					 */
-				}
+		task.setRunnable(() -> {
+			
 		});
 
 		factory.setScheduledExecutorTasks(task);
