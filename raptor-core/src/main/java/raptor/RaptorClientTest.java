@@ -11,6 +11,7 @@ import org.springframework.util.ResourceUtils;
 
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.ext.spring.LogbackConfigurer;
+import raptor.RaptorRpc;
 import raptor.core.AbstractCallBack;
 import raptor.core.RpcResult;
 import raptor.core.client.NettyTestData;
@@ -22,11 +23,15 @@ import raptor.util.StringUtil;
 
 /**
  * Raptor客户端测试类
+ * 
+ * @author gewx
  **/
 public final class RaptorClientTest {
 
 	private static final RaptorLogger LOGGER = new RaptorLogger(RaptorClientTest.class);
 
+	private static final int MULTIPLE = 100;
+	
 	static {
 		try {
 			File file = ResourceUtils.getFile("classpath:raptorLogback.xml");
@@ -52,7 +57,7 @@ public final class RaptorClientTest {
 		String message = "Netty RPC Send, Netty is VeryGood!";
 		NettyTestData data = new NettyTestData();
 
-		HashMap<String, String> mapMessage = new HashMap<String, String>();
+		HashMap<String, String> mapMessage = new HashMap<String, String>(8);
 		mapMessage.put("certNo", "123456");
 
 		@SuppressWarnings("rawtypes")
@@ -62,7 +67,7 @@ public final class RaptorClientTest {
 
 		// 异步
 		try {
-			rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
+			rpc.sendAsyncMessage("mc", "loginAuth", new AbstractCallBack() {
 				@Override
 				public void invoke(RpcResponseBody response) {
 					LOGGER.info("RPC异步响应: " + response);
@@ -84,7 +89,7 @@ public final class RaptorClientTest {
 		// 同步
 		/*
 		 * LOGGER.info(methodName, "服务身份证信息查询[start]"); try { RpcResponseBody response =
-		 * rpc.sendSyncMessage("mc", "LoginAuth", mapMessage, message);
+		 * rpc.sendSyncMessage("mc", "loginAuth", mapMessage, message);
 		 * LOGGER.info("RPC同步响应: " + response); if
 		 * (RpcResult.SUCCESS.equals(response.getRpcCode())) { LOGGER.info(methodName,
 		 * "服务调用SUCCESS~"); } else { LOGGER.warn(methodName, "RPC服务调用异常!"); } } catch
@@ -101,7 +106,7 @@ public final class RaptorClientTest {
 			int cpuNum = Runtime.getRuntime().availableProcessors();
 			Executor pool = Executors.newFixedThreadPool(cpuNum);
 			CyclicBarrier lock = new CyclicBarrier(cpuNum);
-			for (int i = 0; i < cpuNum * 100; i++) {
+			for (int i = 0; i < cpuNum * MULTIPLE; i++) {
 				pool.execute(new Runnable() {
 					@Override
 					public void run() {
@@ -113,7 +118,7 @@ public final class RaptorClientTest {
 						// 参数false作用为:不复用traceId,每次请求都作为单独的事务开始.
 						LOGGER.enter(methodName, "RPC execute start!", false);
 						try {
-							RpcResponseBody resp = rpc.sendSyncMessage("mc", "LoginAuth");
+							RpcResponseBody resp = rpc.sendSyncMessage("mc", "loginAuth");
 							LOGGER.info("RPC同步响应: " + resp);
 							if (RpcResult.SUCCESS.equals(resp.getRpcCode())) {
 								LOGGER.info(methodName, "同步RPC服务调用SUCCESS~");
@@ -130,7 +135,7 @@ public final class RaptorClientTest {
 
 						LOGGER.info("RPC异步请求开始...");
 						try {
-							rpc.sendAsyncMessage("mc", "LoginAuth", new AbstractCallBack() {
+							rpc.sendAsyncMessage("mc", "loginAuth", new AbstractCallBack() {
 								@Override
 								public void invoke(RpcResponseBody resp) {
 									LOGGER.info("RPC异步响应: " + resp);
@@ -155,5 +160,4 @@ public final class RaptorClientTest {
 			}
 		}
 	}
-
 }

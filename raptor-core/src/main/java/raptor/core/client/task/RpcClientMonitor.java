@@ -22,7 +22,7 @@ public final class RpcClientMonitor {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RpcClientMonitor.class);
 
-	private static final ScheduledExecutorFactoryBean factory = new ScheduledExecutorFactoryBean();
+	private static final ScheduledExecutorFactoryBean SCHEDULED_FACTORY = new ScheduledExecutorFactoryBean();
 
 	private RpcClientMonitor() {
 	}
@@ -44,13 +44,14 @@ public final class RpcClientMonitor {
 		task.setFixedRate(false);
 
 		/**
-		 * 以毫秒为单位设置重复执行任务之间的周期。
+		 * 以毫秒为单位设置重复执行任务之间的周期,任务间隔100毫秒.。
 		 **/
-		task.setPeriod(100); // 任务间隔100毫秒.
+		task.setPeriod(100); 
 
 		task.setRunnable(() -> {
 			Map<String, RpcRequestBody> requestPool = RpcClientTaskPool.listMapPool();
-			String[] keys = requestPool.keySet().toArray(new String[] {}); // 客户端请求-回调任务池.
+			// 客户端请求-回调任务池.
+			String[] keys = requestPool.keySet().toArray(new String[] {}); 
 
 			for (String key : keys) {
 				RpcRequestBody requestBody = requestPool.get(key);
@@ -71,15 +72,17 @@ public final class RpcClientMonitor {
 						responseBody.setRpcCode(RpcResult.SCAN_TIME_OUT);
 						responseBody.setRpcTime(rpcTime);
 
-						requestBody.getCall().invoke(responseBody); // 回调通知
+						// 回调通知
+						requestBody.getCall().invoke(responseBody); 
 					}
 				}
 			}
 		});
 
-		factory.setScheduledExecutorTasks(task);
-		factory.setContinueScheduledExecutionAfterException(true); // 调度遇到异常后,调度计划继续执行.
-		factory.setThreadNamePrefix("TASK_RPC_CLIENT_SCAN_");
-		factory.initialize();
+		SCHEDULED_FACTORY.setScheduledExecutorTasks(task);
+		// 调度遇到异常后,调度计划继续执行.
+		SCHEDULED_FACTORY.setContinueScheduledExecutionAfterException(true); 
+		SCHEDULED_FACTORY.setThreadNamePrefix("TASK_RPC_CLIENT_SCAN_");
+		SCHEDULED_FACTORY.initialize();
 	}
 }

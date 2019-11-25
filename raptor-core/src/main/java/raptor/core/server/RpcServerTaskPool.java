@@ -31,61 +31,70 @@ import raptor.util.StringUtil;
 public final class RpcServerTaskPool {
 
 	private static final RaptorLogger LOGGER = new RaptorLogger(RpcServerTaskPool.class);
-		
+
 	private static final ThreadPoolTaskExecutor POOLTASKEXECUTOR = new ThreadPoolTaskExecutor();
 
-	private static final Map<String,RpcHandlerObject> RPC_MAPPING = RpcMapping.listRpcMapping();
-	
+	private static final Map<String, RpcHandlerObject> RPC_MAPPING = RpcMapping.listRpcMapping();
+
 	private RpcServerTaskPool() {
 	}
 
 	/**
-	 * @author gewx 初始化线程配置[根据各自系统实际情况,可自行定制]
+	 * 初始化线程配置[根据各自系统实际情况,可自行定制]
 	 * 
+	 * @author gewx
+	 * @return void
 	 **/
 	public static void initPool() {
 		LOGGER.info("初始化RPC Server业务线程池对象...");
-		POOLTASKEXECUTOR.setQueueCapacity(Constants.CPU_CORE * 10240); //队列深度. 
-		POOLTASKEXECUTOR.setCorePoolSize(Constants.CPU_CORE); // 核心线程数. 
-		POOLTASKEXECUTOR.setMaxPoolSize(Constants.CPU_CORE * 4); // 最大线程数. 
-		POOLTASKEXECUTOR.setKeepAliveSeconds(60 * 30); //线程最大空闲时间30分钟可回收,默认60秒.
-		POOLTASKEXECUTOR.setThreadNamePrefix("TASK_RPC_SERVER_"); // 线程名前缀.
-		POOLTASKEXECUTOR.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy()); //discard
+		// 队列深度.
+		POOLTASKEXECUTOR.setQueueCapacity(Constants.CPU_CORE * 10240);
+		// 核心线程数.
+		POOLTASKEXECUTOR.setCorePoolSize(Constants.CPU_CORE);
+		// 最大线程数.
+		POOLTASKEXECUTOR.setMaxPoolSize(Constants.CPU_CORE * 4);
+		// 线程最大空闲时间30分钟可回收,默认60秒.
+		POOLTASKEXECUTOR.setKeepAliveSeconds(60 * 30);
+		// 线程名前缀.
+		POOLTASKEXECUTOR.setThreadNamePrefix("TASK_RPC_SERVER_");
+		// discard
+		POOLTASKEXECUTOR.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
 		POOLTASKEXECUTOR.initialize();
-		
+
 		// 启动全部核心线程,避免线程在服务运行期间NEW,继而导致系统吞吐能力抖动.
 		POOLTASKEXECUTOR.getThreadPoolExecutor().prestartAllCoreThreads();
 	}
 
 	/**
-	 * @author gewx 添加任务入业务线程池
-	 * @param Object
-	 *            obj 请求参数, AbstractCallBack call 业务回调对象.
+	 * 添加任务入业务线程池
+	 * 
+	 * @author gewx
+	 * @param requestBody 请求对象, call 业务回调对象.
 	 * @return void
 	 **/
 	public static void addTask(RpcRequestBody requestBody, AbstractCallBack call) {
-	    String rpcMethod = requestBody.getRpcMethod();
-	    String traceId = requestBody.getTraceId();
+		String rpcMethod = requestBody.getRpcMethod();
+		String traceId = requestBody.getTraceId();
 		ListenableFuture<RpcResponseBody> future = POOLTASKEXECUTOR
 				.submitListenable(TtlCallable.get(new Callable<RpcResponseBody>() {
 					@Override
 					public RpcResponseBody call() throws Exception {
-						LOGGER.info("RPC服务端收到请求信息: " + requestBody);		
-						
+						LOGGER.info("RPC服务端收到请求信息: " + requestBody);
+
 						RpcHandlerObject handler = RPC_MAPPING.get(rpcMethod);
 						if (handler == null) {
 							throw new RpcException("RPC参数缺失,RpcMethod is null !", RpcResult.ERROR);
 						}
-						
+
 						Object result = null;
-						Object [] objArray = requestBody.getBody();
+						Object[] objArray = requestBody.getBody();
 						if (ArrayUtils.isNotEmpty(objArray)) {
-							         //MethodUtils.invokeExactMethod(object, methodName); 根据类型完全匹配.
+							// MethodUtils.invokeExactMethod(object, methodName); 根据类型完全匹配.
 							result = MethodUtils.invokeMethod(handler.getObject(), handler.getRpcKey(), objArray);
 						} else {
 							result = MethodUtils.invokeMethod(handler.getObject(), handler.getRpcKey());
 						}
-						
+
 						RpcResponseBody body = new RpcResponseBody();
 						body.setRpcCode(RpcResult.SUCCESS);
 						body.setMessageId(requestBody.getMessageId());
@@ -107,18 +116,18 @@ public final class RpcServerTaskPool {
 			@Override
 			public void onFailure(Throwable throwable) {
 				String message = "RPC 服务调用失败,message:[" + StringUtil.getErrorText(throwable) + "]";
-				LOGGER.warn(rpcMethod, message);	
+				LOGGER.warn(rpcMethod, message);
 
 				/**
 				 * 定义回调异常,默认响应体
-				 * **/
+				 **/
 				RpcResponseBody body = new RpcResponseBody();
 				body.setRpcCode(RpcResult.FAIL);
 				body.setMessageId(requestBody.getMessageId());
 				body.setTraceId(traceId);
 				body.setRpcMethod(rpcMethod);
 				body.setMessage("RPC 服务调用失败,message:[" + ExceptionUtils.getRootCauseMessage(throwable) + "]");
-				
+
 				call.invoke(body);
 			}
 		});

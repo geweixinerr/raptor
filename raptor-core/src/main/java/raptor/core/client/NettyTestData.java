@@ -12,6 +12,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
  * 客户端测试数据,1KB
+ * @author gewx
  **/
 public final class NettyTestData implements Serializable {
 
@@ -23,15 +24,15 @@ public final class NettyTestData implements Serializable {
 
 	private String address;
 
-	private float money_0;
+	private float money0;
 
-	private double money_1;
+	private double money1;
 
-	private byte b;
+	private byte bVal;
 
 	private boolean bool;
 
-	private int i;
+	private int iVal;
 
 	private long count;
 
@@ -45,11 +46,11 @@ public final class NettyTestData implements Serializable {
 		this.age = 32;
 		this.userName = "geweixin";
 		this.address = "江苏镇江";
-		this.money_0 = 120.2f;
-		this.money_1 = 1221.01d;
-		this.b = '1';
+		this.money0 = 120.2f;
+		this.money1 = 1221.01d;
+		this.bVal = '1';
 		this.bool = true;
-		this.i = 100;
+		this.iVal = 100;
 		this.count = 10000L;
 		this.map = new HashMap<String, String>();
 		this.map.put("Message", "Netty之有效规避内存泄漏\r\n"
@@ -88,28 +89,12 @@ public final class NettyTestData implements Serializable {
 		this.address = address;
 	}
 
-	public float getMoney_0() {
-		return money_0;
+	public byte getbVal() {
+		return bVal;
 	}
 
-	public void setMoney_0(float money_0) {
-		this.money_0 = money_0;
-	}
-
-	public double getMoney_1() {
-		return money_1;
-	}
-
-	public void setMoney_1(double money_1) {
-		this.money_1 = money_1;
-	}
-
-	public byte getB() {
-		return b;
-	}
-
-	public void setB(byte b) {
-		this.b = b;
+	public void setbVal(byte bVal) {
+		this.bVal = bVal;
 	}
 
 	public boolean isBool() {
@@ -120,12 +105,12 @@ public final class NettyTestData implements Serializable {
 		this.bool = bool;
 	}
 
-	public int getI() {
-		return i;
+	public int getiVal() {
+		return iVal;
 	}
 
-	public void setI(int i) {
-		this.i = i;
+	public void setiVal(int iVal) {
+		this.iVal = iVal;
 	}
 
 	public long getCount() {
@@ -148,6 +133,22 @@ public final class NettyTestData implements Serializable {
 		return array;
 	}
 
+	public float getMoney0() {
+		return money0;
+	}
+
+	public void setMoney0(float money0) {
+		this.money0 = money0;
+	}
+
+	public double getMoney1() {
+		return money1;
+	}
+
+	public void setMoney1(double money1) {
+		this.money1 = money1;
+	}
+
 	@Override
 	public String toString() {
 		ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
@@ -155,11 +156,11 @@ public final class NettyTestData implements Serializable {
 		builder.append("age", this.age);
 		builder.append("userName", this.userName);
 		builder.append("address", this.address);
-		builder.append("money_0", this.money_0);
-		builder.append("money_1", this.money_1);
-		builder.append("b", this.b);
+		builder.append("money_0", this.money0);
+		builder.append("money_1", this.money1);
+		builder.append("bVal", this.bVal);
 		builder.append("bool", this.bool);
-		builder.append("i", this.i);
+		builder.append("iVal", this.iVal);
 		builder.append("map", this.map);
 		builder.append("list", this.list);
 		builder.append("array", ArrayUtils.toString(this.array));

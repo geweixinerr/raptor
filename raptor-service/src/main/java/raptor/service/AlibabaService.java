@@ -35,16 +35,16 @@ public final class AlibabaService {
 	*/
 	/**登录认证**/
 	@RpcMethod
-	public String LoginAuth() {
-		LOGGER.info("LoginAuth----------------->");
+	public String loginAuth() {
+		LOGGER.info("loginAuth----------------->");
 		return "Netty is VeryGood!";
 	}
 	
 	/**登录认证**/
 	
 	@RpcMethod
-	public String LoginAuth(Map<String,String> params,String message) {
-		String methodName = "LoginAuth";
+	public String loginAuth(Map<String,String> params,String message) {
+		String methodName = "loginAuth";
 		LOGGER.enter(methodName, "单点服务认证请求,params: " + params +",message : " + message);
 		StringBuilder sb = new StringBuilder();
 		try {
@@ -66,7 +66,7 @@ public final class AlibabaService {
 	
 	/**登录认证**/
 	@RpcMethod
-	public String LoginAuth(NettyTestData params,String message) {
+	public String loginAuth(NettyTestData params,String message) {
 		//String dbMessage = memberInfoDao.selectOne();
 		return "return: " + message;
 	}

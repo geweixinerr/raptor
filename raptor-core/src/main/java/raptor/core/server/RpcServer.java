@@ -35,7 +35,7 @@ public final class RpcServer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RpcServer.class);
 
-	private static final ServerBootstrap server = new ServerBootstrap();
+	private static final ServerBootstrap SERVER = new ServerBootstrap();
 
 	private static final String ADDRESS_KEY = "localAddress";
 
@@ -58,12 +58,12 @@ public final class RpcServer {
 			// Linux Epoll
 			EventLoopGroup acceptGroup = new EpollEventLoopGroup(1); 
 			EventLoopGroup ioGroup = new EpollEventLoopGroup(Constants.CPU_CORE * 2); 
-			server.group(acceptGroup, ioGroup).channel(EpollServerSocketChannel.class);
+			SERVER.group(acceptGroup, ioGroup).channel(EpollServerSocketChannel.class);
 		} else {
 			LOGGER.info("非Linux系统下,RPC Server启动...");
 			EventLoopGroup acceptGroup = new NioEventLoopGroup(1); 
 			EventLoopGroup ioGroup = new NioEventLoopGroup(Constants.CPU_CORE * 2); 
-			server.group(acceptGroup, ioGroup).channel(NioServerSocketChannel.class);
+			SERVER.group(acceptGroup, ioGroup).channel(NioServerSocketChannel.class);
 		}
 		
 		InetSocketAddress localAddress = null;
@@ -76,7 +76,7 @@ public final class RpcServer {
 		/**
 		 *  服务端接受连接的队列长度，如果队列已满，客户端连接将被拒绝。默认值，Windows为200，其他为128。
 		 * **/
-		server.option(ChannelOption.SO_BACKLOG, 8192) 
+		SERVER.option(ChannelOption.SO_BACKLOG, 8192) 
 				.childOption(ChannelOption.SO_RCVBUF, 256 * Constants.ONE_KB)
 				.childOption(ChannelOption.SO_SNDBUF, 256 * Constants.ONE_KB)
 				.localAddress(localAddress)
@@ -90,7 +90,7 @@ public final class RpcServer {
 					}
 				});
 
-		server.bind().sync().addListener(new ChannelFutureListener() {
+		SERVER.bind().sync().addListener(new ChannelFutureListener() {
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 				if (future.isSuccess()) {					
@@ -108,8 +108,8 @@ public final class RpcServer {
 	 * @author gewx 释放资源
 	 **/
 	public static void stop() {
-		server.config().group().shutdownGracefully();
-		server.config().childGroup().shutdownGracefully();
+		SERVER.config().group().shutdownGracefully();
+		SERVER.config().childGroup().shutdownGracefully();
 	}
 
 }

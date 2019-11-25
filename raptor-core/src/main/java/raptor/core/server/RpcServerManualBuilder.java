@@ -55,18 +55,18 @@ public final class RpcServerManualBuilder {
 
 		private ApplicationContext context;
 
-		public Builder address(String _address) {
-			this.address = _address;
+		public Builder address(String address) {
+			this.address = address;
 			return this;
 		}
 
-		public Builder port(int _port) {
-			this.port = _port;
+		public Builder port(int port) {
+			this.port = port;
 			return this;
 		}
 
-		public Builder setContext(ApplicationContext _context) {
-			this.context = _context;
+		public Builder setContext(ApplicationContext context) {
+			this.context = context;
 			return this;
 		}
 

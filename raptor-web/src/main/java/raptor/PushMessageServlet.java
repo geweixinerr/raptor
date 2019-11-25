@@ -12,15 +12,20 @@ import raptor.core.message.RpcResponseBody;
 import raptor.exception.RpcException;
 import raptor.log.RaptorLogger;
 
+/**
+ * RPC测试服务Servlet
+ * 
+ * @author gewx
+ **/
 @WebServlet("/pushMessageServlet")
 public class PushMessageServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-	
-	private static final String serverNode = "tcs";
-	
+
+	private static final String SERVER_NODE = "tcs";
+
 	private static final RaptorLogger LOGGER = new RaptorLogger(PushMessageServlet.class);
-	
+
 	@SuppressWarnings("rawtypes")
 	private static RaptorRpc rpc = new RaptorRpc();
 
@@ -28,13 +33,14 @@ public class PushMessageServlet extends HttpServlet {
 	 * Default constructor.
 	 */
 	public PushMessageServlet() {
-		
+
 	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		doPost(request, response);
@@ -45,6 +51,7 @@ public class PushMessageServlet extends HttpServlet {
 	 *      response)
 	 */
 	@SuppressWarnings("unchecked")
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		final String methodName = "doPost";
@@ -52,13 +59,13 @@ public class PushMessageServlet extends HttpServlet {
 
 		LOGGER.enter(methodName, "RPC execute start!", false);
 		try {
-			RpcResponseBody result = rpc.sendSyncMessage(serverNode, "LoginAuth");
+			RpcResponseBody result = rpc.sendSyncMessage(SERVER_NODE, "loginAuth");
 			LOGGER.info(methodName, "RPC Result: " + result);
 		} catch (RpcException e) {
 			LOGGER.error(methodName, "异常: " + e.getMessage());
 		}
 		LOGGER.exit(methodName, "RPC execute ok!");
-		
+
 		response.getWriter().write("RPC execute ok!");
 	}
 

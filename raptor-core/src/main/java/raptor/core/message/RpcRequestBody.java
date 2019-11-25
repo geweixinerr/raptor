@@ -148,9 +148,11 @@ public final class RpcRequestBody implements RpcMessage {
 	 *         假设调度线程与正常客户端回调线程同时处理某个回调对象,会产生客户端响应接收到两次的情况.
 	 **/
 	public synchronized boolean isMessageSend() {
-		if (this.send) { // 已发送
+		// 已发送
+		if (this.send) { 
 			return true;
-		} else { // 未发送
+		} else { 
+			// 未发送
 			this.send = true;
 			return false;
 		}

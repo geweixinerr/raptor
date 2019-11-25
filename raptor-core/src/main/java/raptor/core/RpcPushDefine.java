@@ -6,51 +6,63 @@ import raptor.core.message.RpcRequestBody;
 import raptor.exception.RpcException;
 
 /**
- * @author gewx RPC服务接口定义. Channel与业务服务方法解耦层.
- * **/
+ * RPC服务接口定义. Channel与业务服务方法解耦层.
+ * 
+ * @author gewx
+ **/
 public interface RpcPushDefine {
 
 	/**
-	 * @author gewx 消息推送.
-	 * @param RpcRequestBody RPC请求对象
+	 * 消息推送.
+	 * 
+	 * @author gewx
+	 * @param requestBody RPC请求对象
 	 * @throws RpcException RPC异常
-	 * @return void 
-	 * **/
-	
+	 * @return void
+	 **/
+
 	void pushMessage(RpcRequestBody requestBody) throws RpcException;
-	
+
 	/**
-	 * @author gewx 资源关闭,释放tcp pool空闲对象.
-	 * **/
+	 * 资源关闭,释放tcp pool空闲对象.
+	 * 
+	 * @author gewx
+	 **/
 	void close();
-	
+
 	/**
-	 * @author gewx 检测tcp pool当中tcp对象,是否可写.
-	 * */
+	 * 检测tcp pool当中tcp对象,是否可写.
+	 * 
+	 * @author gewx
+	 * @return true 可写, false不可写
+	 */
 	boolean isWritable();
-	
+
 	/**
-	 * @author gewx tcp连接唯一Id
-	 * **/
+	 * 获取tcp连接唯一Id
+	 * 
+	 * @author gewx
+	 * @return tcpId
+	 **/
 	String getTcpId();
-	
+
 	/**
-	 * @author gewx 获取池对象
-	 * **/
+	 * 获取池对象
+	 * 
+	 * @author gewx
+	 * @return rpc池对象
+	 **/
 	ObjectPool<RpcPushDefine> getRpcPoolObject();
-	
+
 	/**
-	 * @author gewx return pool clean
-	 * **/
+	 * pool clean
+	 * 
+	 * @author gewx
+	 **/
 	void returnClean();
-	
+
 	/**
-	 * @author gewx 心跳检测包方法名
-	 * **/
+	 * 心跳检测包方法名
+	 **/
 	String HEARTBEAT_METHOD = "heartbeat";
-	
-	/**
-	 * @author gewx 熔断
-	 * **/
-	String CIRCUIT_BREAKER = "circuitBreaker";
 }

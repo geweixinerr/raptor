@@ -13,7 +13,7 @@ public final class RpcServerMonitor {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RpcServerMonitor.class);
 
-	private static final ScheduledExecutorFactoryBean factory = new ScheduledExecutorFactoryBean();
+	private static final ScheduledExecutorFactoryBean SCHEDULED_FACTORY = new ScheduledExecutorFactoryBean();
 
 	private RpcServerMonitor() {
 	}
@@ -35,17 +35,18 @@ public final class RpcServerMonitor {
 		task.setFixedRate(false);
 
 		/**
-		 * 以毫秒为单位设置重复执行任务之间的周期。
+		 * 以毫秒为单位设置重复执行任务之间的周期, 任务间隔100毫秒.。
 		 **/
-		task.setPeriod(1000 * 30); // 任务间隔100毫秒.
+		task.setPeriod(1000 * 30); 
 
 		task.setRunnable(() -> {
 			
 		});
 
-		factory.setScheduledExecutorTasks(task);
-		factory.setContinueScheduledExecutionAfterException(true); // 调度遇到异常后,调度计划继续执行.
-		factory.setThreadNamePrefix("TASK_RPC_MONITOR_SCAN_");
-		factory.initialize(); 
+		SCHEDULED_FACTORY.setScheduledExecutorTasks(task);
+		// 调度遇到异常后,调度计划继续执行.
+		SCHEDULED_FACTORY.setContinueScheduledExecutionAfterException(true); 
+		SCHEDULED_FACTORY.setThreadNamePrefix("TASK_RPC_MONITOR_SCAN_");
+		SCHEDULED_FACTORY.initialize(); 
 	}
 }

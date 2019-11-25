@@ -29,7 +29,8 @@ public final class RpcMapping {
             		RpcHandlerObject handler = new RpcHandlerObject();
             		handler.setObject(rpcObject);
             		handler.setRpcKey(m.getName());
-            		RPC_MAPPING.put(m.getName(), handler); //便于未来拓展,这里设置为一个POJO映射实体.
+            		// 便于未来拓展,这里设置为一个POJO映射实体.
+            		RPC_MAPPING.put(m.getName(), handler); 
             	}
             }
 		}

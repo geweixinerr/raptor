@@ -94,9 +94,11 @@ public final class RaptorRpc<T extends Serializable> {
 		
 		try {
 			RpcResponseBody result = blockQueue.poll(timeOut, TimeUnit.SECONDS);
-			if (result == null) { //timeOut
+			// timeOut
+			if (result == null) { 
 				Integer rpcTime = StringUtil.timeDiffForMilliSecond(requestBody.getRequestTime(),new DateTime());
-				RpcClientTaskPool.listMapPool().remove(uuid); //remove
+				// remove
+				RpcClientTaskPool.listMapPool().remove(uuid); 
 				result = new RpcResponseBody();
 				result.setRpcCode(RpcResult.TIME_OUT);
 				result.setMessage("服务调用超时.");

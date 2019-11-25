@@ -24,8 +24,8 @@ public final class RpcClientManualBuilder {
 	
 	private final List<Map<String, String>> clientConfig;
 
-	private RpcClientManualBuilder(List<Map<String, String>> _clientConfig) {
-		clientConfig = _clientConfig;
+	private RpcClientManualBuilder(List<Map<String, String>> clientConfig) {
+		this.clientConfig = clientConfig;
 	}
 
 	public void connection() throws Exception {
@@ -50,35 +50,35 @@ public final class RpcClientManualBuilder {
 
 		private final List<Map<String, String>> clientConfig = new ArrayList<>();
 
-		public Builder serverNode(String _serverNode) {
-			this.serverNode = _serverNode;
+		public Builder serverNode(String serverNode) {
+			this.serverNode = serverNode;
 			return this;
 		}
 
-		public Builder remote(String _remote) {
-			this.remote = _remote;
+		public Builder remote(String remote) {
+			this.remote = remote;
 			return this;
 		}
 
-		public Builder port(int _port) {
-			this.port = _port;
+		public Builder port(int port) {
+			this.port = port;
 			return this;
 		}
 
-		public Builder maxclients(int _maxclients) {
-			this.maxclients = _maxclients;
+		public Builder maxclients(int maxclients) {
+			this.maxclients = maxclients;
 			return this;
 		}
 
-		public Builder minclients(int _minclients) {
-			this.minclients = _minclients;
+		public Builder minclients(int minclients) {
+			this.minclients = minclients;
 			return this;
 		}
 
 		public Builder addClient() {
 			checkClientNode();
 
-			Map<String, String> node = new HashMap<>();
+			Map<String, String> node = new HashMap<>(16);
 			node.put("serverNode", this.serverNode); // 服务节点
 			node.put("remote", this.remote); // 服务节点IP地址
 			node.put("port", String.valueOf(this.port)); // 端口号

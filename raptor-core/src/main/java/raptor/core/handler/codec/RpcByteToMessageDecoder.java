@@ -25,7 +25,8 @@ public final class RpcByteToMessageDecoder extends ByteToMessageDecoder {
 			return;
 		}
 		
-		int rpcByteCount = in.readInt(); //RPC调用字节总数
+		// RPC调用字节总数
+		int rpcByteCount = in.readInt(); 
 
 		if (in.readableBytes() < rpcByteCount) {
 			in.resetReaderIndex();
@@ -34,9 +35,11 @@ public final class RpcByteToMessageDecoder extends ByteToMessageDecoder {
 
 		byte [] rpcByteArray = new byte[rpcByteCount];
 		in.readBytes(rpcByteArray);
-//		in.discardReadBytes(); //清理已读取后的无效堆外内存空间.[原理是: 时间(CPU)换空间(堆外内存),这行代码可不加].
+		// 清理已读取后的无效堆外内存空间.[原理是: 时间(CPU)换空间(堆外内存),这行代码可不加].
+        // in.discardReadBytes(); 
 
-		Object rpcObject = configuration.asObject(rpcByteArray); //反序列化
+		// 反序列化
+		Object rpcObject = configuration.asObject(rpcByteArray); 
 		out.add(rpcObject);	
 	}
 

@@ -29,7 +29,7 @@ public final class GzipUtils {
 			throw new IllegalArgumentException("缺失必填参数:bytes!");
 		}
 
-		ByteArrayOutputStream out = new ByteArrayOutputStream(1024 + 512); // init
+		ByteArrayOutputStream out = new ByteArrayOutputStream(1024 + 512); 
 		try {
 			GZIPOutputStream gzip = null;
 			try {
@@ -56,7 +56,7 @@ public final class GzipUtils {
 			throw new IllegalArgumentException("缺失必填参数:str,encoding!");
 		}
 
-		ByteArrayOutputStream out = new ByteArrayOutputStream(1024 + 512); // init
+		ByteArrayOutputStream out = new ByteArrayOutputStream(1024 + 512);
 		try {
 			GZIPOutputStream gzip = null;
 			try {
@@ -87,7 +87,7 @@ public final class GzipUtils {
 			throw new IllegalArgumentException("缺失必填参数:bytes!");
 		}
 
-		ByteArrayOutputStream out = new ByteArrayOutputStream(1024 + 512); // init
+		ByteArrayOutputStream out = new ByteArrayOutputStream(1024 + 512); 
 		ByteArrayInputStream in = new ByteArrayInputStream(bytes);
 		try {
 			GZIPInputStream ungzip = null;
@@ -148,14 +148,17 @@ public final class GzipUtils {
 	public static void main(String[] args) throws IOException {
 		String str = "中国人民万岁,非常好的的多功能下.中国人民万岁,非常好的的多功能下.中国人民万岁,非常好的的多功能下.";
 		int strLength = str.length();
-//		byte[] compressByteArray = compress(str); // 压缩字节数组
-		byte[] compressByteArray = compress(str.getBytes("UTF-8")); // 压缩字节数组
+		// 压缩字节数组
+//		byte[] compressByteArray = compress(str);
+		// 压缩字节数组
+		byte[] compressByteArray = compress(str.getBytes("UTF-8")); 
 		System.out.println("字符串长度: " + strLength);
 		System.out.println("字符比特数组长度: " + str.getBytes().length);
 		System.out.println("压缩后比特数组: " + compressByteArray.length);
 		System.out.println("解压后比特数组长度: " + uncompress(compressByteArray).length);
 
-		System.out.println("解压: " + new String(uncompress(compressByteArray), "UTF-8")); // 解压缩输出字符.
+		// 解压缩输出字符.
+		System.out.println("解压: " + new String(uncompress(compressByteArray), "UTF-8")); 
 	}
 
 }

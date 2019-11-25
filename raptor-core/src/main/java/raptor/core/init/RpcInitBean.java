@@ -26,6 +26,10 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RpcInitBean.class);
 		
+	private static final String RPCSERVER_CONFIG = "RpcServerConfig";
+	
+	private static final String NETTYPOOL_CONFIG = "NettyPoolConfig";
+	
 	private ApplicationContext context;
 	
 	@Override
@@ -37,9 +41,9 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		//服务器启动
-		if (context.containsBean("RpcServerConfig")) {
+		if (context.containsBean(RPCSERVER_CONFIG)) {
 			LOGGER.info("应用服务器启动,RPC服务端参数初始化...");
-			Map<String,String> serverConfig = (Map<String,String>) context.getBean("RpcServerConfig");
+			Map<String,String> serverConfig = (Map<String,String>) context.getBean(RPCSERVER_CONFIG);
 			RpcParameter.INSTANCE.initRpcParameter(serverConfig);
 			RpcServerTaskPool.initPool();
 			RpcServer.start();	
@@ -47,9 +51,9 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 		}
 		
 		//客户端启动
-		if (context.containsBean("NettyPoolConfig")) {
+		if (context.containsBean(NETTYPOOL_CONFIG)) {
 			LOGGER.info("应用服务器启动,RPC客户端参数初始化...");
-			List<Map<String,String>> clientConfig = (List<Map<String,String>>) context.getBean("NettyPoolConfig");
+			List<Map<String,String>> clientConfig = (List<Map<String,String>>) context.getBean(NETTYPOOL_CONFIG);
 			RpcParameter.INSTANCE.initRpcParameter(clientConfig);		
 			RpcClientTaskPool.initPool();	
 			RpcClient.connection();
