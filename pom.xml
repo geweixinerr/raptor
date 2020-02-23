@@ -128,32 +128,6 @@
 				<artifactId>fst</artifactId>
 				<version>2.57</version>
 			</dependency>
-
-            <!-- hibernate注解 start --> 
-			<dependency>
-				<groupId>org.hibernate.validator</groupId>
-				<artifactId>hibernate-validator</artifactId>
-				<version>6.0.14.Final</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.jboss.logging</groupId>
-						<artifactId>jboss-logging</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-
-			<dependency>
-				<groupId>javax.validation</groupId>
-				<artifactId>validation-api</artifactId>
-				<version>2.0.1.Final</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.glassfish</groupId>
-				<artifactId>javax.el</artifactId>
-				<version>3.0.1-b10</version>
-			</dependency>
-			<!-- hibernate注解 end --> 
 			
 			<dependency>
 			    <groupId>com.google.protobuf</groupId>
