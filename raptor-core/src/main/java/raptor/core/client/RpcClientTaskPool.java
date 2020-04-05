@@ -14,7 +14,7 @@ import raptor.core.RpcResult;
 import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
 import raptor.log.RaptorLogger;
-import raptor.util.StringUtil;
+import raptor.util.DateUtils;
 
 /**
  * @author gewx RPC Client端业务线程池
@@ -74,7 +74,7 @@ public final class RpcClientTaskPool {
 				}
 
 				DateTime thisDate = new DateTime();
-				Integer rpcTime = StringUtil.timeDiffForMilliSecond(requestBody.getRequestTime(), thisDate);
+				int rpcTime = (int)DateUtils.timeDiffForMilliSecond(requestBody.getRequestTime(), thisDate);
 				responseBody.setRpcTime(rpcTime);
 
 				LOGGER.info("RPC客户端收到响应: " + responseBody);

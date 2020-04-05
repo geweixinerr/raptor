@@ -3,9 +3,6 @@ package raptor.util;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.joda.time.DateTime;
-import org.joda.time.Period;
-
 /**
  * @author gewx 字符串操作辅助类
  **/
@@ -32,15 +29,5 @@ public final class StringUtil {
 		} catch (Exception ex) {
 			return "ERROR!";
 		}
-	}
-
-	/**
-	 * @author gewx 计算时间差,RPC请求耗时,单位:毫秒
-	 **/
-	public static Integer timeDiffForMilliSecond(DateTime date1, DateTime date2) {
-		Period p2 = new Period(date1, date2);
-		// 相差的秒
-		int seconds = p2.getSeconds(); 
-		return seconds * 1000 + p2.getMillis();
 	}
 }

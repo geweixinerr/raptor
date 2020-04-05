@@ -20,6 +20,7 @@ import raptor.core.message.RpcRequestBody;
 import raptor.core.message.RpcResponseBody;
 import raptor.exception.RpcException;
 import raptor.log.ThreadContext;
+import raptor.util.DateUtils;
 import raptor.util.StringUtil;
 
 /**
@@ -96,7 +97,7 @@ public final class RaptorRpc<T extends Serializable> {
 			RpcResponseBody result = blockQueue.poll(timeOut, TimeUnit.SECONDS);
 			// timeOut
 			if (result == null) { 
-				Integer rpcTime = StringUtil.timeDiffForMilliSecond(requestBody.getRequestTime(),new DateTime());
+				int rpcTime = (int)DateUtils.timeDiffForMilliSecond(requestBody.getRequestTime(),new DateTime());
 				// remove
 				RpcClientTaskPool.listMapPool().remove(uuid); 
 				result = new RpcResponseBody();

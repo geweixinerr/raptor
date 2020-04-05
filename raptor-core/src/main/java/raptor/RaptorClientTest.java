@@ -11,7 +11,6 @@ import org.springframework.util.ResourceUtils;
 
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.ext.spring.LogbackConfigurer;
-import raptor.RaptorRpc;
 import raptor.core.AbstractCallBack;
 import raptor.core.RpcResult;
 import raptor.core.client.NettyTestData;
