@@ -6,7 +6,9 @@ import org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean;
 import org.springframework.scheduling.concurrent.ScheduledExecutorTask;
 
 /**
- * @author gewx RPC Server监视器扫描服务
+ * RPC Server监视器扫描服务
+ * 
+ * @author gewx 
  * 
  **/
 public final class RpcServerMonitor {
@@ -19,7 +21,7 @@ public final class RpcServerMonitor {
 	}
 
 	/**
-	 * 扫描超时请求.
+	 * 扫描超时请求
 	 **/
 	public static void scan() {
 		LOGGER.info("RpcServerMonitor监视器扫描...");

@@ -16,7 +16,9 @@ import raptor.log.ThreadContext;
 import raptor.util.StringUtil;
 
 /**
- * @author gewx RPC Server业务分发器
+ * RPC Server业务分发器
+ * 
+ * @author gewx 
  **/
 public final class ServerDispatcherHandler extends SimpleChannelInboundHandler<RpcRequestBody> {
 

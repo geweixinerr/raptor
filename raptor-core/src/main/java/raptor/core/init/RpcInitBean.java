@@ -20,7 +20,9 @@ import raptor.core.server.RpcServerTaskPool;
 import raptor.core.server.task.RpcServerMonitor;
 
 /**
- * @author gewx RPC客户端/服务端初始化,并负责RPC服务关闭资源释放
+ * RPC客户端/服务端初始化,并负责RPC服务关闭资源释放
+ * 
+ * @author gewx 
  * **/
 public final class RpcInitBean implements ApplicationContextAware , InitializingBean , DisposableBean {
 

@@ -25,9 +25,10 @@ import raptor.log.RaptorLogger;
 import raptor.util.StringUtil;
 
 /**
- * @author gewx RPC Server端业务线程池
+ * RPC Server端业务线程池
+ * 
+ * @author gewx 
  **/
-
 public final class RpcServerTaskPool {
 
 	private static final RaptorLogger LOGGER = new RaptorLogger(RpcServerTaskPool.class);

@@ -34,14 +34,16 @@ import raptor.core.init.RpcParameter;
 import raptor.core.pool.TcpPoolFactory;
 
 /**
- * @author gewx Netty客户端类
+ * Netty客户端类
+ * 
+ * @author gewx 
  **/
 public final class RpcClient {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RpcClient.class);
 
 	/**
-	 * @author gewx 多客户端配置与连接池映射关系.
+	 * 多客户端配置与连接池映射关系.
 	 **/
 	private static final Map<String, ObjectPool<RpcPushDefine>> RPC_OBJECT_POOL = new ConcurrentHashMap<String, ObjectPool<RpcPushDefine>>();
 

@@ -8,13 +8,14 @@ import org.springframework.stereotype.Service;
 import raptor.core.RpcResult;
 import raptor.core.annotation.RpcHandler;
 import raptor.core.annotation.RpcMethod;
-import raptor.core.client.NettyTestData;
 import raptor.exception.RpcException;
 import raptor.log.RaptorLogger;
 import raptor.plugin.demo.DemoPlugin;
 
 /**
- * @author gewx 业务服务类 Test类
+ * gewx 业务服务类 Test类
+ * 
+ * @author 
  * **/
 
 @RpcHandler
@@ -63,12 +64,4 @@ public final class AlibabaService {
 		LOGGER.exit(methodName, "单点认证服务请求结束!");
 		return sb.toString();
 	}
-	
-	/**登录认证**/
-	@RpcMethod
-	public String loginAuth(NettyTestData params,String message) {
-		//String dbMessage = memberInfoDao.selectOne();
-		return "return: " + message;
-	}
-	
 }

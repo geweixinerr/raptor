@@ -6,7 +6,7 @@ import raptor.core.message.RpcRequestBody;
 import raptor.exception.RpcException;
 
 /**
- * RPC服务接口定义. Channel与业务服务方法解耦层.
+ * RPC服务接口定义, Channel与业务服务方法解耦层
  * 
  * @author gewx
  **/

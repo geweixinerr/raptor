@@ -5,7 +5,9 @@ import raptor.util.StringUtil;
 
 
 /**
- * @author gewx 线程异常处理
+ * 线程异常处理
+ * 
+ * @author gewx 
  * **/
 
 public final class ThreadException implements Thread.UncaughtExceptionHandler{

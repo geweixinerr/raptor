@@ -15,7 +15,9 @@ import raptor.core.message.RpcResponseBody;
 import raptor.util.DateUtils;
 
 /**
- * @author gewx RPC 客户端监视器,定时执行超时扫描: 本线程执行过期消息清理.
+ * 客户端监视器,定时执行超时扫描: 本线程执行过期消息清理
+ * 
+ * @author gewx RPC 
  * 
  **/
 public final class RpcClientMonitor {
@@ -28,7 +30,7 @@ public final class RpcClientMonitor {
 	}
 
 	/**
-	 * 扫描超时请求.
+	 * 扫描超时请求
 	 **/
 	public static void scan() {
 		LOGGER.info("客户端超时消息清理器启动...");

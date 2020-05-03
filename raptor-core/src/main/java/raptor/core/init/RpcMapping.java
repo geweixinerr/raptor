@@ -8,7 +8,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import raptor.core.annotation.RpcMethod;
 
 /**
- * @author gewx RPC服务端映射初始化类
+ * RPC服务端映射初始化类
+ * 
+ * @author gewx
  * **/
 public final class RpcMapping {
 

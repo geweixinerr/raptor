@@ -13,7 +13,6 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.ext.spring.LogbackConfigurer;
 import raptor.core.AbstractCallBack;
 import raptor.core.RpcResult;
-import raptor.core.client.NettyTestData;
 import raptor.core.client.RpcClientManualBuilder;
 import raptor.core.message.RpcResponseBody;
 import raptor.exception.RpcException;
@@ -54,8 +53,7 @@ public final class RaptorClientTest {
 		final String methodName = "testMethod";
 		// 组装发送消息
 		String message = "Netty RPC Send, Netty is VeryGood!";
-		NettyTestData data = new NettyTestData();
-
+		
 		HashMap<String, String> mapMessage = new HashMap<String, String>(8);
 		mapMessage.put("certNo", "123456");
 
@@ -76,7 +74,7 @@ public final class RaptorClientTest {
 						LOGGER.warn(methodName, "RPC服务调用异常!");
 					}
 				}
-			}, 5, data, message);
+			}, 5, mapMessage, message);
 		} catch (RpcException e) {
 			if (RpcResult.FAIL_NETWORK_CONNECTION.equals(e.getRpcCode())) {
 				LOGGER.error(methodName, "网络连接异常, message: " + e.getMessage());

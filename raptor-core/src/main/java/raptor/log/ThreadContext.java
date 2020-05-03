@@ -7,7 +7,6 @@ import com.alibaba.ttl.TransmittableThreadLocal;
  * 
  * @author gewx
  **/
-
 public final class ThreadContext {
 	
 	public static final TransmittableThreadLocal<String> TRACEID = new TransmittableThreadLocal<String>();

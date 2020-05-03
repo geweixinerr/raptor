@@ -12,7 +12,9 @@ import raptor.core.client.task.RpcClientMonitor;
 import raptor.core.init.RpcParameter;
 
 /**
- * @author gewx RPC Client 手工配置构建启动类
+ * RPC Client 手工配置构建启动类
+ * 
+ * @author gewx 
  **/
 public final class RpcClientManualBuilder {
 

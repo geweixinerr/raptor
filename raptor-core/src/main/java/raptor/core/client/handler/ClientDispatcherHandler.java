@@ -24,24 +24,27 @@ import raptor.log.ThreadContext;
 import raptor.util.StringUtil;
 
 /**
- * @author gewx 客户端RPC入站请求处理器
+ * 客户端RPC入站请求处理器
+ * 
+ * @author gewx
  **/
-public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResponseBody> implements RpcPushDefine {
+public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<RpcResponseBody>
+		implements RpcPushDefine {
 
 	private static final RaptorLogger LOGGER = new RaptorLogger(ClientDispatcherHandler.class);
 
 	private static final Integer DEFAULT_HEARTBEAT_COUNT = 5;
-	
+
 	private final AtomicInteger heartbeatCount = new AtomicInteger();
-	
+
 	private final ObjectPool<RpcPushDefine> pool;
-	
-	private final String tcpId; 
-	
+
+	private final String tcpId;
+
 	private final String serverNode;
-	
+
 	private ChannelHandlerContext ctx;
-	
+
 	public ClientDispatcherHandler(String tcpId, String serverNode) {
 		this.tcpId = tcpId;
 		this.serverNode = serverNode;
@@ -65,7 +68,6 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		future.addListener(new ChannelFutureListener() {
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
-				//mark:回调此处会发生一次线程上下文切换,需要重置线程号.
 				ThreadContext.TRACEID.set(requestBody.getTraceId());
 				if (future.isSuccess()) {
 					LOGGER.info("RPC客户端数据出站SUCCESS, " + requestBody);
@@ -73,19 +75,22 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 						pool.returnObject(rpc);
 					} catch (Exception e) {
 						String message = StringUtil.getErrorText(e);
-						LOGGER.error("资源释放异常,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);
+						LOGGER.error("资源释放异常,tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: "
+								+ message);
 						pool.invalidateObject(rpc);
 					}
- 				} else {
- 					outboundException(requestBody.getMessageId(), requestBody.getTraceId(), "Rpc出站Fail.", RpcResult.FAIL_NETWORK_TRANSPORT);
-					String message = StringUtil.getErrorText(future.cause()); 
-					LOGGER.warn("RPC客户端数据出站FAIL: " + requestBody + ", tcpId: " + rpc.getTcpId() + ", serverNode: " + serverNode + ", message: " + message);	
- 					pool.invalidateObject(rpc);
+				} else {
+					outboundException(requestBody.getMessageId(), requestBody.getTraceId(), "Rpc出站Fail.",
+							RpcResult.FAIL_NETWORK_TRANSPORT);
+					String message = StringUtil.getErrorText(future.cause());
+					LOGGER.warn("RPC客户端数据出站FAIL: " + requestBody + ", tcpId: " + rpc.getTcpId() + ", serverNode: "
+							+ serverNode + ", message: " + message);
+					pool.invalidateObject(rpc);
 				}
 			}
 		});
 	}
-	
+
 	@Override
 	public void close() {
 		ctx.close();
@@ -96,11 +101,11 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 		Channel channel = ctx.channel();
 		boolean isWritable = channel.isWritable();
 		boolean isActive = channel.isActive();
-		
+
 		if (isWritable && isActive) {
 			return true;
 		} else {
-		    return false;
+			return false;
 		}
 	}
 
@@ -108,53 +113,53 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 	public void returnClean() {
 		heartbeatCount.set(0);
 	}
-	
+
 	@Override
 	public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
 		this.ctx = ctx;
 	}
-	
+
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcResponseBody responseBody) throws Exception {
 		if (HEARTBEAT_METHOD.equals(responseBody.getRpcMethod())) {
 			heartbeatCount.set(0);
 			LOGGER.warn("[重要!!!]tcp 心跳包收到响应,tcpId: " + getTcpId() + ", serverNode: " + serverNode);
 			return;
-		} 
-		
+		}
+
 		ThreadContext.TRACEID.set(responseBody.getTraceId());
-		responseBody.setReturnTime(new DateTime());	
-		RpcClientTaskPool.addTask(responseBody); 
-		
+		responseBody.setReturnTime(new DateTime());
+		RpcClientTaskPool.addTask(responseBody);
+
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		String message = StringUtil.getErrorText(cause);
-		LOGGER.error("RPC IO异常,tcpId: "+ getTcpId() + ", serverNode: " + serverNode + ", message: " + message);
+		LOGGER.error("RPC IO异常,tcpId: " + getTcpId() + ", serverNode: " + serverNode + ", message: " + message);
 		pool.invalidateObject(this);
 	}
 
 	@Override
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
 		heartbeatCount.incrementAndGet();
-		
+
 		Channel channel = ctx.channel();
 		InetSocketAddress local = (InetSocketAddress) channel.localAddress();
 		InetSocketAddress remote = (InetSocketAddress) channel.remoteAddress();
-		
+
 		if (heartbeatCount.intValue() >= DEFAULT_HEARTBEAT_COUNT) {
 			LOGGER.warn("[重要!!!]心跳检测无响应, tcpId: " + getTcpId() + ", 客户端: " + local.getAddress() + ":" + local.getPort()
-			+ ", 服务器: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + serverNode 
-			+ ", active: " + pool.getNumActive() +", Idle: " + pool.getNumIdle());
+					+ ", 服务器: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + serverNode
+					+ ", active: " + pool.getNumActive() + ", Idle: " + pool.getNumIdle());
 			pool.invalidateObject(this);
 			return;
 		}
-		
+
 		RpcRequestBody requestBody = new RpcRequestBody();
 		requestBody.setMessageId(new UUID().toString());
 		requestBody.setRpcMethod(HEARTBEAT_METHOD);
-		requestBody.setBody(new String[] {getTcpId()});
+		requestBody.setBody(new String[] { getTcpId() });
 		ChannelFuture future = ctx.writeAndFlush(requestBody);
 		future.addListener(new ChannelFutureListener() {
 			@Override
@@ -165,22 +170,23 @@ public final class ClientDispatcherHandler extends SimpleChannelInboundHandler<R
 				} else {
 					state.append("FAIL");
 				}
-				
-				LOGGER.warn("[重要!!!]心跳检测,发送" + state.toString() + ", tcpId: " + getTcpId() + ", 客户端: " + local.getAddress() + ":" + local.getPort()
-				+ ", 服务器: " + remote.getAddress() + ":" + remote.getPort() + ", serverNode: " + serverNode 
-				+ ", active: " + pool.getNumActive() +", Idle: " + pool.getNumIdle());
+
+				LOGGER.warn("[重要!!!]心跳检测,发送" + state.toString() + ", tcpId: " + getTcpId() + ", 客户端: "
+						+ local.getAddress() + ":" + local.getPort() + ", 服务器: " + remote.getAddress() + ":"
+						+ remote.getPort() + ", serverNode: " + serverNode + ", active: " + pool.getNumActive()
+						+ ", Idle: " + pool.getNumIdle());
 			}
 		});
-		
+
 	}
-	
+
 	private static void outboundException(String messageId, String traceId, String message, RpcResult rpcCode) {
 		RpcResponseBody responseBody = new RpcResponseBody();
 		responseBody.setRpcCode(rpcCode);
 		responseBody.setMessage(message);
 		responseBody.setMessageId(messageId);
 		responseBody.setTraceId(traceId);
-		RpcClientTaskPool.addTask(responseBody); 
+		RpcClientTaskPool.addTask(responseBody);
 	}
-	
+
 }

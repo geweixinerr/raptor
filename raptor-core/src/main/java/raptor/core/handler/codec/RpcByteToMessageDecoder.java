@@ -9,7 +9,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
 /**
- * @author gewx 入站处理-解码器,解决TCP拆包,粘包,半包读写.
+ * 入站处理-解码器,解决TCP拆包,粘包,半包读写
+ * 
+ * @author gewx 
  * 
  * **/
 public final class RpcByteToMessageDecoder extends ByteToMessageDecoder {

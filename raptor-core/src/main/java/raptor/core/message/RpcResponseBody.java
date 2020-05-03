@@ -7,12 +7,12 @@ import org.joda.time.DateTime;
 import raptor.core.RpcResult;
 
 /**
- * @author gewx RPC消息响应主体
+ * RPC消息响应主体
+ * 
+ * @author gewx 
  * **/
 public final class RpcResponseBody implements RpcMessage {
 
-	/**
-	 */
 	private static final long serialVersionUID = 495386357818590739L;
     
 	/**
@@ -125,11 +125,6 @@ public final class RpcResponseBody implements RpcMessage {
 		builder.append("messageId",messageId);
 		builder.append("message",message);
 		builder.append("rpcCode",rpcCode.getCode());
-		
-		/**
-		 * DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss:SSS");
-		 * builder.append("returnTime",returnTime);
-		 * **/
 		builder.append("rpcTime",rpcTime);
 		builder.append("body",body);
 		return builder.toString();

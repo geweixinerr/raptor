@@ -17,7 +17,9 @@ import raptor.log.RaptorLogger;
 import raptor.util.DateUtils;
 
 /**
- * @author gewx RPC Client端业务线程池
+ * RPC Client端业务线程池
+ * 
+ * @author gewx 
  **/
 
 public final class RpcClientTaskPool {

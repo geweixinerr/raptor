@@ -18,7 +18,9 @@ import raptor.exception.RpcException;
 import raptor.util.StringUtil;
 
 /**
- * @author gewx tcp连接对象池
+ * tcp连接对象池
+ * 
+ * @author gewx
  **/
 public final class TcpPoolFactory extends BasePooledObjectFactory<RpcPushDefine> {
 

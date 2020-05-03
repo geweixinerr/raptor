@@ -1,7 +1,9 @@
 package raptor.core;
 
 /**
- * @author gewx 常量类
+ * 常量类
+ * 
+ * @author gewx 
  * **/
 public final class Constants {
 

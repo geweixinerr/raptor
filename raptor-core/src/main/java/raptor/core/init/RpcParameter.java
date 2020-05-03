@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author gewx RPC参数存储单例类
+ * RPC参数存储单例类
+ * 
+ * @author gewx
  * **/
 public final class RpcParameter {
 

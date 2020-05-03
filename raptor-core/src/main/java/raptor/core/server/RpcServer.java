@@ -29,7 +29,9 @@ import raptor.exception.RpcException;
 import raptor.util.StringUtil;
 
 /**
- * @author gewx RPC Server
+ * RPC Server
+ * 
+ * @author gewx 
  **/
 public final class RpcServer {
 

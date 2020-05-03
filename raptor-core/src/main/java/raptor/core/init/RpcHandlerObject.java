@@ -1,7 +1,9 @@
 package raptor.core.init;
 
 /**
- * @author gewx 映射对象实体
+ * 映射对象实体
+ * 
+ * @author gewx 
  * **/
 public final class RpcHandlerObject {
 
@@ -32,5 +34,4 @@ public final class RpcHandlerObject {
 	public void setObject(Object object) {
 		this.object = object;
 	}
-
 }

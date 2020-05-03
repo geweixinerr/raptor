@@ -10,13 +10,12 @@ import org.joda.time.format.DateTimeFormatter;
 import raptor.core.AbstractCallBack;
 
 /**
- * @author gewx RPC消息发送主体
+ * RPC消息发送主体
+ * 
+ * @author gewx 
  * **/
 public final class RpcRequestBody implements RpcMessage {
 
-	/**
-	 * thread safe 
-	 * **/
 	private transient static final DateTimeFormatter DATE_FORMATE = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss:SSS");
 	
 	private static final long serialVersionUID = 1584389395921234145L;
@@ -37,7 +36,7 @@ public final class RpcRequestBody implements RpcMessage {
 	private Object[] body;
 	
 	/**
-	 * 是否同步[true-同步,false-异步]
+	 * 是否同步 true|同步,false|异步
 	 * **/
 	private boolean isSync;
 	

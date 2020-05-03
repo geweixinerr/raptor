@@ -8,7 +8,9 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import raptor.core.message.RpcMessage;
 
 /**
- * @author gewx 出站处理-编码器
+ * 出站处理-编码器
+ * 
+ * @author gewx 
  * **/
 public final class RpcMessageToByteEncoder extends MessageToByteEncoder<RpcMessage> {
 
