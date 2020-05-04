@@ -7,7 +7,7 @@ https://stackoverflow.com/questions/5731162/xml-schema-or-dtd-for-logback-xml
                xsi:schemaLocation="http://ch.qos.logback/xml/ns/logback 
                https://raw.githubusercontent.com/enricopulatzo/logback-XSD/master/src/main/xsd/logback.xsd">
 	<contextName>${contextName}</contextName>
-	<property name="log_Home" value="/raptor/logs" />
+	<property name="log_Home" value="/tmp/logs/raptor"/>
 
 	<!-- 控制台输出 -->
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
