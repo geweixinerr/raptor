@@ -14,4 +14,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RpcHandler {
 
+	/**
+	 * RPC类名,契约
+	 * **/
+	String value() default "";
 }
