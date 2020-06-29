@@ -36,11 +36,11 @@ public final class RpcMapping {
 					 * JtaMethod annotation = m.getAnnotation(JtaMethod.class); String value =
 					 * annotation.value();
 					 */
-					String jtaMethod = AnnotationUtil.getAnnotationValue(m, RpcMethod.class, "value");
+					String rpcMethod = AnnotationUtil.getAnnotationValue(m, RpcMethod.class, "value");
 
 					RpcHandlerObject handler = new RpcHandlerObject();
 					handler.setObject(rpcObject);
-					handler.setRpcKey(defaultIfBlank(jtaMethod, m.getName()));
+					handler.setRpcKey(defaultIfBlank(rpcMethod, m.getName()));
 					// 便于未来拓展,这里设置为一个POJO映射实体.
 					RPC_MAPPING.put(m.getName(), handler);
 				}
