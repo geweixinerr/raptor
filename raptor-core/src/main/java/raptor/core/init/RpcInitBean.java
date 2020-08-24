@@ -32,6 +32,11 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 	
 	private static final String NETTYPOOL_CONFIG = "NettyPoolConfig";
 	
+	/**
+	 * 销毁对象
+	 **/
+	private RpcServer.Bootstrap bootstrap;
+	
 	private ApplicationContext context;
 	
 	@Override
@@ -48,7 +53,7 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 			Map<String,String> serverConfig = (Map<String,String>) context.getBean(RPCSERVER_CONFIG);
 			RpcParameter.INSTANCE.initRpcParameter(serverConfig);
 			RpcServerTaskPool.initPool();
-			RpcServer.start();	
+			bootstrap = RpcServer.start();	
 			RpcServerMonitor.scan();
 		}
 		
@@ -59,7 +64,7 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 			RpcParameter.INSTANCE.initRpcParameter(clientConfig);		
 			RpcClientTaskPool.initPool();	
 			RpcClient.connection();
-			RpcClientMonitor.scan(); //启动客户端超时请求清理器
+			RpcClientMonitor.scan(); 
 		}
 	
 		//初始化建立服务端RPC映射关系
@@ -70,7 +75,6 @@ public final class RpcInitBean implements ApplicationContextAware , Initializing
 	@Override
 	public void destroy() throws Exception {
 		LOGGER.info("应用服务器关闭,释放RPC资源");
-		RpcServer.stop();
+		bootstrap.shutdownGracefully();
 	}
-	
 }
