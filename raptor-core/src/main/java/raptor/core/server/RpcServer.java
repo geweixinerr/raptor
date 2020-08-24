@@ -31,18 +31,16 @@ import raptor.util.StringUtil;
 /**
  * RPC Server
  * 
- * @author gewx 
+ * @author gewx
  **/
 public final class RpcServer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RpcServer.class);
 
-	private static final ServerBootstrap SERVER = new ServerBootstrap();
-
 	private static final String ADDRESS_KEY = "localAddress";
 
 	private static final String PORT = "port";
-	
+
 	private RpcServer() {
 	}
 
@@ -50,38 +48,32 @@ public final class RpcServer {
 	 * @author gewx 启动RPC服务
 	 * @throws InterruptedException
 	 **/
-	public static void start() throws InterruptedException {
+	public static Bootstrap start() throws InterruptedException {
 		/**
 		 * Reactor主从多线程模型 接受客户端请求的线程池,无需太多,默认设置为物理机核心CPU数. IO处理线程池,默认为物理机核心CPU数 * 2.
 		 **/
 		Map<String, String> serverConfig = RpcParameter.INSTANCE.getServerConfig();
-		if (SystemUtils.IS_OS_LINUX) {
-			LOGGER.info("Linux系统下,RPC Server启动...");
-			// Linux Epoll
-			EventLoopGroup acceptGroup = new EpollEventLoopGroup(1); 
-			EventLoopGroup ioGroup = new EpollEventLoopGroup(Constants.CPU_CORE * 2); 
-			SERVER.group(acceptGroup, ioGroup).channel(EpollServerSocketChannel.class);
-		} else {
-			LOGGER.info("非Linux系统下,RPC Server启动...");
-			EventLoopGroup acceptGroup = new NioEventLoopGroup(1); 
-			EventLoopGroup ioGroup = new NioEventLoopGroup(Constants.CPU_CORE * 2); 
-			SERVER.group(acceptGroup, ioGroup).channel(NioServerSocketChannel.class);
-		}
-		
+
+		ServerBootstrap server = new ServerBootstrap();
+		EventLoopGroup acceptGroup = SystemUtils.IS_OS_LINUX ? new EpollEventLoopGroup(1) : new NioEventLoopGroup(1);
+		EventLoopGroup ioGroup = SystemUtils.IS_OS_LINUX ? new EpollEventLoopGroup(Constants.CPU_CORE * 2)
+				: new NioEventLoopGroup(Constants.CPU_CORE * 2);
+		server.group(acceptGroup, ioGroup)
+				.channel(SystemUtils.IS_OS_LINUX ? EpollServerSocketChannel.class : NioServerSocketChannel.class);
+
 		InetSocketAddress localAddress = null;
 		if (StringUtils.isNotBlank(serverConfig.get(ADDRESS_KEY))) {
-			localAddress = new InetSocketAddress(serverConfig.get(ADDRESS_KEY),Integer.parseInt(serverConfig.get(PORT)));
+			localAddress = new InetSocketAddress(serverConfig.get(ADDRESS_KEY),
+					Integer.parseInt(serverConfig.get(PORT)));
 		} else {
 			localAddress = new InetSocketAddress(Integer.parseInt(serverConfig.get(PORT)));
 		}
-		
+
 		/**
-		 *  服务端接受连接的队列长度，如果队列已满，客户端连接将被拒绝。默认值，Windows为200，其他为128。
-		 * **/
-		SERVER.option(ChannelOption.SO_BACKLOG, 8192) 
-				.childOption(ChannelOption.SO_RCVBUF, 256 * Constants.ONE_KB)
-				.childOption(ChannelOption.SO_SNDBUF, 256 * Constants.ONE_KB)
-				.localAddress(localAddress)
+		 * 服务端接受连接的队列长度，如果队列已满，客户端连接将被拒绝。默认值，Windows为200，其他为128。
+		 **/
+		server.option(ChannelOption.SO_BACKLOG, 8192).childOption(ChannelOption.SO_RCVBUF, 256 * Constants.ONE_KB)
+				.childOption(ChannelOption.SO_SNDBUF, 256 * Constants.ONE_KB).localAddress(localAddress)
 				.childHandler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
@@ -92,10 +84,10 @@ public final class RpcServer {
 					}
 				});
 
-		SERVER.bind().sync().addListener(new ChannelFutureListener() {
+		server.bind().sync().addListener(new ChannelFutureListener() {
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
-				if (future.isSuccess()) {					
+				if (future.isSuccess()) {
 					LOGGER.info("RPC 服务启动成功!");
 				} else {
 					String message = StringUtil.getErrorText(future.cause());
@@ -104,14 +96,21 @@ public final class RpcServer {
 				}
 			}
 		});
+
+		return () -> {
+			LOGGER.info("消息组件优雅关机,释放资源...");
+			acceptGroup.shutdownGracefully();
+			ioGroup.shutdownGracefully();
+		};
 	}
 
 	/**
-	 * @author gewx 释放资源
+	 * 函数式服务,优雅关机
+	 * 
+	 * @author gewx
 	 **/
-	public static void stop() {
-		SERVER.config().group().shutdownGracefully();
-		SERVER.config().childGroup().shutdownGracefully();
+	@FunctionalInterface
+	public interface Bootstrap {
+		void shutdownGracefully();
 	}
-
 }
